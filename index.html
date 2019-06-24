@@ -1,0 +1,1005 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Semantic Workshop</title>
+    <link rel="stylesheet" type="text/css" href="bmlt_semantic.css">
+    <script type="text/javascript" src="bmlt_semantic.js"></script>
+</head>
+<body>
+    <div id="bmlt_semantic" class="bmlt_semantic">
+        <h1 id="bmlt_semantic_badserver_h1" style="display:none">You must provide a valid Root Server URL in order for this to work.</h1>
+        <h1 id="bmlt_semantic_header_h1" class="bmlt_semantic_header_h1">Semantic Workshop</h1>
+        <div id="bmlt_main_blurb" class="bmlt_workshop_blurb_note_div bmlt_main_blurb">
+            <p>This workshop will help you to build a semantic URL or [[BMLT_SIMPLE(XXX)]] shortcode by interactively guiding you through the process of specifying the various options.</p>
+            <p>You start by selecting the main result (a shortcode or direct response URL), then select what type of data you want the server to return.</p>
+            <p>Depending on the choices made above, you will have a range of options available to you in generating the URL or shortcode.</p>
+            <p>The section just below this will have the URL or shortcode available, and will be updated "live," as you make your choices.</p>
+        </div>
+        <div id="bmlt_semantic_header" class="bmlt_semantic_header">
+            <div id="bmlt_semantic_info_div_download_line" class="bmlt_semantic_info_line bmlt_semantic_info_div_download_line">
+                <div id="bmlt_semantic_info_div_result_url_wrapper" class="bmlt_semantic_info_div_result_url_wrapper"><span class="info_label">The Response URL Is:</span><span class="info_value"><span id="bmlt_semantic_info_div_url_active_span"><a target="_blank" href="https://bmlt.sezf.org/main_server/client_interface/csv/?switcher=GetSearchResults">https://bmlt.sezf.org/main_server/client_interface/csv/?switcher=GetSearchResults</a></span><span id="bmlt_semantic_info_div_url_Invalid_span" style="display: none;">&lt;INVALID VALUE&gt;</span></span></div>
+            </div>
+            <div id="bmlt_semantic_info_div_shortcode_line class="bmlt_semantic_info_line bmlt_semantic_info_div_shortcode_line" style="display:none"><div id="bmlt_semantic_info_div_shortcode_wrapper" class="bmlt_semantic_info_div_shortcode_wrapper"><span class="info_label">The Shortcode Is:</span><span class="info_value"><span id="bmlt_semantic_info_div_shortcode_active_span"></span><span id="bmlt_semantic_info_div_shortcode_Invalid_span">&lt;INVALID VALUE&gt;</span></span></div>
+            </div>
+            <div class="clear_both"></div>
+        </div>
+        <form id="enter_server_url_form" class="enter_server_url_form" onclick="load();">
+            <div id="enter_server_url_form_div" class="enter_server_url_form_div">
+                <label id="enter_server_url_form_div_label" class="enter_server_url_form_div_label" for="enter_server_url_form_div_url_input">Enter A Valid BMLT Root Server URL:</label>
+                <input type="text" size="40" id="enter_server_url_form_div_url_input" class="enter_server_url_form_div_url_input" value="https://bmlt.sezf.org/main_server" />
+                <input type="submit" class="formEntrySubmit" value="Load" />
+            </div>
+        </form>
+        <form id="bmlt_semantic_form" class="bmlt_semantic_form">
+            <div id="bmlt_semantic_form_div" class="bmlt_semantic_form_div">
+                    <fieldset id="bmlt_semantic_form_main_fieldset" class="bmlt_semantic_form_main_fieldset"><legend id="bmlt_semantic_form_main_fieldset_legend" class="bmlt_semantic_form_main_fieldset_legend">
+                        <label id="bmlt_semantic_form_main_mode_select_label" for="bmlt_semantic_form_main_mode_select" class="bmlt_semantic_form_main_mode_select_label">This Will Be A</label><select id="bmlt_semantic_form_main_mode_select" class="bmlt_semantic_form_main_mode_select">
+                        <option value="DOWNLOAD" selected="selected">Direct Response URL</option><option value="SHORTCODE_SIMPLE">[[BMLT_SIMPLE]] Shortcode</option><option value="SHORTCODE_TABLE">[[BMLT_TABLE]] Shortcode</option>
+                    </select>
+                    </legend>
+                        <div class="block_mode_checkbox_div" id="block_mode_checkbox_div" style="display:none">
+                            <input type="checkbox" id="block_mode_checkbox" class="block_mode_checkbox" onchange="bmlt_semantic_js_object.handleBlockCheckboxChange(this)" value="on">
+                            <label for="block_mode_checkbox">Return results as block-mode HTML elements</label>
+                        </div>
+                        <div id="bmlt_semantic_form_direct_url_div" class="bmlt_semantic_form_direct_url_div">
+                            <label id="bmlt_semantic_form_response_type_select_label" for="bmlt_semantic_form_response_type_select" class="bmlt_semantic_form_response_type_select_label">The Returned Data Will be</label><select id="bmlt_semantic_form_response_type_select" class="bmlt_semantic_form_response_type_select">
+                            <option value="csv" selected="selected">CSV</option><option value="xml">XML</option><option value="json">JSON</option><option id="bmlt_semantic_form_response_type_select_kml_option" value="kml">KML</option><option id="bmlt_semantic_form_response_type_select_gpx_option" value="gpx">GPX</option><option id="bmlt_semantic_form_response_type_select_poi_option" value="poi">POI CSV</option><option value="simple-block">Simple HTML (Block Elements)</option><option value="simple">Simple HTML (Table)</option>
+                        </select>
+                        </div>
+                        <fieldset id="bmlt_semantic_form_switcher_fieldset" class="bmlt_semantic_form_switcher_fieldset"><legend id="bmlt_semantic_form_switcher_fieldset_legend" class="bmlt_semantic_form_switcher_fieldset_legend"><label id="bmlt_semantic_form_switcher_type_select_label" for="bmlt_semantic_form_switcher_type_select" class="bmlt_semantic_form_switcher_type_select_label">We Want to</label>
+                            <select id="bmlt_semantic_form_switcher_type_select" class="bmlt_semantic_form_switcher_type_select">
+                                <option value="GetSearchResults" selected="selected">Get Meeting Search Results</option><option id="bmlt_semantic_form_switcher_type_select_formats_option" value="GetFormats">Get Formats</option><option id="bmlt_semantic_form_switcher_type_select_sb_option" value="GetServiceBodies">Get Service Bodies</option><option id="bmlt_semantic_form_switcher_type_select_changes_option" value="GetChanges">Get Changes</option><option id="bmlt_semantic_form_switcher_type_select_fieldkey_option" value="GetFieldKeys">Get A List of Available Field Keys</option><option id="bmlt_semantic_form_switcher_type_select_fieldval_option" value="GetFieldValues">Get A List of Specific Field Values</option><option id="bmlt_semantic_form_switcher_type_select_naws_option" value="GetNAWSDump">Get A NAWS Format Dump</option><option id="bmlt_semantic_form_switcher_type_select_schema_option" disabled="disabled" value="XMLSchema">Get XML Schema</option><option id="bmlt_semantic_form_switcher_type_select_server_langs_option" disabled="disabled" value="GetLangs">Get Server Languages</option><option id="bmlt_semantic_form_switcher_type_select_server_info_option" value="GetServerInfo">Get Server Information</option><option id="bmlt_semantic_form_switcher_type_select_coverage_area_option" value="GetCoverageArea">Get Geographic Coverage Area</option>
+                            </select>
+                        </legend>
+                            <div id="bmlt_switcher_div_no_options_blurb" class="bmlt_workshop_blurb_note_div" style="display:none">There are no additional options for this operation.</div>
+                            <div id="bmlt_switcher_naws_dump_div" class="bmlt_switcher_naws_dump_div" style="display:none">
+                                <select id="bmlt_switcher_naws_dump_sb_select" class="bmlt_switcher_naws_dump_sb_select" onchange="bmlt_semantic_js_object.handleNAWSDumpSelectChange(this)"><option value="" disabled="disabled" selected="selected">Select A Service Body</option>
+                                </select>
+                            </div>
+                            <div id="bmlt_semantic_form_meeting_search_div" class="bmlt_semantic_form_meeting_search_div">
+                                <div id="bmlt_semantic_form_weekday_header_checkbox_div" class="bmlt_semantic_form_weekday_header_checkbox_div" style="display:none"><input type="checkbox" id="bmlt_semantic_form_weekday_header_checkbox" class="bmlt_semantic_form_weekday_header_checkbox" onchange="bmlt_semantic_js_object.handleWeekdayHeaderChange(this)">
+                                    <label id="bmlt_semantic_form_weekday_header_checkbox_label" for="bmlt_semantic_form_weekday_header_checkbox" class="bmlt_semantic_form_weekday_header_checkbox_label">Separate the Results by Weekday</label>
+                                </div>
+                                <div id="bmlt_semantic_form_used_formats_div" class="bmlt_semantic_form_used_formats_div" style="display:none"><div id="bmlt_semantic_form_used_formats_checkbox_div" class="bmlt_semantic_form_used_formats_checkbox_div"><input type="checkbox" id="bmlt_semantic_form_used_formats_checkbox" class="bmlt_semantic_form_used_formats_checkbox" onchange="bmlt_semantic_js_object.handleUsedFormatsChange(this)" value="on">
+                                    <label id="bmlt_semantic_form_used_formats_checkbox_label" for="bmlt_semantic_form_used_formats_checkbox" class="bmlt_semantic_form_used_formats_checkbox_label">Get the Formats Used In the Results of this search</label>
+                                </div>
+                                    <div id="bmlt_semantic_form_just_used_formats_checkbox_div" class="bmlt_semantic_form_just_used_formats_checkbox_div"><input type="checkbox" id="bmlt_semantic_form_just_used_formats_checkbox" class="bmlt_semantic_form_just_used_formats_checkbox" disabled="disabled" onchange="bmlt_semantic_js_object.handleUsedFormatsChange(this)" value="on">
+                                        <label id="bmlt_semantic_form_just_used_formats_checkbox_label" for="bmlt_semantic_form_just_used_formats_checkbox" class="bmlt_semantic_form_used_formats_checkbox_label">Get just the formats (not the search results)</label>
+                                    </div>
+                                </div>
+                                <fieldset id="bmlt_semantic_form_weekday_fieldset" class="bmlt_semantic_form_weekday_fieldset"><legend id="bmlt_semantic_form_weekday_fieldset_legend" class="bmlt_semantic_form_weekday_fieldset_legend">Search for Meetings that Gather on Specific Weekdays</legend>
+                                    <div id="bmlt_semantic_form_weekday_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.</p></div><div id="bmlt_semantic_form_weekday_checkbox_1_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_1" class="bmlt_checkbox_input" value="1" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_1" id="bmlt_semantic_form_weekday_checkbox_1_label" class="bmlt_checkbox_label">Sunday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_2_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_2" class="bmlt_checkbox_input" value="2" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_2" id="bmlt_semantic_form_weekday_checkbox_2_label" class="bmlt_checkbox_label">Monday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_3_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_3" class="bmlt_checkbox_input" value="3" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_3" id="bmlt_semantic_form_weekday_checkbox_3_label" class="bmlt_checkbox_label">Tuesday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_4_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_4" class="bmlt_checkbox_input" value="4" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_4" id="bmlt_semantic_form_weekday_checkbox_4_label" class="bmlt_checkbox_label">Wednesday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_5_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_5" class="bmlt_checkbox_input" value="5" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_5" id="bmlt_semantic_form_weekday_checkbox_5_label" class="bmlt_checkbox_label">Thursday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_6_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_6" class="bmlt_checkbox_input" value="6" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_6" id="bmlt_semantic_form_weekday_checkbox_6_label" class="bmlt_checkbox_label">Friday</label></div>
+                                    <div id="bmlt_semantic_form_weekday_checkbox_7_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_weekday_checkbox_7" class="bmlt_checkbox_input" value="7" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_weekday_checkbox_7" id="bmlt_semantic_form_weekday_checkbox_7_label" class="bmlt_checkbox_label">Saturday</label></div>
+                                    <div class="clear_both"></div></fieldset>
+                                <fieldset id="bmlt_semantic_form_not_weekday_fieldset" class="bmlt_semantic_form_weekday_fieldset"><legend id="bmlt_semantic_form_not_weekday_fieldset_legend" class="bmlt_semantic_form_weekday_fieldset_legend">Search for Meetings that DO NOT Gather on Specific Weekdays</legend>
+                                    <div id="bmlt_semantic_form_not_weekday_blurb_div" class="bmlt_workshop_blurb_note_div"><p>Any of these that are selected will prevent meetings that gather on the given weekday from being included in the search.</p></div><div id="bmlt_semantic_form_not_weekday_checkbox_1_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_1" class="bmlt_checkbox_input" value="-1" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_1" id="bmlt_semantic_form_not_weekday_checkbox_1_label" class="bmlt_checkbox_label">Sunday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_2_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_2" class="bmlt_checkbox_input" value="-2" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_2" id="bmlt_semantic_form_not_weekday_checkbox_2_label" class="bmlt_checkbox_label">Monday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_3_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_3" class="bmlt_checkbox_input" value="-3" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_3" id="bmlt_semantic_form_not_weekday_checkbox_3_label" class="bmlt_checkbox_label">Tuesday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_4_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_4" class="bmlt_checkbox_input" value="-4" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_4" id="bmlt_semantic_form_not_weekday_checkbox_4_label" class="bmlt_checkbox_label">Wednesday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_5_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_5" class="bmlt_checkbox_input" value="-5" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_5" id="bmlt_semantic_form_not_weekday_checkbox_5_label" class="bmlt_checkbox_label">Thursday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_6_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_6" class="bmlt_checkbox_input" value="-6" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_6" id="bmlt_semantic_form_not_weekday_checkbox_6_label" class="bmlt_checkbox_label">Friday</label></div>
+                                    <div id="bmlt_semantic_form_not_weekday_checkbox_7_container_div" class="bmlt_weekday_checkbox_container"><input type="checkbox" id="bmlt_semantic_form_not_weekday_checkbox_7" class="bmlt_checkbox_input" value="-7" onchange="bmlt_semantic_js_object.handleWeekdayCheckbox(this)"><label for="bmlt_semantic_form_not_weekday_checkbox_7" id="bmlt_semantic_form_not_weekday_checkbox_7_label" class="bmlt_checkbox_label">Saturday</label></div>
+                                    <div class="clear_both"></div></fieldset>
+                                <fieldset id="bmlt_semantic_form_formats_fieldset" class="bmlt_semantic_form_formats_fieldset"><legend id="bmlt_semantic_form_formats_fieldset_legend" class="bmlt_semantic_form_formats_fieldset_legend">Search for Meetings that have Specific Formats</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "AND" search. Every one of these have to match in order to count.</p></div><div id="bmlt_semantic_form_formats_fieldset_div" class="bmlt_semantic_form_formats_fieldset_div"></div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_un_formats_fieldset" class="bmlt_semantic_form_formats_fieldset"><legend id="bmlt_semantic_form_un_formats_fieldset_legend" class="bmlt_semantic_form_formats_fieldset_legend">Search for Meetings that DO NOT Have Specific Formats</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "AND" search. Every one of these have to match in order to count.</p></div><div id="bmlt_semantic_form_not_formats_fieldset_div" class="bmlt_semantic_form_formats_fieldset_div"></div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_keys_fieldset" class="bmlt_semantic_form_keys_fieldset"><legend id="bmlt_semantic_form_keys_fieldset_legend" class="bmlt_semantic_form_keys_fieldset_legend"><label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_select" class="bmlt_semantic_form_field_select_label">Search for a Specific Value of</label>
+                                    <select id="bmlt_semantic_form_field_select" class="bmlt_semantic_form_field_select" onchange="bmlt_semantic_js_object.handleFieldKeySelectChange(this)">
+                                        <option value="" selected="selected">No Field Selected</option>
+                                    </select>
+                                </legend>
+                                    <div id="bmlt_semantic_form_fields_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p></div><div id="bmlt_semantic_form_meeting_fields_fieldset_contents_div" class="bmlt_semantic_form_meeting_fields_fieldset_contents_div" style="display:none"><label id="bmlt_semantic_form_value_select_label" for="bmlt_semantic_form_value_select" class="bmlt_semantic_form_value_select_label">The Value Will Be:</label>
+                                        <select id="bmlt_semantic_form_value_select" class="bmlt_semantic_form_value_select" onchange="bmlt_semantic_js_object.fieldValueChosen(this)">
+                                            <option value="" selected="selected" disabled="disabled">Existing Values</option>
+                                        </select>
+                                        <input type="text" id="bmlt_semantic_form_value_text" class="bmlt_semantic_form_value_text bmlt_semantic_form_disabled_text" value="Enter A Text String">
+                                    </div></fieldset>
+                                <fieldset id="bmlt_semantic_form_sb_fieldset" class="bmlt_semantic_form_sb_fieldset"><legend id="bmlt_semantic_form_sb_fieldset_legend" class="bmlt_semantic_form_sb_fieldset_legend">Search for Meetings that Belong to Certain Service Bodies</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.</p></div><div id="bmlt_semantic_form_sb_fieldset_div"></div></fieldset>
+                                <fieldset id="bmlt_semantic_form_sb_not_fieldset" class="bmlt_semantic_form_sb_fieldset"><legend id="bmlt_semantic_form_sb_not_fieldset_legend" class="bmlt_semantic_form_sb_fieldset_legend">Search for Meetings that DO NOT Belong to Certain Service Bodies</legend>
+                                    <div id="bmlt_semantic_form_sb_not_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.</p></div><div id="bmlt_semantic_form_sb_not_fieldset_div"></div></fieldset>
+                                <fieldset id="bmlt_semantic_form_text_search_fieldset" class="bmlt_semantic_form_text_search_fieldset"><legend id="bmlt_semantic_form_text_search_fieldset_legend" class="bmlt_semantic_form_text_search_fieldset_legend">Search for Specific Text</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If you do not enter any text, it will have no effect on the search.</p></div><div id="bmlt_semantic_form_text_search_div"><label for="bmlt_semantic_form_text_search_text" id="bmlt_semantic_form_text_search_text_label">Search for This Text:</label><input type="text" id="bmlt_semantic_form_text_search_text" class="bmlt_semantic_form_text_search_text bmlt_semantic_form_disabled_text" value="Enter A Text String"><select id="bmlt_semantic_form_text_search_select" class="bmlt_semantic_form_text_search_select" onchange="bmlt_semantic_js_object.handleTextSearchText(this)" disabled=""><option value="" selected="selected">Do a General "Casual" Text Search</option><option value="SearchStringAll=1">Search for all the words</option><option value="SearchStringExact=1">Search for the Exact Text</option><option value="StringSearchIsAnAddress=1">This is a Location</option></select><div id="text_search_radius_input_div" class="text_search_radius_input_div" style="display:none"><label for="bmlt_semantic_form_text_search_text_radius" id="bmlt_semantic_form_text_search_text_radius_label">Search Within a Radius of</label><input type="text" id="bmlt_semantic_form_text_search_text_radius" class="bmlt_semantic_form_text_search_radius_text bmlt_semantic_form_disabled_text" value=""><label for="bmlt_semantic_form_text_search_text_radius" id="bmlt_semantic_form_text_search_text_radius_units_label">Miles (or Km, Depending on the Root Server) -Negative Value Must be Integer, and is for Auto-Radius</label></div>
+                                    </div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_start_time_fieldset" class="bmlt_semantic_form_start_time_fieldset"><legend id="bmlt_semantic_form_start_time_fieldset_legend" class="bmlt_semantic_form_start_time_fieldset_legend">Meeting Start or End Time</legend>
+                                    <div id="bmlt_semantic_form_start_time_blurb_div" class="bmlt_workshop_blurb_note_div"><p>Format: HH:MM (Military time). 12:00 is Noon, 23:59 is Midnight. Leave blank to ignore.</p></div><div id="bmlt_semantic_form_start_time_fieldset_min_div" class="bmlt_semantic_form_start_time_fieldset_div"><label for="bmlt_semantic_form_start_time_min_text" id="bmlt_semantic_form_start_time_min_text_label">Meetings start after:</label><input pattern="^[0-9\:]{0,5}$" type="text" id="bmlt_semantic_form_start_time_min_text" class="bmlt_semantic_form_time_text bmlt_semantic_form_disabled_text" value=""></div>
+                                    <div id="bmlt_semantic_form_start_time_fieldset_max_div" class="bmlt_semantic_form_start_time_fieldset_div"><label for="bmlt_semantic_form_start_time_max_text" id="bmlt_semantic_form_start_time_max_text_label">Meetings start before:</label><input pattern="^[0-9\:]{0,5}$" type="text" id="bmlt_semantic_form_start_time_max_text" class="bmlt_semantic_form_time_text bmlt_semantic_form_disabled_text" value=""></div>
+                                    <div id="bmlt_semantic_form_end_time_fieldset_max_div" class="bmlt_semantic_form_end_time_fieldset_div"><label for="bmlt_semantic_form_end_time_max_text" id="bmlt_semantic_form_end_time_max_text_label">Meetings end before:</label><input pattern="^[0-9\:]{0,5}$" type="text" id="bmlt_semantic_form_end_time_max_text" class="bmlt_semantic_form_time_text bmlt_semantic_form_disabled_text" value=""></div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_duration_fieldset" class="bmlt_semantic_form_duration_fieldset"><legend id="bmlt_semantic_form_duration_fieldset_legend" class="bmlt_semantic_form_duration_fieldset_legend">Meeting Duration</legend>
+                                    <div id="bmlt_semantic_form_duration_blurb_div" class="bmlt_workshop_blurb_note_div"><p>Format: HH:MM. Leave blank to ignore.</p></div><div id="bmlt_semantic_form_duration_fieldset_div" class="bmlt_semantic_form_duration_fieldset_div"><div id="bmlt_semantic_form_duration_fieldset_min_div" class="bmlt_semantic_form_duration_fieldset_div"><label for="bmlt_semantic_form_duration_min_text" id="bmlt_semantic_form_duration_min_text_label">Meetings last at least:</label><input pattern="^[0-9\:]{0,5}$" type="text" id="bmlt_semantic_form_duration_min_text" class="bmlt_semantic_form_time_text bmlt_semantic_form_disabled_text" value=""></div>
+                                        <div id="bmlt_semantic_form_duration_fieldset_max_div" class="bmlt_semantic_form_duration_fieldset_div"><label for="bmlt_semantic_form_duration_max_text" id="bmlt_semantic_form_duration_max_text_label">Meetings last less than or equal to:</label><input pattern="^[0-9\:]{0,5}$" type="text" id="bmlt_semantic_form_duration_max_text" class="bmlt_semantic_form_time_text bmlt_semantic_form_disabled_text" value=""></div>
+                                    </div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_map_fieldset" class="bmlt_semantic_form_map_fieldset"><legend id="bmlt_semantic_form_map_fieldset_legend" class="bmlt_semantic_form_map_fieldset_legend">Search Using Longitude, Latitude and a Search Radius</legend>
+                                    <div id="bmlt_semantic_form_map_checkbox_div" class="bmlt_semantic_form_map_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_map_checkbox" class="bmlt_semantic_form_map_checkbox" onchange="bmlt_semantic_js_object.handleMapCheckboxChange(this)">
+                                        <label id="bmlt_semantic_form_map_checkbox_label" for="bmlt_semantic_form_map_checkbox" class="bmlt_semantic_form_map_checkbox_label">Use Geographic Coordinates</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_map_wrapper_div" class="bmlt_semantic_form_map_wrapper_div" style="display:none">
+                                        <script type="text/javascript" src="https://maps.google.com/maps/api/js?key="></script>
+                                        <div id="bmlt_semantic_form_map_div" class="bmlt_semantic_form_map_div"></div>
+                                        <div id="map_search_longlat_input_div" class="map_search_longlat_input_div">
+                                            <label for="bmlt_semantic_form_map_search_longitude_text" id="bmlt_semantic_form_map_search_text_longitude_label">Longitude:</label><input value="" type="text" pattern="^[0-9\.\-]+$" id="bmlt_semantic_form_map_search_longitude_text" class="bmlt_semantic_form_map_search_longitude_text bmlt_semantic_form_disabled_text"><label for="bmlt_semantic_form_map_search_latitude_text" id="bmlt_semantic_form_map_search_text_latitude_label">Latitude:</label><input value="" type="text" pattern="^[0-9\.\-]+$" id="bmlt_semantic_form_map_search_latitude_text" class="bmlt_semantic_form_map_search_latitude_text bmlt_semantic_form_disabled_text"></div>
+                                        <div id="map_search_radius_input_div" class="map_search_radius_input_div">
+                                            <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If you do not specify a radius, the location search will not work.</p><p>If you specify a negative radius, then it needs to be an integer, and will specify how many meetings to (roughly) find in an auto-radius search.</p><p>If you specify a negative value, the units won't really matter.</p></div>
+                                            <label for="bmlt_semantic_form_map_search_text_radius" id="bmlt_semantic_form_map_search_text_radius_label">Search Within a Radius of</label><input type="text" id="bmlt_semantic_form_map_search_text_radius" class="bmlt_semantic_form_map_search_radius_text bmlt_semantic_form_disabled_text" value=""><select id="bmlt_semantic_form_map_search_text_radius_units" class="bmlt_semantic_form_map_search_text_radius_units" onchange="bmlt_semantic_js_object.handleMapRadiusUnitsChange(this)"><option value="geo_width" selected="selected">Miles</option><option value="geo_width_km">Kilometers</option></select></div>
+                                    </div></fieldset>
+                                <fieldset id="bmlt_semantic_form_specific_fields_fieldset" class="bmlt_semantic_form_specific_fields_fieldset"><legend id="bmlt_semantic_form_specific_fields_fieldset_legend" class="bmlt_semantic_form_specific_fields_fieldset_legend">
+                                    Return Only Specific Fields</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>The order of the response will be determined by the server.</p></div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_id_bigint_" class="bmlt_semantic_form_field_key_checkbox" value="id_bigint" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_id_bigint_" for="bmlt_semantic_form_field_key_checkbox_id_bigint_" class="bmlt_semantic_form_field_key_checkbox_label">ID</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_worldid_mixed_" class="bmlt_semantic_form_field_key_checkbox" value="worldid_mixed" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_worldid_mixed_" for="bmlt_semantic_form_field_key_checkbox_worldid_mixed_" class="bmlt_semantic_form_field_key_checkbox_label">World ID</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_service_body_bigint_" class="bmlt_semantic_form_field_key_checkbox" value="service_body_bigint" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_service_body_bigint_" for="bmlt_semantic_form_field_key_checkbox_service_body_bigint_" class="bmlt_semantic_form_field_key_checkbox_label">Service Body ID</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_weekday_tinyint_" class="bmlt_semantic_form_field_key_checkbox" value="weekday_tinyint" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_weekday_tinyint_" for="bmlt_semantic_form_field_key_checkbox_weekday_tinyint_" class="bmlt_semantic_form_field_key_checkbox_label">Weekday</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_start_time_" class="bmlt_semantic_form_field_key_checkbox" value="start_time" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_start_time_" for="bmlt_semantic_form_field_key_checkbox_start_time_" class="bmlt_semantic_form_field_key_checkbox_label">Start Time</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_duration_time_" class="bmlt_semantic_form_field_key_checkbox" value="duration_time" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_duration_time_" for="bmlt_semantic_form_field_key_checkbox_duration_time_" class="bmlt_semantic_form_field_key_checkbox_label">Duration</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_formats_" class="bmlt_semantic_form_field_key_checkbox" value="formats" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_formats_" for="bmlt_semantic_form_field_key_checkbox_formats_" class="bmlt_semantic_form_field_key_checkbox_label">Formats</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_lang_enum_" class="bmlt_semantic_form_field_key_checkbox" value="lang_enum" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_lang_enum_" for="bmlt_semantic_form_field_key_checkbox_lang_enum_" class="bmlt_semantic_form_field_key_checkbox_label">Language</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_longitude_" class="bmlt_semantic_form_field_key_checkbox" value="longitude" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_longitude_" for="bmlt_semantic_form_field_key_checkbox_longitude_" class="bmlt_semantic_form_field_key_checkbox_label">Longitude</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_latitude_" class="bmlt_semantic_form_field_key_checkbox" value="latitude" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_latitude_" for="bmlt_semantic_form_field_key_checkbox_latitude_" class="bmlt_semantic_form_field_key_checkbox_label">Latitude</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_comments_" class="bmlt_semantic_form_field_key_checkbox" value="comments" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_comments_" for="bmlt_semantic_form_field_key_checkbox_comments_" class="bmlt_semantic_form_field_key_checkbox_label">Comments</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_city_subsection_" class="bmlt_semantic_form_field_key_checkbox" value="location_city_subsection" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_city_subsection_" for="bmlt_semantic_form_field_key_checkbox_location_city_subsection_" class="bmlt_semantic_form_field_key_checkbox_label">Borough</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_nation_" class="bmlt_semantic_form_field_key_checkbox" value="location_nation" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_nation_" for="bmlt_semantic_form_field_key_checkbox_location_nation_" class="bmlt_semantic_form_field_key_checkbox_label">Nation</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_postal_code_1_" class="bmlt_semantic_form_field_key_checkbox" value="location_postal_code_1" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_postal_code_1_" for="bmlt_semantic_form_field_key_checkbox_location_postal_code_1_" class="bmlt_semantic_form_field_key_checkbox_label">Zip Code</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_province_" class="bmlt_semantic_form_field_key_checkbox" value="location_province" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_province_" for="bmlt_semantic_form_field_key_checkbox_location_province_" class="bmlt_semantic_form_field_key_checkbox_label">State</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_sub_province_" class="bmlt_semantic_form_field_key_checkbox" value="location_sub_province" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_sub_province_" for="bmlt_semantic_form_field_key_checkbox_location_sub_province_" class="bmlt_semantic_form_field_key_checkbox_label">County</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_municipality_" class="bmlt_semantic_form_field_key_checkbox" value="location_municipality" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_municipality_" for="bmlt_semantic_form_field_key_checkbox_location_municipality_" class="bmlt_semantic_form_field_key_checkbox_label">City</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_neighborhood_" class="bmlt_semantic_form_field_key_checkbox" value="location_neighborhood" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_neighborhood_" for="bmlt_semantic_form_field_key_checkbox_location_neighborhood_" class="bmlt_semantic_form_field_key_checkbox_label">Neighborhood</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_street_" class="bmlt_semantic_form_field_key_checkbox" value="location_street" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_street_" for="bmlt_semantic_form_field_key_checkbox_location_street_" class="bmlt_semantic_form_field_key_checkbox_label">Street Address</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_info_" class="bmlt_semantic_form_field_key_checkbox" value="location_info" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_info_" for="bmlt_semantic_form_field_key_checkbox_location_info_" class="bmlt_semantic_form_field_key_checkbox_label">Additional Location Information</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_location_text_" class="bmlt_semantic_form_field_key_checkbox" value="location_text" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_location_text_" for="bmlt_semantic_form_field_key_checkbox_location_text_" class="bmlt_semantic_form_field_key_checkbox_label">Location Name</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_meeting_name_" class="bmlt_semantic_form_field_key_checkbox" value="meeting_name" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_meeting_name_" for="bmlt_semantic_form_field_key_checkbox_meeting_name_" class="bmlt_semantic_form_field_key_checkbox_label">Meeting Name</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_bus_lines_" class="bmlt_semantic_form_field_key_checkbox" value="bus_lines" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_bus_lines_" for="bmlt_semantic_form_field_key_checkbox_bus_lines_" class="bmlt_semantic_form_field_key_checkbox_label">Bus Lines</label>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_checkbox_div" class="bmlt_semantic_form_field_key_checkbox_div">
+                                        <input type="checkbox" id="bmlt_semantic_form_field_key_checkbox_train_lines_" class="bmlt_semantic_form_field_key_checkbox" value="train_lines" onchange="bmlt_semantic_js_object.handleSpecificFieldChange(this)">
+                                        <label id="bmlt_semantic_form_field_key_checkbox_label_train_lines_" for="bmlt_semantic_form_field_key_checkbox_train_lines_" class="bmlt_semantic_form_field_key_checkbox_label">Train Lines</label>
+                                    </div>
+                                </fieldset>
+                                <fieldset id="bmlt_semantic_form_sort_fields_fieldset" class="bmlt_semantic_form_sort_fields_fieldset"><legend id="bmlt_semantic_form_sort_fields_fieldset_legend" class="bmlt_semantic_form_sort_fields_fieldset_legend">
+                                    Sort Response</legend>
+                                    <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>Select the order of the fields to be added to the sort.</p></div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">ID</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_id_bigint" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_id_bigint_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_id_bigint_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_id_bigint_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_id_bigint_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_id_bigint_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_id_bigint_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_id_bigint_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_id_bigint_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_id_bigint_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_id_bigint_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_id_bigint_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_id_bigint_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_id_bigint_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_id_bigint_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_id_bigint_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_id_bigint_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_id_bigint_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_id_bigint_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_id_bigint_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_id_bigint_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_id_bigint_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_id_bigint_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_id_bigint_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_id_bigint_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_id_bigint_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">World ID</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_worldid_mixed" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_worldid_mixed_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_worldid_mixed_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_worldid_mixed_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_worldid_mixed_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_worldid_mixed_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_worldid_mixed_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_worldid_mixed_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_worldid_mixed_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_worldid_mixed_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_worldid_mixed_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_worldid_mixed_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_worldid_mixed_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_worldid_mixed_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_worldid_mixed_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_worldid_mixed_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_worldid_mixed_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_worldid_mixed_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_worldid_mixed_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_worldid_mixed_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_worldid_mixed_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_worldid_mixed_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_worldid_mixed_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_worldid_mixed_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_worldid_mixed_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_worldid_mixed_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Service Body ID</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_service_body_bigint" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_service_body_bigint_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_service_body_bigint_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_service_body_bigint_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_service_body_bigint_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_service_body_bigint_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_service_body_bigint_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_service_body_bigint_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_service_body_bigint_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_service_body_bigint_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_service_body_bigint_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_service_body_bigint_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_service_body_bigint_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_service_body_bigint_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_service_body_bigint_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_service_body_bigint_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_service_body_bigint_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_service_body_bigint_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_service_body_bigint_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_service_body_bigint_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_service_body_bigint_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_service_body_bigint_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_service_body_bigint_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_service_body_bigint_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_service_body_bigint_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_service_body_bigint_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Weekday</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_weekday_tinyint" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_weekday_tinyint_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Start Time</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_start_time" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_start_time_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_start_time_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_start_time_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_start_time_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_start_time_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_start_time_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_start_time_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_start_time_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_start_time_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_start_time_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_start_time_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_start_time_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_start_time_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_start_time_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_start_time_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_start_time_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_start_time_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_start_time_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_start_time_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_start_time_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_start_time_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_start_time_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_start_time_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_start_time_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_start_time_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Duration</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_duration_time" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_duration_time_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_duration_time_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_duration_time_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_duration_time_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_duration_time_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_duration_time_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_duration_time_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_duration_time_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_duration_time_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_duration_time_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_duration_time_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_duration_time_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_duration_time_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_duration_time_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_duration_time_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_duration_time_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_duration_time_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_duration_time_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_duration_time_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_duration_time_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_duration_time_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_duration_time_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_duration_time_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_duration_time_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_duration_time_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Formats</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_formats" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_formats_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_formats_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_formats_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_formats_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_formats_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_formats_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_formats_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_formats_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_formats_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_formats_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_formats_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_formats_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_formats_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_formats_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_formats_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_formats_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_formats_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_formats_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_formats_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_formats_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_formats_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_formats_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_formats_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_formats_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_formats_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Language</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_lang_enum" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_lang_enum_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_lang_enum_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_lang_enum_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_lang_enum_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_lang_enum_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_lang_enum_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_lang_enum_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_lang_enum_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_lang_enum_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_lang_enum_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_lang_enum_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_lang_enum_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_lang_enum_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_lang_enum_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_lang_enum_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_lang_enum_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_lang_enum_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_lang_enum_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_lang_enum_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_lang_enum_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_lang_enum_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_lang_enum_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_lang_enum_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_lang_enum_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_lang_enum_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Longitude</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_longitude" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_longitude_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_longitude_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_longitude_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_longitude_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_longitude_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_longitude_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_longitude_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_longitude_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_longitude_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_longitude_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_longitude_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_longitude_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_longitude_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_longitude_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_longitude_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_longitude_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_longitude_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_longitude_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_longitude_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_longitude_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_longitude_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_longitude_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_longitude_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_longitude_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_longitude_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Latitude</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_latitude" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_latitude_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_latitude_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_latitude_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_latitude_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_latitude_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_latitude_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_latitude_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_latitude_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_latitude_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_latitude_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_latitude_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_latitude_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_latitude_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_latitude_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_latitude_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_latitude_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_latitude_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_latitude_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_latitude_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_latitude_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_latitude_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_latitude_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_latitude_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_latitude_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_latitude_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Comments</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_comments" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_comments_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_comments_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_comments_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_comments_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_comments_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_comments_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_comments_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_comments_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_comments_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_comments_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_comments_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_comments_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_comments_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_comments_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_comments_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_comments_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_comments_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_comments_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_comments_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_comments_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_comments_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_comments_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_comments_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_comments_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_comments_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Borough</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_city_subsection" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_city_subsection_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_city_subsection_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_city_subsection_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_city_subsection_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_city_subsection_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_city_subsection_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_city_subsection_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_city_subsection_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_city_subsection_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_city_subsection_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_city_subsection_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_city_subsection_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_city_subsection_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_city_subsection_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_city_subsection_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_city_subsection_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_city_subsection_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_city_subsection_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_city_subsection_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_city_subsection_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_city_subsection_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_city_subsection_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_city_subsection_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_city_subsection_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_city_subsection_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Nation</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_nation" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_nation_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_nation_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_nation_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_nation_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_nation_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_nation_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_nation_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_nation_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_nation_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_nation_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_nation_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_nation_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_nation_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_nation_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_nation_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_nation_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_nation_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_nation_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_nation_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_nation_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_nation_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_nation_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_nation_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_nation_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_nation_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Zip Code</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_postal_code_1" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_postal_code_1_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">State</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_province" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_province_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_province_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_province_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_province_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_province_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_province_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_province_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_province_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_province_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_province_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_province_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_province_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_province_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_province_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_province_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_province_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_province_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_province_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_province_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_province_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_province_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_province_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_province_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_province_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_province_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">County</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_sub_province" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_sub_province_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_sub_province_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_sub_province_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_sub_province_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_sub_province_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_sub_province_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_sub_province_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_sub_province_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_sub_province_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_sub_province_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_sub_province_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_sub_province_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_sub_province_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_sub_province_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_sub_province_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_sub_province_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_sub_province_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_sub_province_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_sub_province_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_sub_province_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_sub_province_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_sub_province_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_sub_province_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_sub_province_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_sub_province_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">City</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_municipality" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_municipality_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_municipality_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_municipality_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_municipality_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_municipality_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_municipality_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_municipality_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_municipality_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_municipality_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_municipality_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_municipality_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_municipality_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_municipality_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_municipality_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_municipality_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_municipality_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_municipality_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_municipality_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_municipality_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_municipality_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_municipality_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_municipality_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_municipality_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_municipality_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_municipality_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Neighborhood</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_neighborhood" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_neighborhood_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_neighborhood_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_neighborhood_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_neighborhood_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_neighborhood_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_neighborhood_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_neighborhood_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_neighborhood_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_neighborhood_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_neighborhood_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_neighborhood_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_neighborhood_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_neighborhood_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_neighborhood_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_neighborhood_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_neighborhood_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_neighborhood_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_neighborhood_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_neighborhood_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_neighborhood_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_neighborhood_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_neighborhood_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_neighborhood_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_neighborhood_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_neighborhood_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Street Address</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_street" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_street_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_street_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_street_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_street_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_street_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_street_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_street_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_street_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_street_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_street_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_street_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_street_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_street_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_street_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_street_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_street_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_street_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_street_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_street_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_street_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_street_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_street_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_street_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_street_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_street_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Additional Location Information</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_info" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_info_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_info_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_info_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_info_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_info_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_info_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_info_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_info_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_info_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_info_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_info_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_info_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_info_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_info_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_info_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_info_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_info_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_info_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_info_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_info_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_info_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_info_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_info_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_info_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_info_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Location Name</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_location_text" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_location_text_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_location_text_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_location_text_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_location_text_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_location_text_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_location_text_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_location_text_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_location_text_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_location_text_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_location_text_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_location_text_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_location_text_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_location_text_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_location_text_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_location_text_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_location_text_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_location_text_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_location_text_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_location_text_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_location_text_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_location_text_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_location_text_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_location_text_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_location_text_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_location_text_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Meeting Name</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_meeting_name" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_meeting_name_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_meeting_name_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_meeting_name_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_meeting_name_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_meeting_name_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_meeting_name_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_meeting_name_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_meeting_name_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_meeting_name_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_meeting_name_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_meeting_name_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_meeting_name_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_meeting_name_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_meeting_name_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_meeting_name_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_meeting_name_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_meeting_name_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_meeting_name_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_meeting_name_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_meeting_name_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_meeting_name_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_meeting_name_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_meeting_name_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_meeting_name_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_meeting_name_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Bus Lines</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_bus_lines" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_bus_lines_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_bus_lines_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_bus_lines_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_bus_lines_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_bus_lines_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_bus_lines_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_bus_lines_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_bus_lines_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_bus_lines_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_bus_lines_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_bus_lines_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_bus_lines_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_bus_lines_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_bus_lines_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_bus_lines_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_bus_lines_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_bus_lines_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_bus_lines_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_bus_lines_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_bus_lines_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_bus_lines_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_bus_lines_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_bus_lines_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_bus_lines_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_bus_lines_24">24</option>
+                                        </select>
+                                    </div>
+                                    <div id="bmlt_semantic_form_field_key_sort_field_div" class="bmlt_semantic_form_field_key_sort_field_div">
+                                        <label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_sort_select" class="bmlt_semantic_form_field_select_label">Train Lines</label>
+                                        <select id="bmlt_semantic_form_field_sort_select_train_lines" class="bmlt_semantic_form_field_sort_select" onchange="bmlt_semantic_js_object.handleSortFieldChange(this.options[this.selectedIndex])">
+                                            <option value="0" selected="selected" id="bmlt_semantic_form_field_sort_select_train_lines_0">Don't Sort</option><option value="1" id="bmlt_semantic_form_field_sort_select_train_lines_1">1</option>
+                                            <option value="2" id="bmlt_semantic_form_field_sort_select_train_lines_2">2</option>
+                                            <option value="3" id="bmlt_semantic_form_field_sort_select_train_lines_3">3</option>
+                                            <option value="4" id="bmlt_semantic_form_field_sort_select_train_lines_4">4</option>
+                                            <option value="5" id="bmlt_semantic_form_field_sort_select_train_lines_5">5</option>
+                                            <option value="6" id="bmlt_semantic_form_field_sort_select_train_lines_6">6</option>
+                                            <option value="7" id="bmlt_semantic_form_field_sort_select_train_lines_7">7</option>
+                                            <option value="8" id="bmlt_semantic_form_field_sort_select_train_lines_8">8</option>
+                                            <option value="9" id="bmlt_semantic_form_field_sort_select_train_lines_9">9</option>
+                                            <option value="10" id="bmlt_semantic_form_field_sort_select_train_lines_10">10</option>
+                                            <option value="11" id="bmlt_semantic_form_field_sort_select_train_lines_11">11</option>
+                                            <option value="12" id="bmlt_semantic_form_field_sort_select_train_lines_12">12</option>
+                                            <option value="13" id="bmlt_semantic_form_field_sort_select_train_lines_13">13</option>
+                                            <option value="14" id="bmlt_semantic_form_field_sort_select_train_lines_14">14</option>
+                                            <option value="15" id="bmlt_semantic_form_field_sort_select_train_lines_15">15</option>
+                                            <option value="16" id="bmlt_semantic_form_field_sort_select_train_lines_16">16</option>
+                                            <option value="17" id="bmlt_semantic_form_field_sort_select_train_lines_17">17</option>
+                                            <option value="18" id="bmlt_semantic_form_field_sort_select_train_lines_18">18</option>
+                                            <option value="19" id="bmlt_semantic_form_field_sort_select_train_lines_19">19</option>
+                                            <option value="20" id="bmlt_semantic_form_field_sort_select_train_lines_20">20</option>
+                                            <option value="21" id="bmlt_semantic_form_field_sort_select_train_lines_21">21</option>
+                                            <option value="22" id="bmlt_semantic_form_field_sort_select_train_lines_22">22</option>
+                                            <option value="23" id="bmlt_semantic_form_field_sort_select_train_lines_23">23</option>
+                                            <option value="24" id="bmlt_semantic_form_field_sort_select_train_lines_24">24</option>
+                                        </select>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div id="bmlt_semantic_form_changes_div" class="bmlt_semantic_form_changes_div" style="display:none"><div id="bmlt_semantic_form_changes_blurb_div" class="bmlt_workshop_blurb_note_div"><p>You Must Enter Dates In This Format: YYYY-MM-DD (separated by dashes)</p><p>YYYY = 4-digit year, MM = 2-digit month (01 is January), DD = 2-digit month day (01 - 31)</p></div>
+                                <div id="bmlt_semantic_form_changes_from_div" class="bmlt_semantic_form_line"><label title="You Must Enter Dates In This Format: YYYY-MM-DD (separated by dashes)" for="bmlt_semantic_form_changes_from_text" id="bmlt_semantic_form_changes_from_label" class="bmlt_semantic_form_changes_from_label">Get meeting changes starting from (and including) this date:</label><input type="text" pattern="^[0-9\-]+$" title="You Must Enter Dates In This Format: YYYY-MM-DD (separated by dashes)" id="bmlt_semantic_form_changes_from_text" class="bmlt_semantic_form_changes_date_text bmlt_semantic_form_disabled_text" value="YYYY-MM-DD" maxlength="10"></div>
+                                <div id="bmlt_semantic_form_changes_to_div" class="bmlt_semantic_form_line"><label title="You Must Enter Dates In This Format: YYYY-MM-DD (separated by dashes)" for="bmlt_semantic_form_changes_to_text" id="bmlt_semantic_form_changes_to_label" class="bmlt_semantic_form_changes_to_label">Get meeting changes until (and inluding) this date:</label><input type="text" pattern="^[0-9\-]+$" title="You Must Enter Dates In This Format: YYYY-MM-DD (separated by dashes)" id="bmlt_semantic_form_changes_to_text" class="bmlt_semantic_form_changes_date_text bmlt_semantic_form_disabled_text" value="YYYY-MM-DD" maxlength="10"></div>
+                                <div id="bmlt_semantic_form_changes_meeting_div" class="bmlt_semantic_form_line"><label title="Enter the numeric ID of the meeting to check." for="bmlt_semantic_form_changes_id_text" id="bmlt_semantic_form_changes_id_label" class="bmlt_semantic_form_changes_id_label">Look for changes in a meeting with this ID:</label><input type="text" pattern="^[0-9]+$" title="Enter the numeric ID of the meeting to check." id="bmlt_semantic_form_changes_id_text" class="bmlt_semantic_form_changes_id_text bmlt_semantic_form_disabled_text" value="" maxlength="6"></div>
+                                <div id="bmlt_semantic_form_changes_sb_div" class="bmlt_semantic_form_line"><label for="bmlt_switcher_changes_sb_select" id="bmlt_semantic_form_changes_sb_id_label" class="bmlt_semantic_form_changes_sb_id_label">Look for changes in a particular Service body:</label><select id="bmlt_switcher_changes_sb_select" class="bmlt_switcher_changes_sb_select" onchange="bmlt_semantic_js_object.handleChangesSBSelectChange(this)"><option value="" selected="selected">No Service Body Selected</option>
+                                </select>
+                                </div>
+                                <div class="clear_both"></div>
+                            </div>
+                            <fieldset id="bmlt_semantic_form_main_fields_fieldset" class="bmlt_semantic_form_main_fields_fieldset" style="display:none"><legend id="bmlt_semantic_form_main_fields_fieldset_legend" class="bmlt_semantic_form_main_fields_fieldset_legend"><label id="bmlt_semantic_form_field_main_select_label" for="bmlt_semantic_form_field_main_select" class="bmlt_semantic_form_field_select_label">Search for a Specific Value of</label>
+                                <select id="bmlt_semantic_form_field_main_select" class="bmlt_semantic_form_field_select" onchange="bmlt_semantic_js_object.handleFieldKeySelectChange(this)">
+                                    <option value="" selected="selected" disabled="disabled">Select A Field</option>
+                                </select>
+                            </legend>
+                                <div id="bmlt_semantic_form_main_fields_fieldset_contents_div" class="bmlt_semantic_form_main_fields_fieldset_contents_div" style="display:block">
+                                    <div id="bmlt_switcher_field_value_div_no_options_blurb" class="bmlt_workshop_blurb_note_div" style="display: block;">There are no additional options for this operation.</div>
+                                    <div id="bmlt_switcher_field_value_div_no_selected_formats_blurb" class="bmlt_workshop_blurb_note_div" style="display:none">
+                                        <p>If none of these are selected, then all formats will be returned.</p>
+                                        <p>This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.</p>
+                                    </div>
+                                    <div id="bmlt_switcher_field_value_div_formats" class="bmlt_switcher_field_value_div_formats" style="display:none"></div>
+                                </div>
+                            </fieldset>
+                            <fieldset id="bmlt_semantic_form_schema_select_fieldset" class="bmlt_semantic_form_schema_select_fieldset" style="display:none"><legend id="bmlt_semantic_form_schema_select_fieldset_legend" class="bmlt_semantic_form_schema_select_fieldset_legend">Select An XML Schema Type</legend>
+                                <div id="bmlt_semantic_form_schema_select_blurb_div" class="bmlt_workshop_blurb_note_div">
+                                    <p>This will download <a href="http://www.w3schools.com/schema/">an XML Schema</a> document.</p><p>XML Schema is a semantic "contract" that defines what the XML response data will look like.</p>
+                                </div>
+                                <label id="bmlt_semantic_form_schema_select_label" for="bmlt_semantic_form_schema_select" class="bmlt_semantic_form_schema_select_label">Schema Type:</label>
+                                <select id="bmlt_semantic_form_schema_select" class="bmlt_semantic_form_schema_select" onchange="bmlt_semantic_js_object.refreshURI()">
+                                    <option value="GetSearchResults" selected="selected">Search Results</option><option value="GetMeetingLocationInfo">Search Results Location Information</option><option value="GetFieldKeys">Available Field Keys</option><option value="GetFieldValues">Field Key Value Response</option><option value="AdminPermissions">Administrative Permissions</option><option value="ChangeResponse">Administrative Change Response</option><option value="DeletedMeeting">Administrative Deletion Response</option><option value="FieldTemplates">Administrative Field Templates</option><option value="GetChanges">Meeting Changes</option><option value="GetFormats">Meeting Formats</option><option value="GetLangs">Languages</option><option value="GetServiceBodies">Flat Service Bodies</option><option value="HierServiceBodies">Hierarchical Service Bodies</option><option value="ServerInfo">Server Information</option><option value="GetCoverageArea">Geographic Coverage Area</option><option value="UserInfo">User Info</option>
+                                </select>
+                            </fieldset>
+                            <div id="bmlt_semantic_form_formats_fieldset_contents_div" class="bmlt_semantic_form_formats_fieldset_contents_div" style="display:none">
+                                <label id="bmlt_semantic_formats_lang_select_labelselect_label" for="bmlt_semantic_formats_lang_select" class="bmlt_semantic_formats_lang_select_label">Format Language:</label>
+                                <select id="bmlt_semantic_formats_lang_select" class="bmlt_semantic_formats_lang_select" onchange="bmlt_semantic_js_object.handleFormatsLangSelectChange(this)">
+                                    <option value="" selected="selected">Server Language</option>
+                                    <option value="en">English</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="dk">Dansk</option>
+                                    <option value="es">Español</option>
+                                    <option value="fr">Français</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="sv">Svenska</option>
+                                </select>
+                            </div>
+                            <fieldset id="bmlt_semantic_coverage_area_fieldset" class="bmlt_semantic_coverage_area_fieldset" style="display:none"><legend id="bmlt_semantic_coverage_area_fieldset_legend" class="bmlt_semantic_coverage_area_fieldset_legend">Geographic Coverage Area</legend>
+                                <div id="bmlt_semantic_coverage_area_fieldset_map_div" class="bmlt_semantic_coverage_area_fieldset_map_div"></div>
+                            </fieldset>
+                        </fieldset>
+                    </fieldset>
+                </div>
+        </form>
+        <div id="bmlt_semantic_info_div_root_url_line" class="bmlt_semantic_info_line bmlt_semantic_footer">
+            <div id="bmlt_semantic_version_wrapper" class="bmlt_semantic_version_wrapper">
+                <span class="info_label">Version:</span>
+                <span class="info_value">2.0.0</span>
+            </div>
+            Additional info is available <a href="https://bmlt.app/semantic/semantic-workshop/" target="_blank">here</a>.
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    function load() {
+        var url = document.getElementById('enter_server_url_form_div_url_input').value;
+        var sObj = new BMLTSemantic(url, 2013000)
+    }
+</script>
+</html>
