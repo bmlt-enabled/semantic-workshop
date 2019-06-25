@@ -495,11 +495,11 @@ BMLTSemantic.prototype.coverageMapObject = null;
     \returns a new XMLHTTPRequest object
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.ajaxRequest = function (url, callback, method, payload) {
+BMLTSemantic.prototype.ajaxRequest = function (url, callback) {
     var functionName = 'jsonp_' + (new Date).getTime().toString() + '_' + Math.floor(Math.random() * 1000000).toString();
     var callbackScript = document.createElement('script');
     callbackScript.setAttribute('type', 'text/javascript');
-    callbackScript.appendChild(document.createTextNode('self.' + functionName + ' = ' + callback.toString())); //.replace('/*<PAYLOAD>*/', 'var payload = ' + JSON.stringify(payload))));
+    callbackScript.appendChild(document.createTextNode('self.' + functionName + ' = ' + callback.toString()));
     document.getElementsByTagName('head').item(0).appendChild(callbackScript);
 
     var script = document.createElement('script');
@@ -553,7 +553,7 @@ BMLTSemantic.prototype.reloadFromServer = function () {
 BMLTSemantic.prototype.fetchServerInfo = function () {
     this.serverInfo = null;
     if ( this.version >= 2006020 ) {
-        this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServerInfo', this.fetchServerInfoCallback, 'get', this);
+        this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServerInfo', this.fetchServerInfoCallback);
     }
 };
 
@@ -564,7 +564,7 @@ BMLTSemantic.prototype.fetchServerInfo = function () {
 /*******************************************************************************************/
 BMLTSemantic.prototype.fetchCoverageArea = function () {
     this.serverInfo = null;
-    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetCoverageArea', this.fetchCoverageAreaCallback, 'get', this);
+    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetCoverageArea', this.fetchCoverageAreaCallback);
 };
 
 /*******************************************************************************************/
@@ -576,7 +576,7 @@ BMLTSemantic.prototype.fetchFormats = function () {
     this.state.formats = null;
     this.state.unformats = null;
     
-    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetFormats', this.fetchFormatsCallback, 'get', this);
+    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetFormats', this.fetchFormatsCallback);
 };
 
 /*******************************************************************************************/
@@ -587,7 +587,7 @@ BMLTSemantic.prototype.fetchFormats = function () {
 BMLTSemantic.prototype.fetchLangs = function () {
     this.languages = null;
     if ( this.version >= 2006020 ) {
-        this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServerInfo', this.fetchLangsCallback, 'get', this);
+        this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServerInfo', this.fetchLangsCallback);
     };
 };
 
@@ -600,7 +600,7 @@ BMLTSemantic.prototype.fetchServiceBodies = function () {
     this.state.services = null;
     this.state.sb_id = null;
     
-    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServiceBodies', this.fetchServiceBodiesCallback, 'get', this);
+    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetServiceBodies', this.fetchServiceBodiesCallback);
 };
 
 /*******************************************************************************************/
@@ -609,10 +609,18 @@ BMLTSemantic.prototype.fetchServiceBodies = function () {
 */
 /*******************************************************************************************/
 BMLTSemantic.prototype.fetchFieldKeys = function () {
+    var self = this;
     this.getScopedElement('bmlt_switcher_field_value_div_formats').innerHTML = '';
     this.getScopedElement('bmlt_switcher_field_value_div_no_selected_formats_blurb').hide();
     this.getScopedElement('bmlt_semantic_form_meeting_fields_fieldset_contents_div').hide();
-    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetFieldKeys', this.fetchFieldKeysCallback, 'get', this);
+    this.ajaxRequest(this.ajax_base_uri + '/client_interface/jsonp/?switcher=GetFieldKeys', function(res) {
+        if ( res.length > 0) {
+            instance.setAllSortFieldFunctions(res);
+            instance.setAllSortFieldState(res);
+            instance.clearSorts(res);
+            instance.populateFieldSelect(res);
+        }
+    });
 };
 
 /*******************************************************************************************/
@@ -620,18 +628,21 @@ BMLTSemantic.prototype.fetchFieldKeys = function () {
     \brief Sets up and performs an AJAX call to fetch the available field keys.
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.fetchFieldValues = function () {
+BMLTSemantic.prototype.fetchFieldValues = function (key) {
     this.getScopedElement('bmlt_semantic_form_meeting_fields_fieldset_contents_div').hide();
-    var key = this.state.meeting_key.toString();
-    var url = this.ajax_base_uri + '&GetFieldValues&meeting_key=' + key;
-    this.ajaxRequest(url, this.fetchFieldValuesCallback, 'get', this);
+    var url = this.ajax_base_uri + '/client_interface/jsonp?switcher=GetFieldValues&meeting_key=' + key;
+    instance.key = key;
+    this.ajaxRequest(url,function(res) {
+        if ( res.length > 0 ) {
+            /*instance.field_values.sort(function (a,b) {
+
+            });*/
+
+            instance.updateFieldValuesPopup(res, instance.key);
+        }
+    });
 };
 
-/*******************************************************************************************/
-/**
-    \brief The response.
-*/
-/*******************************************************************************************/
 BMLTSemantic.prototype.fetchVersionCallback = function (inHTTPReqObject) {
     if ( inHTTPReqObject.responseText ) {
         var context = inHTTPReqObject.extraData;
@@ -641,70 +652,49 @@ BMLTSemantic.prototype.fetchVersionCallback = function (inHTTPReqObject) {
     }
 };
 
-BMLTSemantic.prototype.fetchServerInfoCallback = function (inHTTPReqObject) {
-    if ( inHTTPReqObject.responseText ) {
-        var context = inHTTPReqObject.extraData;
-        eval('context.serverInfo = ' + inHTTPReqObject.responseText + '[0];');
-        context.current_lat = parseFloat(context.serverInfo.centerLatitude);
-        context.current_lng = parseFloat(context.serverInfo.centerLongitude);
-        context.current_zoom = parseInt(context.serverInfo.centerZoom, 10);
-        context.fetchCoverageArea();
-    };
+BMLTSemantic.prototype.fetchServerInfoCallback = function (res) {
+    if ( res.length > 0 ) {
+        instance.current_lat = parseFloat(res[0].centerLatitude);
+        instance.current_lng = parseFloat(res[0].centerLongitude);
+        instance.current_zoom = parseInt(res[0].centerZoom, 10);
+        instance.fetchCoverageArea();
+    }
 };
 
-BMLTSemantic.prototype.fetchCoverageAreaCallback = function (inHTTPReqObject) {
-    if ( inHTTPReqObject.responseText ) {
-        var context = inHTTPReqObject.extraData;
-        eval('var coverageAreaRaw = ' + inHTTPReqObject.responseText + '[0];');
-        
-        context.coverageArea = new Object();
-        context.coverageArea.ne_corner = new google.maps.LatLng(parseFloat(coverageAreaRaw.nw_corner_latitude), parseFloat(coverageAreaRaw.se_corner_longitude));
-        context.coverageArea.sw_corner = new google.maps.LatLng(parseFloat(coverageAreaRaw.se_corner_latitude), parseFloat(coverageAreaRaw.nw_corner_longitude));
-    };
-};
-
-BMLTSemantic.prototype.fetchFormatsCallback = function (inHTTPReqObject ) {
-    if ( inHTTPReqObject.responseText ) {
-        var context = inHTTPReqObject.extraData;
-        eval('context.format_objects = ' + inHTTPReqObject.responseText + ';');
-
-        if ( context.getScopedElement('bmlt_semantic_form_switcher_type_select').value == 'GetFieldValues' ) {
-            context.populateFormatsSection(context.getScopedElement('bmlt_switcher_field_value_div_formats'), false);
-        } else {
-            context.populateFormatsSection(context.getScopedElement('bmlt_semantic_form_formats_fieldset_div'), false);
-            context.populateFormatsSection(context.getScopedElement('bmlt_semantic_form_not_formats_fieldset_div'), true);
+BMLTSemantic.prototype.fetchCoverageAreaCallback = function (res ) {
+    if ( res.length > 0 ) {
+        instance.coverageArea = {
+            ne_corner: new google.maps.LatLng(parseFloat(res.nw_corner_latitude), parseFloat(res.se_corner_longitude)),
+            sw_corner: new google.maps.LatLng(parseFloat(res.se_corner_latitude), parseFloat(res.nw_corner_longitude))
         };
-    };
+    }
 };
 
-/*******************************************************************************************/
-/**
-    \brief The response.
-*/
-/*******************************************************************************************/
-BMLTSemantic.prototype.fetchLangsCallback = function ( inHTTPReqObject
-                                                        ) {
+BMLTSemantic.prototype.fetchFormatsCallback = function(res) {
+    if ( res.length > 0 ) {
+        if ( instance.getScopedElement('bmlt_semantic_form_switcher_type_select').value === 'GetFieldValues' ) {
+            instance.populateFormatsSection(instance.getScopedElement('bmlt_switcher_field_value_div_formats'), res,false);
+        } else {
+            instance.populateFormatsSection(instance.getScopedElement('bmlt_semantic_form_formats_fieldset_div'), res,false);
+            instance.populateFormatsSection(instance.getScopedElement('bmlt_semantic_form_not_formats_fieldset_div'), res,true);
+        }
+    }
+};
+
+BMLTSemantic.prototype.fetchLangsCallback = function ( inHTTPReqObject) {
     if ( inHTTPReqObject.responseText ) {
         var context = inHTTPReqObject.extraData;
         eval('var serverInfo = ' + inHTTPReqObject.responseText + ';');
         context.languages = serverInfo[0].langs.toString().split(',');
-    };
+    }
 };
 
-/*******************************************************************************************/
-/**
-    \brief
-*/
-/*******************************************************************************************/
-BMLTSemantic.prototype.populateFormatsSection = function (
-    formatContainer,
-    unformat
-) {
-    this.sortByKey(this.format_objects, 'key_string');
+BMLTSemantic.prototype.populateFormatsSection = function ( formatContainer, format_objects, unformat ) {
+    this.sortByKey(format_objects, 'key_string');
     formatContainer.innerHTML = '';
-    if ( this.format_objects && this.format_objects.length ) {
-        for (var i = 0; i < this.format_objects.length; i++) {
-            var formatObject = this.format_objects[i];
+    if ( this.format_objects && format_objects.length ) {
+        for (var i = 0; i < format_objects.length; i++) {
+            var formatObject = format_objects[i];
             var newContainer = document.createElement('div');
             newContainer.id = this.getScopedID(formatContainer.id + '_' + formatObject.id);
             newContainer.className ='bmlt_checkbox_container';
@@ -732,34 +722,24 @@ BMLTSemantic.prototype.populateFormatsSection = function (
             newContainer.appendChild(newCheckboxLabel);
             
             formatContainer.appendChild(newContainer);
-        };
+        }
         
         var breakerBreakerRubberDuck = document.createElement('div');
         breakerBreakerRubberDuck.className ='clear_both';
         formatContainer.appendChild(breakerBreakerRubberDuck);
-    };
+    }
+
     this.refreshURI();
 };
 
-/*******************************************************************************************/
-/**
-    \brief The response.
-*/
-/*******************************************************************************************/
-BMLTSemantic.prototype.fetchServiceBodiesCallback = function (inHTTPReqObject
-                                                                ) {
+BMLTSemantic.prototype.fetchServiceBodiesCallback = function (inHTTPReqObject) {
     if ( inHTTPReqObject.responseText ) {
         var context = inHTTPReqObject.extraData;
         eval('context.temp_service_body_objects = ' + inHTTPReqObject.responseText + ';');
         context.populateServiceBodiesSection();
-    };
+    }
 };
 
-/*******************************************************************************************/
-/**
-    \brief
-*/
-/*******************************************************************************************/
 BMLTSemantic.prototype.populateServiceBodiesSection = function () {
     var sb_select1 = this.getScopedElement('bmlt_switcher_naws_dump_sb_select');
     var sb_select2 = this.getScopedElement('bmlt_switcher_changes_sb_select');
@@ -959,16 +939,13 @@ BMLTSemantic.prototype.getChildServiceBodies = function (inParentObject
     \brief The response.
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.fetchFieldKeysCallback = function (inHTTPReqObject
-                                                        ) {
-    if ( inHTTPReqObject.responseText ) {
-        var context = inHTTPReqObject.extraData;
-        eval('context.field_keys = ' + inHTTPReqObject.responseText + ';');
-        context.setAllSortFieldFunctions();
-        context.setAllSortFieldState();
-        context.clearSorts();
-        context.populateFieldSelect();
-    };
+BMLTSemantic.prototype.fetchFieldKeysCallback = function (res) {
+    if ( res.length > 0) {
+        this.setAllSortFieldFunctions(res);
+        this.setAllSortFieldState(res);
+        this.clearSorts(res);
+        this.populateFieldSelect();
+    }
 };
 
 /*******************************************************************************************/
@@ -976,38 +953,38 @@ BMLTSemantic.prototype.fetchFieldKeysCallback = function (inHTTPReqObject
     \brief The response.
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.populateFieldSelect = function () {
+BMLTSemantic.prototype.populateFieldSelect = function (values) {
     var mainSelectElement = this.getScopedElement('bmlt_semantic_form_field_main_select');
     var meetingSelectElement = this.getScopedElement('bmlt_semantic_form_field_select');
     
     if ( mainSelectElement && mainSelectElement.options ) {
         for (var i = (mainSelectElement.options.length - 1); i > 0; i--) {
             mainSelectElement.removeChild(mainSelectElement.options[i]);
-        };
-    };
+        }
+    }
     
     if ( meetingSelectElement && meetingSelectElement.options ) {
         for (var i = (meetingSelectElement.options.length - 1); i > 0; i--) {
             meetingSelectElement.removeChild(meetingSelectElement.options[i]);
-        };
-    };
+        }
+    }
     
-    for (var i = 0; i < this.field_keys.length; i++) {
-        var key = this.field_keys[i].key;
+    for (var i = 0; i < values.length; i++) {
+        var key = values[i].key;
         
         var newOption = document.createElement('option');
         newOption.value = key;
-        newOption.appendChild(document.createTextNode(this.field_keys[i].description));
+        newOption.appendChild(document.createTextNode(values[i].description));
         mainSelectElement.appendChild(newOption);
         
-        if ( (key != 'formats') && (key != 'weekday_tinyint') && (key != 'service_body_bigint') && (key != 'id_bigint') && (key != 'longitude') && (key != 'latitude') ) {
+        if ( (key !== 'formats') && (key !== 'weekday_tinyint') && (key !== 'service_body_bigint') && (key !== 'id_bigint') && (key !== 'longitude') && (key !== 'latitude') ) {
             newOption = document.createElement('option');
             newOption.value = key;
-            newOption.appendChild(document.createTextNode(this.field_keys[i].description));
+            newOption.appendChild(document.createTextNode(values[i].description));
             meetingSelectElement.appendChild(newOption);
-        };
-    };
-    
+        }
+    }
+
     mainSelectElement.selectedIndex = 0;
     meetingSelectElement.selectedIndex = 0;
     this.refreshURI();
@@ -1018,81 +995,33 @@ BMLTSemantic.prototype.populateFieldSelect = function () {
     \brief The response.
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.fetchFieldValuesCallback = function (inHTTPReqObject
-                                                        ) {
-    if ( inHTTPReqObject.responseText ) {
-        var context = inHTTPReqObject.extraData;
-        eval('context.field_values = ' + inHTTPReqObject.responseText + ';');
-        
-        context.field_values.sort(function (a,b) {
-                                                eval('var textA = a.' + context.state.meeting_key.toString() + '.toString();var textB = b.' + context.state.meeting_key.toString() + '.toString();');
-                                                ret = 0;
-            if ( textA != 'NULL' ) {
-                if ( textB == 'NULL' ) {
-                    ret = 1;
-                } else {
-                    eval('var numA = parseFloat ( a.' + context.state.meeting_key + ' );var numB = parseFloat ( b.' + context.state.meeting_key + ' );');
-                    if ( !isNaN(numA) && !isNaN(numB) &&  numA > numB ) {
-                        ret = 1;
-                    } else {
-                        if ( !isNaN(numA) && !isNaN(numB) &&  numB > numA ) {
-                            ret = -1;
-                        } else {
-                            eval('var intA = parseInt ( a.' + context.state.meeting_key + ' );var intB = parseInt ( b.' + context.state.meeting_key + ' );');
-                            if ( intA > intB ) {
-                                ret = 1;
-                            } else {
-                                if ( intB > intA ) {
-                                    ret = -1;
-                                } else {
-                                    if ( textA > textB ) {
-                                        ret = 1;
-                                    } else {
-                                        if ( textB > textA ) {
-                                            ret = -1;
-                                        };
-                                    };
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-                                                
-                                                return ret;
-        });
-        
-        context.updateFieldValuesPopup();
-    };
-};
+BMLTSemantic.prototype.fetchFieldValuesCallback = function(res) {
+
+}
 
 /*******************************************************************************************/
 /**
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.updateFieldValuesPopup = function () {
+BMLTSemantic.prototype.updateFieldValuesPopup = function (field_values, key) {
     var select_object = this.getScopedElement('bmlt_semantic_form_value_select');
 
     for (var i = select_object.options.length - 1; i > 0; i--) {
         select_object.removeChild(select_object.options[i]);
     };
     
-    if ( this.field_values && this.field_values.length ) {
-        for (var i = 0; i < this.field_values.length; i++) {
-            var value_object = this.field_values[i];
-            
-            eval('var value_text = value_object.' + this.state.meeting_key.toString() + '.toString();');
-            if ( value_text != 'NULL' ) {
-                var newOption = document.createElement('option');
-                newOption.value = value_text;
-                newOption.appendChild(document.createTextNode(value_text));
-                select_object.appendChild(newOption);
-            };
-        };
+    if ( field_values.length > 0 ) {
+        for (var i = 0; i < field_values.length; i++) {
+            var value_object = field_values[i];
+            var newOption = document.createElement('option');
+            newOption.value = value_object[key];
+            newOption.appendChild(document.createTextNode(value_object[key]));
+            select_object.appendChild(newOption);
+        }
         
         this.getScopedElement('bmlt_semantic_form_meeting_fields_fieldset_contents_div').show();
-    };
+    }
     
     this.refreshURI();
 };
@@ -1235,13 +1164,12 @@ BMLTSemantic.prototype.handleSwitcherSelectChange = function ( inSelect ) {
 /*******************************************************************************************/
 BMLTSemantic.prototype.handleFieldKeySelectChange = function ( inSelect ) {
     var key = inSelect.value;
-    this.state.meeting_key = key;
-    
-    if ( inSelect.id == this.getScopedID('bmlt_semantic_form_field_select') ) {
+
+    if ( inSelect.id === this.getScopedID('bmlt_semantic_form_field_select') ) {
         this.getScopedElement('bmlt_semantic_form_value_text').value = this.getScopedElement('bmlt_semantic_form_value_text').defaultValue;
         this.getScopedElement('bmlt_semantic_form_value_text').focus();
-        this.fetchFieldValues();
-    };
+        this.fetchFieldValues(key);
+    }
 
     this.refreshURI();
 };
@@ -1526,18 +1454,18 @@ BMLTSemantic.prototype.clearWeekdays = function ( ) {
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.clearSorts = function ( ) {
-    if ( this.field_keys ) {
-        for (var i = 0; i < this.field_keys.length; i++) {
-            var selectObject = this.getScopedElement(this.getSortItemID(this.field_keys[i].key.toString()));
+BMLTSemantic.prototype.clearSorts = function (values) {
+    if ( values ) {
+        for (var i = 0; i < values.length; i++) {
+            var selectObject = this.getScopedElement(this.getSortItemID(values[i].key.toString()));
             
             if ( selectObject ) {
                 selectObject.selectedIndex = 0;
                 selectObject.className = selectObject.defaultClass;
-            };
-        };
-    };
-};
+            }
+        }
+    }
+}
 
 /*******************************************************************************************/
 /**
@@ -1866,15 +1794,15 @@ BMLTSemantic.prototype.getSortItemID = function ( inKey, inIndex ) {
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.setSortFieldFunctions = function ( inKey ) {
-    this.setBasicFunctions(this.getSortItemID(inKey, null));
+BMLTSemantic.prototype.setSortFieldFunctions = function ( key, values ) {
+    this.setBasicFunctions(this.getSortItemID(key, null));
     
-    for (var i = 0; i <= this.field_keys.length; i++) {
-        var sortItemOptionID = this.getSortItemID(inKey, i);
+    for (var i = 0; i <= values.length; i++) {
+        var sortItemOptionID = this.getSortItemID(key, i);
         this.setBasicFunctions(sortItemOptionID);
         var sortItem = this.getScopedElement(sortItemOptionID);
         if ( sortItem ) {
-            sortItem.fieldKey = inKey;
+            sortItem.fieldKey = key;
         };
     };
 };
@@ -1884,10 +1812,10 @@ BMLTSemantic.prototype.setSortFieldFunctions = function ( inKey ) {
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.setAllSortFieldFunctions = function ( ) {
-    for (var i = 0; i < this.field_keys.length; i++) {
-        this.setSortFieldFunctions(this.field_keys[i].key.toString());
-    };
+BMLTSemantic.prototype.setAllSortFieldFunctions = function (values) {
+    for (var i = 0; i < values.length; i++) {
+        this.setSortFieldFunctions(values[i].key.toString(), values);
+    }
 };
 
 /*******************************************************************************************/
@@ -1895,9 +1823,9 @@ BMLTSemantic.prototype.setAllSortFieldFunctions = function ( ) {
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.setSortFieldState = function ( inKey, inMaxNum ) {
+BMLTSemantic.prototype.setSortFieldState = function ( inKey, values, inMaxNum ) {
     inMaxNum++;
-    for (var i = 1; i <= this.field_keys.length; i++) {
+    for (var i = 1; i <= values.length; i++) {
         var sortItemOptionID = this.getSortItemID(inKey, i);
         var optionElement = this.getScopedElement(sortItemOptionID);
         
@@ -1905,14 +1833,14 @@ BMLTSemantic.prototype.setSortFieldState = function ( inKey, inMaxNum ) {
             var sortItemSelect = optionElement.parentNode;
 
             if ( sortItemSelect ) {
-                if ( (sortItemSelect.selectedIndex == 0) && (optionElement.value == inMaxNum) ) {
+                if ( (sortItemSelect.selectedIndex === 0) && (optionElement.value === inMaxNum) ) {
                     optionElement.enable();
                 } else {
                     optionElement.disable();
-                };
-            };
-        };
-    };
+                }
+            }
+        }
+    }
 };
 
 /*******************************************************************************************/
@@ -1920,33 +1848,33 @@ BMLTSemantic.prototype.setSortFieldState = function ( inKey, inMaxNum ) {
     \brief
 */
 /*******************************************************************************************/
-BMLTSemantic.prototype.setAllSortFieldState = function ( ) {
+BMLTSemantic.prototype.setAllSortFieldState = function (values) {
     var maxNum = 0;
     
     if ( this.state.sorts && this.state.sorts.length ) {
         maxNum = this.state.sorts[this.state.sorts.length - 1].order;
     
-        for (var i = 0; i < this.field_keys.length; i++) {
-            var key = this.field_keys[i].key.toString();
+        for (var i = 0; i < values.length; i++) {
+            var key = values[i].key.toString();
             var selectID = this.getSortItemID(key);
             var selectObject = this.getScopedElement(selectID);
             selectObject.className = selectObject.defaultClass;
             for (var c = 0; c < this.state.sorts.length; c++) {
                 var sortObject = this.state.sorts[c];
                 
-                if ( sortObject.key == key ) {
+                if ( sortObject.key === key ) {
                     selectObject.selectedIndex = sortObject.order;
                     if ( sortObject.order > 0 ) {
                         selectObject.className = selectObject.defaultClass + ' sortSelectHighlight';
-                    };
-                };
-            };
-        };
-    };
+                    }
+                }
+            }
+        }
+    }
     
-    for (var i = 0; i < this.field_keys.length; i++) {
-        this.setSortFieldState(this.field_keys[i].key.toString(), maxNum);
-    };
+    for (var j = 0; j < values.length; j++) {
+        this.setSortFieldState(values[j].key.toString(), values, maxNum);
+    }
 };
 
 /*******************************************************************************************/

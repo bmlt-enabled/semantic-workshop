@@ -23,11 +23,11 @@
             </div>
             <div class="clear_both"></div>
         </div>
-        <form id="enter_server_url_form" class="enter_server_url_form" onclick="load();">
+        <form id="enter_server_url_form" class="enter_server_url_form">
             <div id="enter_server_url_form_div" class="enter_server_url_form_div">
                 <label id="enter_server_url_form_div_label" class="enter_server_url_form_div_label" for="enter_server_url_form_div_url_input">Enter A Valid BMLT Root Server URL:</label>
                 <input type="text" size="40" id="enter_server_url_form_div_url_input" class="enter_server_url_form_div_url_input" value="https://bmlt.sezf.org/main_server" />
-                <input type="submit" class="formEntrySubmit" value="Load" />
+                <input type="button" class="formEntrySubmit" value="Load" onclick="load();"/>
             </div>
         </form>
         <form id="bmlt_semantic_form" class="bmlt_semantic_form">
@@ -92,12 +92,12 @@
                                     <div id="bmlt_semantic_form_sb_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p><p>If any are selected, then the search will require that the selected terms match.</p><p>This is an "AND" search. Every one of these have to match in order to count.</p></div><div id="bmlt_semantic_form_not_formats_fieldset_div" class="bmlt_semantic_form_formats_fieldset_div"></div>
                                 </fieldset>
                                 <fieldset id="bmlt_semantic_form_keys_fieldset" class="bmlt_semantic_form_keys_fieldset"><legend id="bmlt_semantic_form_keys_fieldset_legend" class="bmlt_semantic_form_keys_fieldset_legend"><label id="bmlt_semantic_form_field_select_label" for="bmlt_semantic_form_field_select" class="bmlt_semantic_form_field_select_label">Search for a Specific Value of</label>
-                                    <select id="bmlt_semantic_form_field_select" class="bmlt_semantic_form_field_select" onchange="bmlt_semantic_js_object.handleFieldKeySelectChange(this)">
+                                    <select id="bmlt_semantic_form_field_select" class="bmlt_semantic_form_field_select" onchange="instance.handleFieldKeySelectChange(this)">
                                         <option value="" selected="selected">No Field Selected</option>
                                     </select>
                                 </legend>
                                     <div id="bmlt_semantic_form_fields_blurb_div" class="bmlt_workshop_blurb_note_div"><p>If none of these are selected, they will have no bearing at all on the search.</p></div><div id="bmlt_semantic_form_meeting_fields_fieldset_contents_div" class="bmlt_semantic_form_meeting_fields_fieldset_contents_div" style="display:none"><label id="bmlt_semantic_form_value_select_label" for="bmlt_semantic_form_value_select" class="bmlt_semantic_form_value_select_label">The Value Will Be:</label>
-                                        <select id="bmlt_semantic_form_value_select" class="bmlt_semantic_form_value_select" onchange="bmlt_semantic_js_object.fieldValueChosen(this)">
+                                        <select id="bmlt_semantic_form_value_select" class="bmlt_semantic_form_value_select" onchange="instance.fieldValueChosen(this)">
                                             <option value="" selected="selected" disabled="disabled">Existing Values</option>
                                         </select>
                                         <input type="text" id="bmlt_semantic_form_value_text" class="bmlt_semantic_form_value_text bmlt_semantic_form_disabled_text" value="Enter A Text String">
@@ -997,9 +997,12 @@
     </div>
 </body>
 <script type="text/javascript">
+    var instance;
+
     function load() {
         var url = document.getElementById('enter_server_url_form_div_url_input').value;
-        var sObj = new BMLTSemantic(url, 2013000)
+        instance = new BMLTSemantic(url, 2013000)
+        return false;
     }
 </script>
 </html>
