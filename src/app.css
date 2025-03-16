@@ -11,3 +11,11 @@ html body {
 html.dark body {
   background-color: #1b1e21;
 }
+
+body {
+  margin: 1em;
+}
+
+h1 {
+  font-size: 2em;
+}
