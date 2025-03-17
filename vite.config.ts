@@ -1,16 +1,11 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import laravel from 'laravel-vite-plugin';
 import { svelteTesting } from '@testing-library/svelte/vite';
 
 export default defineConfig({
   plugins: [
     svelte(),
-    svelteTesting(),
-    laravel({
-      input: ['resources/js/app.ts'],
-      refresh: true
-    })
+    svelteTesting()
   ],
   test: {
     globals: true,
