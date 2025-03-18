@@ -136,7 +136,12 @@
     }
   }
 
-  onMount(getAllData);
+  async function initialize() {
+    translations.setLanguage(workshopLanguage);
+    getAllData();
+  }
+
+  onMount(initialize);
 </script>
 
 <main>
@@ -154,7 +159,7 @@
     bind:value={workshopLanguage}
     onchange={() => translations.setLanguage(workshopLanguage)}
   >
-    {#each langs as string[] as key}
+    {#each translations.getAvailableLanguages() as key}
       <option value={key}>{allLanguages[key]}</option>
     {/each}
   </select>
