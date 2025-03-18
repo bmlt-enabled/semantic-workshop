@@ -51,13 +51,13 @@ describe('semantic workshop tests', () => {
     const user = await selectOperation('GetFormats');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
-    expect(formatLanguage.item(0)?.label).toBe('Server Language');
+    expect(formatLanguage.item(0)?.label).toBe('Server language');
     expect(formatLanguage.item(1)?.label).toBe('English');
     expect(formatLanguage.item(2)?.label).toBe('Español');
     expect(formatLanguage.item(3)?.label).toBe('Deutsch');
     await userEvent.selectOptions(formatLanguage, ['de']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de' })).toBeInTheDocument();
-    const allFormats = screen.getByRole('checkbox', { name: 'Show All Formats' }) as HTMLInputElement;
+    const allFormats = screen.getByRole('checkbox', { name: 'Show all formats' }) as HTMLInputElement;
     expect(allFormats.checked).toBe(false);
     await user.click(allFormats);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de&show_all=1' })).toBeInTheDocument();
@@ -141,7 +141,7 @@ describe('semantic workshop tests', () => {
     await userEvent.selectOptions(menu, ['GetFormats']);
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
     expect(formatLanguage.length).toBe(2);
-    expect(formatLanguage.item(0)?.label).toBe('Server Language');
+    expect(formatLanguage.item(0)?.label).toBe('Server language');
     expect(formatLanguage.item(1)?.label).toBe('Italiano');
     // finally set the root server URL to the empty string
     await user.clear(rootServerURL);

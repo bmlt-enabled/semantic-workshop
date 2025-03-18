@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';
+  import { translations } from './stores/localization';
 
   // defaultRootServerURL can also be '' (that works)
   const defaultRootServerURL = 'https://bmlt.wszf.org/main_server/';
@@ -21,6 +22,7 @@
   };
 
   // state that is separate from a particular operation
+  let workshopLanguage = $state('en');
   // rootServerUrl is what gets typed in the URL textbox
   let rootServerURL = $state(defaultRootServerURL);
   // the savedRootServerURL will always end in a / (added if necessary to the rootServerURL)
@@ -90,7 +92,7 @@
         availableFields = await getData('GetFieldKeys');
         availableFields?.sort((a, b) => a.description.localeCompare(b.description));
       } catch (error) {
-        serverError = 'Server error -- ' + error;
+        serverError = $translations.serverError + ' -- ' + error;
         serverInfo = undefined;
         langs = undefined;
         nativeLang = undefined;
@@ -138,15 +140,31 @@
 </script>
 
 <main>
-  <h1 class="mb-4 dark:text-white">BMLT Semantic Workshop</h1>
+  <h1 class="mb-4 dark:text-white">{$translations.title}</h1>
 
   <DarkMode size="lg" class="inline-block hover:text-gray-900 dark:hover:text-white" />
-  <p class="mb-4 dark:text-white">
-    This is a re-implementation of the semantic workshop for the BMLT root server, intended to work with the new Svelte UI. It is currently a standalone app in SvelteKit. It could remain as a separate
-    app, or later also be linked with the BMLT root server.
+<form class="mb-4 w-3/12">
+
+  <label for="workshopLanguage" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.language}:</label>
+  <select
+    id="workshopLanguage"
+    class="mb-4 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5
+        text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white
+        dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+    bind:value={workshopLanguage}
+    onchange={() => translations.setLanguage(workshopLanguage)}
+  >
+    {#each langs as string[] as key}
+      <option value={key}>{allLanguages[key]}</option>
+    {/each}
+  </select>
+</form>
+
+  <p class="mt-4 mb-4 dark:text-white">
+    {$translations.intro}
   </p>
 
-  <label for="responseURL" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Response URL:</label>
+  <label for="responseURL" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.responseURL}:</label>
   <output id="responseURL">
     {#if responseURL}
       <a href={responseURL} target="_blank" class="font-medium text-blue-600 underline hover:no-underline dark:text-blue-500">{responseURL}</a>
@@ -161,7 +179,7 @@
       class="block w-full rounded-lg border border-gray-300 bg-gray-50
     p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700
     dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-      placeholder="enter root server URL"
+      placeholder={$translations.urlPlaceholder}
       required
       bind:value={rootServerURL}
     />
@@ -172,15 +190,15 @@
     text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700
     dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
     >
-      Update root server URL
+    {$translations.updateURL}
     </Button>
-    <Helper class="bg-red-500!">
+    <Helper>
       {#if serverError}
-        {serverError}
+        <div class="text-red-500">{serverError}</div>
       {/if}
     </Helper>
 
-    <label for="operation" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Operation:</label>
+    <label for="operation" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.operation}:</label>
     <select
       id="operation"
       class="mb-4 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5
@@ -188,21 +206,21 @@
         dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
       bind:value={operation}
     >
-      <option value="GetServiceBodies">Get Service Bodies</option>
-      <option value="GetSearchResults">Get Meeting Search Results</option>
-      <option value="GetFormats">Get Formats</option>
-      <option value="GetChanges">Get Changes</option>
-      <option value="GetFieldKeys">Get a List of Available Field Keys</option>
-      <option value="GetFieldValues">Get a List of Specific Field Values</option>
-      <option value="GetNAWSDump">Get a NAWS Format Export</option>
-      <option value="GetServerInfo">Get Server Information</option>
-      <option value="GetCoverageArea">Get Geographic Coverage Area</option>
+      <option value="GetServiceBodies">{$translations.getServiceBodies}</option>
+      <option value="GetSearchResults">{$translations.getSearchResults}</option>
+      <option value="GetFormats">{$translations.getFormats}</option>
+      <option value="GetChanges">{$translations.getChanges}</option>
+      <option value="GetFieldKeys">{$translations.getFieldKeys}</option>
+      <option value="GetFieldValues">{$translations.getFieldValues}</option>
+      <option value="GetNAWSDump">{$translations.getNAWSDump}</option>
+      <option value="GetServerInfo">{$translations.getServerInfo}</option>
+      <option value="GetCoverageArea">{$translations.getCoverageArea}</option>
     </select>
 
     {#if operation === 'GetSearchResults'}
     <div class="dark:text-white">todo: not finished</div>
     {:else if operation === 'GetFormats'}
-      <label for="formatLanguage" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Format language:</label>
+      <label for="formatLanguage" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.formatLanguage}:</label>
       <select
         id="formatLanguage"
         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm
@@ -210,19 +228,19 @@
           dark:focus:border-blue-500 dark:focus:ring-blue-500"
         bind:value={formatLanguage}
       >
-        <option value="">Server Language</option>
+        <option value="">{$translations.serverLanguage}</option>
         {#each langs as string[] as key}
           <option value={key}>{allLanguages[key]}</option>
         {/each}
       </select>
       <label>
         <input type="checkbox" bind:checked={showAllFormats} />
-        <div class="dark:text-white">Show All Formats</div>
+        <div class="dark:text-white">{$translations.showAllFormats}</div>
       </label>
     {:else if operation === 'GetChanges'}
-      <label for="changesDates" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Get changes between (inclusive):</label>
+      <label for="changesDates" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.getChangesBetween}:</label>
       <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} />
-      <label for="changesMeetingId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Get changes for a meeting with this ID:</label>
+      <label for="changesMeetingId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.getChangesForMeeting}:</label>
       <input
         type="text"
         inputmode="numeric"
@@ -232,7 +250,7 @@
     dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         bind:value={changesMeetingId}
       />
-      <label for="changesServiceBodyId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Service body:</label>
+      <label for="changesServiceBodyId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.serviceBody}:</label>
       <select
         id="changesServiceBodyId"
         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm
@@ -240,13 +258,13 @@
           dark:focus:border-blue-500 dark:focus:ring-blue-500"
         bind:value={changesServiceBodyId}
       >
-        <option value="">No service body selected</option>
+        <option value="">{$translations.noServiceBodySelected}</option>
         {#each serviceBodies as { name: string; id: string }[] as s}
           <option value={s.id}>{s.name}</option>
         {/each}
       </select>
     {:else if operation === 'GetFieldValues'}
-      <label for="keyForGetFieldValues" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Field:</label>
+      <label for="keyForGetFieldValues" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.field}:</label>
       <select
         id="keyForGetFieldValues"
         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm
@@ -259,7 +277,7 @@
         {/each}
       </select>
     {:else if operation === 'GetNAWSDump'}
-      <label for="nawsDumpServiceBodyId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">Service body:</label>
+      <label for="nawsDumpServiceBodyId" class="mt-6 block text-sm font-medium text-gray-900 dark:text-white">{$translations.serviceBody}:</label>
       <select
         id="nawsDumpServiceBodyId"
         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm
