@@ -11,6 +11,7 @@ const settings = { defaultLanguage: 'en' };
 /*eslint sort-keys: ["error", "asc", {caseSensitive: false}]*/
 const strings = new (LocalizedStrings as any)({
   de: {
+    allServiceBodies: 'All service bodies',
     field: 'Field',
     formatLanguage: 'Format language',
     getServiceBodies: 'Get Service Bodies',
@@ -28,9 +29,11 @@ const strings = new (LocalizedStrings as any)({
       with the new Svelte UI. It is currently a standalone app in SvelteKit. It could remain as a separate
       app, or later also be linked with the BMLT root server.`,
     language: 'Sprache',
-    noServiceBodySelected: 'No service body selected',
+    none: '- Keine -',
+    noParameters: '- no parameters for this operation -',
     operation: 'Operation',
     responseURL: 'Response URL',
+    rootServerURL: 'Root server URL',
     serverError: 'Server error',
     serverLanguage: 'Server language',
     serviceBody: 'Service body',
@@ -40,6 +43,8 @@ const strings = new (LocalizedStrings as any)({
     urlPlaceholder: 'enter root server URL'
   },
   en: {
+    allServiceBodies: 'All service bodies',
+    chooseOption: 'Choose option ...',
     field: 'Field',
     formatLanguage: 'Format language',
     getServiceBodies: 'Get Service Bodies',
@@ -53,13 +58,17 @@ const strings = new (LocalizedStrings as any)({
     getNAWSDump: 'Get a NAWS Format Export',
     getServerInfo: 'Get Server Information',
     getCoverageArea: 'Get Geographic Coverage Area',
+    getUsedFormats: 'Get the formats used in the results of this search',
+    getFormatsOnly: 'Get just the formats (not the search results)',
     intro: `This is a re-implementation of the semantic workshop for the BMLT root server, intended to work
       with the new Svelte UI. It is currently a standalone app in SvelteKit. It could remain as a separate
       app, or later also be linked with the BMLT root server.`,
     language: 'Language',
-    noServiceBodySelected: 'No service body selected',
+    none: '- none -',
+    noParameters: '- no parameters for this operation -',
     operation: 'Operation',
     responseURL: 'Response URL',
+    rootServerURL: 'Root server URL',
     serverError: 'Server error',
     serverLanguage: 'Server language',
     serviceBody: 'Service body',

@@ -34,7 +34,7 @@ describe('semantic workshop tests', () => {
     const rootServerURL = screen.getByRole('textbox', { name: 'Root server URL:' }) as HTMLInputElement;
     expect(screen.getByRole('button', { name: 'Update root server URL' })).toBeDisabled();
     const operation = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    expect(operation.value).toBe('GetServiceBodies');
+    expect(operation.value).toBe('');
   });
 
   test('test Get Service Bodies', async () => {
@@ -51,17 +51,18 @@ describe('semantic workshop tests', () => {
     const user = await selectOperation('GetFormats');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
-    expect(formatLanguage.item(0)?.label).toBe('Server language');
-    expect(formatLanguage.item(1)?.label).toBe('English');
-    expect(formatLanguage.item(2)?.label).toBe('Español');
-    expect(formatLanguage.item(3)?.label).toBe('Deutsch');
+    expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
+    expect(formatLanguage.item(1)?.label).toBe('Server language');
+    expect(formatLanguage.item(2)?.label).toBe('Deutsch');
+    expect(formatLanguage.item(3)?.label).toBe('English');
+    expect(formatLanguage.item(4)?.label).toBe('Español');
     await userEvent.selectOptions(formatLanguage, ['de']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de' })).toBeInTheDocument();
     const allFormats = screen.getByRole('checkbox', { name: 'Show all formats' }) as HTMLInputElement;
     expect(allFormats.checked).toBe(false);
     await user.click(allFormats);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de&show_all=1' })).toBeInTheDocument();
-    await userEvent.selectOptions(formatLanguage, ['']);
+    await userEvent.selectOptions(formatLanguage, ['servLang']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&show_all=1' })).toBeInTheDocument();
   });
 
@@ -73,13 +74,16 @@ describe('semantic workshop tests', () => {
     // user.click(openDatePicker);
     const meetingIdTextBox = screen.getByRole('textbox', { name: 'Get changes for a meeting with this ID:' }) as HTMLInputElement;
     await user.type(meetingIdTextBox, '439');
+    // hack!  click someplace random to get svelte to accept the edit
+    await user.click(screen.getByRole('heading', { name: 'BMLT Semantic Workshop', level: 1 }));
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges&meeting_id=439' })).toBeInTheDocument();
     await user.clear(meetingIdTextBox);
     const serviceBody = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(serviceBody.item(0)?.label).toBe('No service body selected');
-    expect(serviceBody.item(1)?.label).toBe('Big Zone');
-    expect(serviceBody.item(2)?.label).toBe('Northern Region');
-    expect(serviceBody.item(3)?.label).toBe('Southern Region');
+    expect(serviceBody.item(0)?.label).toBe('Choose option ...');
+    expect(serviceBody.item(1)?.label).toBe('All service bodies');
+    expect(serviceBody.item(2)?.label).toBe('Big Zone');
+    expect(serviceBody.item(3)?.label).toBe('Northern Region');
+    expect(serviceBody.item(4)?.label).toBe('Southern Region');
     await userEvent.selectOptions(serviceBody, ['8']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges&service_body_id=8' })).toBeInTheDocument();
   });
@@ -91,21 +95,23 @@ describe('semantic workshop tests', () => {
 
   test('test Get a List of Specific Field Values', async () => {
     const user = await selectOperation('GetFieldValues');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=service_body_bigint' })).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
-    expect(field.item(0)?.label).toBe('Service Body ID');
-    expect(field.item(1)?.label).toBe('Start Time');
+    expect(field.item(0)?.label).toBe('Choose option ...');
+    expect(field.item(1)?.label).toBe('Service Body ID');
+    expect(field.item(2)?.label).toBe('Start Time');
     await userEvent.selectOptions(field, ['start_time']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=start_time' })).toBeInTheDocument();
   });
 
   test('test Get a NAWS Format Export', async () => {
     const user = await selectOperation('GetNAWSDump');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetNAWSDump&sb_id=5' })).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(field.item(0)?.label).toBe('Big Zone');
-    expect(field.item(1)?.label).toBe('Northern Region');
-    expect(field.item(2)?.label).toBe('Southern Region');
+    expect(field.item(0)?.label).toBe('Choose option ...');
+    expect(field.item(1)?.label).toBe('Big Zone');
+    expect(field.item(2)?.label).toBe('Northern Region');
+    expect(field.item(3)?.label).toBe('Southern Region');
     await userEvent.selectOptions(field, ['9']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetNAWSDump&sb_id=9' })).toBeInTheDocument();
   });
@@ -135,21 +141,25 @@ describe('semantic workshop tests', () => {
     await user.click(updateURL);
     const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
     // changing the URL should reset the selected operation
-    expect(menu.value).toBe('GetServiceBodies');
+    expect(menu.value).toBe('');
+    await userEvent.selectOptions(menu, ['GetServiceBodies']);
+    // we should see the URL and parameters for smallzone now
     expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
-    // we should see parameters for smallzone now
     await userEvent.selectOptions(menu, ['GetFormats']);
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
-    expect(formatLanguage.length).toBe(2);
-    expect(formatLanguage.item(0)?.label).toBe('Server language');
-    expect(formatLanguage.item(1)?.label).toBe('Italiano');
+    expect(formatLanguage.length).toBe(3);
+    expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
+    expect(formatLanguage.item(1)?.label).toBe('Server language');
+    expect(formatLanguage.item(2)?.label).toBe('Italiano');
     // finally set the root server URL to the empty string
     await user.clear(rootServerURL);
     await user.click(updateURL);
     expect(screen.queryByRole('link')).toBe(null);
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     await userEvent.selectOptions(menu, ['GetNAWSDump']);
     const serviceBodiesMenu = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(serviceBodiesMenu.length).toBe(0);
+    expect(serviceBodiesMenu.length).toBe(1);
+    expect(serviceBodiesMenu.item(0)?.label).toBe('Choose option ...');
   });
 
   test('bad root server URL', async () => {
@@ -162,4 +172,12 @@ describe('semantic workshop tests', () => {
     await user.click(updateURL);
     expect(screen.getByText(/Server error -- Error: mocked server error/)).toBeInTheDocument();
   });
+
+  test('change semantic workshop language', async () => {
+    render(App);
+    const languagerMenu = screen.getByRole('combobox', { name: 'Language:' }) as HTMLSelectElement;
+    await userEvent.selectOptions(languagerMenu, ['de']);
+    expect(screen.getByRole('heading', { name: 'BMLT Semantische Werkstatt', level: 1 })).toBeInTheDocument();
+  });
+
 });
