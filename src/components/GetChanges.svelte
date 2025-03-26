@@ -1,19 +1,25 @@
 <script lang="ts">
-  import { Datepicker, Input, Label, Select } from 'flowbite-svelte';
+  import { Datepicker, Helper, Input, Label, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
   let { serviceBodies, parameters = $bindable() } = $props();
   let changesFrom: Date | undefined = $state();
   let changesTo: Date | undefined = $state();
-  let changesMeetingId: number | undefined = $state();
+  let changesMeetingId: string = $state('');
+  let badChangesMeetingId: boolean = $state(false);
   let changesServiceBodyId: string = $state('all');
 
   function computeParameters() {
-    parameters = changesDateParam(changesFrom, 'start') +
-          changesDateParam(changesTo, 'end') +
-          (changesMeetingId ? '&meeting_id=' + changesMeetingId.toString() : '') +
-          (changesServiceBodyId === 'all' ? '' : '&service_body_id=' + changesServiceBodyId);
+    badChangesMeetingId = /[^\d]/.test(changesMeetingId);
+    if (badChangesMeetingId) {
+      parameters = null;
+    } else {
+      parameters = changesDateParam(changesFrom, 'start') +
+        changesDateParam(changesTo, 'end') +
+        (changesMeetingId ? '&meeting_id=' + changesMeetingId : '') +
+        (changesServiceBodyId === 'all' ? '' : '&service_body_id=' + changesServiceBodyId);
+    }
   }
 
   function changesDateParam(date: Date | undefined, what: string) {
@@ -38,7 +44,10 @@
   </Label>
   <Label>
     {$translations.getChangesForMeeting}:
-    <Input type="text" inputmode="numeric" bind:value={changesMeetingId} onchange={computeParameters} />
+    <Input type="text" bind:value={changesMeetingId} on:input={computeParameters} />
+    {#if badChangesMeetingId}
+      <div class="text-red-500">{$translations.invalidMeetingId}</div>
+    {/if}
   </Label>
   <Label>
     {$translations.serviceBody}:

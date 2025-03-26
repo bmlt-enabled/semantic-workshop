@@ -28,9 +28,9 @@
   ];
 
   const operationOptions = [
-    { name: $translations.getServiceBodies, value: 'GetServiceBodies' },
     { name: $translations.getSearchResults, value: 'GetSearchResults' },
     { name: $translations.getFormats, value: 'GetFormats' },
+    { name: $translations.getServiceBodies, value: 'GetServiceBodies' },
     { name: $translations.getChanges, value: 'GetChanges' },
     { name: $translations.getFieldKeys, value: 'GetFieldKeys' },
     { name: $translations.getFieldValues, value: 'GetFieldValues' },
@@ -51,6 +51,7 @@
   let availableFields: { key: string; description: string }[] | undefined = $state();
   let serverLangs: string[] | undefined = $state();
   let nativeLang: string | undefined = $state();
+  let formats: { key_string: string, id: string }[] = $state();
 
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.
@@ -89,6 +90,8 @@
         serviceBodies?.sort((a, b) => a.name.localeCompare(b.name));
         availableFields = await getData('GetFieldKeys');
         availableFields?.sort((a, b) => a.description.localeCompare(b.description));
+        formats = await getData('GetFormats');
+        formats?.sort((a, b) => a.key_string.localeCompare(b.key_string));
         serverError = '';
       } catch (error) {
         serverError = $translations.serverError + ' -- ' + error;
@@ -97,6 +100,7 @@
         nativeLang = undefined;
         serviceBodies = undefined;
         availableFields = undefined;
+        formats = undefined;
       }
     }
   }
@@ -144,7 +148,7 @@
     </Label>
 
     {#if operation === 'GetSearchResults'}
-      <GetMeetingSearchResults bind:parameters />
+      <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
     {:else if operation === 'GetFormats'}
       <GetFormats {serverLangs} {allLanguages} bind:parameters />
     {:else if operation === 'GetChanges'}

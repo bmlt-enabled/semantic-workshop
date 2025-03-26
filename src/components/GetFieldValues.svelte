@@ -5,12 +5,14 @@
 
   let { availableFields, parameters = $bindable() } = $props();
   let keyForGetFieldValues: string | undefined = $state();
+  const fieldOptions: { name: string, value: string }[] = availableFields.map( (f: { key: string, description: string }) => ({ name: f.description, value: f.key }));
 
+  // If keyForGetFieldValues is null, no field has been selected and so we should not have a response URL yet.
+  // Set parameters to null in computeParameters and onMount to indicate this.
   function computeParameters() {
-    parameters = keyForGetFieldValues ? '&meeting_key=' + keyForGetFieldValues : null;
+    parameters = keyForGetFieldValues ? '&meeting_key=' + encodeURIComponent(keyForGetFieldValues) : null;
   }
 
-  const fieldOptions: { name: string, value: string }[] = availableFields.map( (f: { key: string, description: string }) => ({ name: f.description, value: f.key }));
   onMount(() => parameters = null);
 </script>
 
