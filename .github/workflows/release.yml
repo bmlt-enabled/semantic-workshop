@@ -5,7 +5,7 @@ on:
     tags: ['*']
 
 jobs:
-  deploy-nacc-release:
+  deploy-semantic-workshop-release:
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
@@ -19,7 +19,9 @@ jobs:
         run: |
           npm ci
           npm run build
-          zip -r semantic-workshop.zip dist/*
+          cd dist
+          zip -r ../semantic-workshop.zip *
+          cd ..
 
       - name: Generate Release Notes 📝
         if: github.ref_type == 'tag'
