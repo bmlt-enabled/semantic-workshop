@@ -26,19 +26,19 @@ function mockResponse(url: string) {
     ];
   } else if (/GetFieldValues&meeting_key=location_province/.test(url)) {
     return [
-        { location_province: 'WA', ids: '10,20,30' },
-        { location_province: 'OR', ids: '44,55,60' }
-      ];
-} else if (/GetFieldValues&meeting_key=weird%26key/.test(url)) {
+      { location_province: 'WA', ids: '10,20,30' },
+      { location_province: 'OR', ids: '44,55,60' }
+    ];
+  } else if (/GetFieldValues&meeting_key=weird%26key/.test(url)) {
     return [
-        { 'weird&key': 'a[3]', ids: '10,20,30' },
-        { 'weird&key': 'b[4]', ids: '44,55,60' }
-      ];
+      { 'weird&key': 'a[3]', ids: '10,20,30' },
+      { 'weird&key': 'b[4]', ids: '44,55,60' }
+    ];
   } else if (/GetFormats/.test(url)) {
     return [
-        { key_string: 'VM', id: '5' },
-        { key_string: 'Ag', id: '8' },
-        { key_string: 'LGBT', id: '3' }
+      { key_string: 'VM', id: '5' },
+      { key_string: 'Ag', id: '8' },
+      { key_string: 'LGBT', id: '3' }
     ];
   } else {
     throw new Error('Internal error: no mocked response for this request' + url);

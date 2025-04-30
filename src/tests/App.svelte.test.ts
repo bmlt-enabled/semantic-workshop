@@ -103,7 +103,6 @@ describe('semantic workshop tests (except get meetings)', () => {
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=location_province' })).toBeInTheDocument();
     await userEvent.selectOptions(field, ['weird&key']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=weird%26key' })).toBeInTheDocument();
-
   });
 
   test('test Get a NAWS Format Export', async () => {
@@ -181,7 +180,6 @@ describe('semantic workshop tests (except get meetings)', () => {
     await userEvent.selectOptions(languagerMenu, ['de']);
     expect(screen.getByRole('heading', { name: 'BMLT Semantische Werkstatt', level: 1 })).toBeInTheDocument();
   });
-
 });
 
 describe('Get Meeting Search Results tests', () => {
@@ -209,7 +207,7 @@ describe('Get Meeting Search Results tests', () => {
 
   test('test meetings that gather on specific weekdays', async () => {
     const user = await selectOperation('GetSearchResults');
-    // bit of a hack -- there are TWO Monday boxes, one for meetings that gather on Mondays 
+    // bit of a hack -- there are TWO Monday boxes, one for meetings that gather on Mondays
     // and another for meetings that do not gather on Mondays
     const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
     expect(mondays.length).toBe(2);
@@ -229,7 +227,7 @@ describe('Get Meeting Search Results tests', () => {
     await user.click(wednesdays[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays[]=-2&weekdays[]=-4' })).toBeInTheDocument();
   });
-      
+
   test('test meetings that have specific venue types', async () => {
     const user = await selectOperation('GetSearchResults');
     const virtual = screen.getAllByRole('checkbox', { name: 'Virtual' });
@@ -311,5 +309,4 @@ describe('Get Meeting Search Results tests', () => {
     await userEvent.selectOptions(existingValue, ['b[4]']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=weird%26key&meeting_key_value=b%5B4%5D' })).toBeInTheDocument();
   });
-
 });
