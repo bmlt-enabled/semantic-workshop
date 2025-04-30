@@ -1,0 +1,39 @@
+name: 'release'
+
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  deploy-nacc-release:
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout 🛒
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Build 🔧
+        run: |
+          npm ci
+          npm run build
+          zip -r semantic-workshop.zip dist/*
+
+      - name: Generate Release Notes 📝
+        if: github.ref_type == 'tag'
+        run: |
+          curl -LO https://raw.githubusercontent.com/bmlt-enabled/release-notes-tool/master/gh-release-notes.sh
+          chmod +x gh-release-notes.sh
+          ./gh-release-notes.sh CHANGELOG.md "##"
+          RELEASE_TYPE=$(if [[ "$GITHUB_REF_NAME" =~ -(beta|rc) ]]; then echo "true"; else echo "false"; fi)
+          echo "RELEASE_TYPE=${RELEASE_TYPE}" >> $GITHUB_ENV
+
+      - name: Create Release 🎉
+        uses: ncipollo/release-action@v1.14.0
+        if: github.ref_type == 'tag'
+        with:
+          artifacts: semantic-workshop.zip
+          bodyFile: "changelog.txt"
+          prerelease: ${{ env.RELEASE_TYPE }}
