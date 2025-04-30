@@ -4,7 +4,7 @@
   import { translations } from '../stores/localization';
 
   let { parameters = $bindable() } = $props();
-  onMount(() => parameters = '');
+  onMount(() => (parameters = ''));
 </script>
-  
+
 <P class="dark:text-white">{$translations.noParameters}</P>

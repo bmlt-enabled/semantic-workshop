@@ -51,12 +51,14 @@
   let availableFields: { key: string; description: string }[] | undefined = $state();
   let serverLangs: string[] | undefined = $state();
   let nativeLang: string | undefined = $state();
-  let formats: { key_string: string, id: string }[] = $state();
+  let formats: { key_string: string; id: string }[] = $state();
 
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.
   let parameters: string | null = $state('');
-  let responseURL = $derived(operation === '' || savedRootServerURL === '' || serverError || parameters === null ? '' : savedRootServerURL + 'client_interface/json/?switcher=' + operation + parameters);
+  let responseURL = $derived(
+    operation === '' || savedRootServerURL === '' || serverError || parameters === null ? '' : savedRootServerURL + 'client_interface/json/?switcher=' + operation + parameters
+  );
 
   async function updateRootServerURL() {
     const s = rootServerURL.trim();
@@ -120,46 +122,47 @@
 
   <DarkMode size="lg" class="inline-block hover:text-gray-900 dark:hover:text-white" />
 
-<Label>
-  {$translations.language}:
-  <Select class="mt-2" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
-</Label>
+  <Label>
+    {$translations.language}:
+    <Select class="mt-2" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
+  </Label>
 
-<Label for="responseURL" >{$translations.responseURL}:</Label>
-<output id="responseURL">
-  {#if responseURL}
-    <a  href={responseURL} target="_blank" class="font-medium text-blue-600 underline hover:no-underline dark:text-blue-500">{responseURL}</a>
-  {:else}
-    <div class="dark:text-white">{$translations.none}</div>
-  {/if}
-</output>
-
-<Label for="rootServerURL" >{$translations.rootServerURL}:</Label>
-<Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} />
-<Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} >{$translations.updateURL}</Button>
-<Helper>
-  {#if serverError}
-    <div class="text-red-500">{serverError}</div>
-  {/if}
-</Helper>
-
-    <Label for="operation" class="mb-2">{$translations.operation}:
-    <Select id="operation" class="mt-2" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
-    </Label>
-
-    {#if operation === 'GetSearchResults'}
-      <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
-    {:else if operation === 'GetFormats'}
-      <GetFormats {serverLangs} {allLanguages} bind:parameters />
-    {:else if operation === 'GetChanges'}
-      <GetChanges {serviceBodies} bind:parameters />
-    {:else if operation === 'GetFieldValues'}
-      <GetFieldValues {availableFields} bind:parameters />
-    {:else if operation === 'GetNAWSDump'}
-      <GetNAWSDump {serviceBodies} bind:parameters />
-    {:else if operation === 'GetCoverageArea'}
-      <GetCoverageArea bind:parameters />
-    {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
-      <GetOther bind:parameters />
+  <Label for="responseURL">{$translations.responseURL}:</Label>
+  <output id="responseURL">
+    {#if responseURL}
+      <a href={responseURL} target="_blank" class="font-medium text-blue-600 underline hover:no-underline dark:text-blue-500">{responseURL}</a>
+    {:else}
+      <div class="dark:text-white">{$translations.none}</div>
     {/if}
+  </output>
+
+  <Label for="rootServerURL">{$translations.rootServerURL}:</Label>
+  <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} />
+  <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL}>{$translations.updateURL}</Button>
+  <Helper>
+    {#if serverError}
+      <div class="text-red-500">{serverError}</div>
+    {/if}
+  </Helper>
+
+  <Label for="operation" class="mb-2"
+    >{$translations.operation}:
+    <Select id="operation" class="mt-2" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
+  </Label>
+
+  {#if operation === 'GetSearchResults'}
+    <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
+  {:else if operation === 'GetFormats'}
+    <GetFormats {serverLangs} {allLanguages} bind:parameters />
+  {:else if operation === 'GetChanges'}
+    <GetChanges {serviceBodies} bind:parameters />
+  {:else if operation === 'GetFieldValues'}
+    <GetFieldValues {availableFields} bind:parameters />
+  {:else if operation === 'GetNAWSDump'}
+    <GetNAWSDump {serviceBodies} bind:parameters />
+  {:else if operation === 'GetCoverageArea'}
+    <GetCoverageArea bind:parameters />
+  {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
+    <GetOther bind:parameters />
+  {/if}
 </main>

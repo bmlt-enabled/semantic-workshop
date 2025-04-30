@@ -110,8 +110,8 @@ const strings = new (LocalizedStrings as any)({
     updateURL: 'Update root server URL',
     urlPlaceholder: 'enter root server URL',
     value: 'Value',
-    venueTypes: [ 'In-person', 'Virtual', 'Hybrid' ],
-    weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ]
+    venueTypes: ['In-person', 'Virtual', 'Hybrid'],
+    weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   }
 });
 

@@ -15,7 +15,8 @@
     if (badChangesMeetingId) {
       parameters = null;
     } else {
-      parameters = changesDateParam(changesFrom, 'start') +
+      parameters =
+        changesDateParam(changesFrom, 'start') +
         changesDateParam(changesTo, 'end') +
         (changesMeetingId ? '&meeting_id=' + changesMeetingId : '') +
         (changesServiceBodyId === 'all' ? '' : '&service_body_id=' + changesServiceBodyId);
@@ -32,9 +33,9 @@
     }
   }
 
-  const bodies: { name: string, value: string }[] = serviceBodies.map( (b: { name: string, id: string }) => ({ name: b.name, value: b.id }));
-  const serviceBodyOptions = [{value: 'all', name: $translations.allServiceBodies }].concat(bodies);
-  onMount(() => parameters = '');
+  const bodies: { name: string; value: string }[] = serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id }));
+  const serviceBodyOptions = [{ value: 'all', name: $translations.allServiceBodies }].concat(bodies);
+  onMount(() => (parameters = ''));
 </script>
 
 <div>
