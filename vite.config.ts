@@ -3,6 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
 
 export default defineConfig({
+  base: '/semantic/',
   plugins: [
     svelte(),
     svelteTesting()
