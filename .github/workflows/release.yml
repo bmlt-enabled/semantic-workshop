@@ -19,9 +19,15 @@ jobs:
         run: |
           npm ci
           npm run build
+          npm run build:laravel
           cd dist
           zip -r ../semantic-workshop.zip *
           tar -czf ../semantic-workshop.tar.gz *
+          cd ..
+          cd public
+          mv build semantic
+          zip -r ../semantic-workshop-laravel.zip semantic
+          tar -czf ../semantic-workshop-laravel.tar.gz semantic
           cd ..
 
       - name: Generate Release Notes 📝
