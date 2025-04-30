@@ -43,6 +43,6 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         if: github.ref_type == 'tag'
         with:
-          artifacts: semantic-workshop.zip,semantic-workshop.tar.gz
+          artifacts: semantic-workshop.zip,semantic-workshop.tar.gz,semantic-workshop-laravel.zip,semantic-workshop-laravel.tar.gz
           bodyFile: "changelog.txt"
           prerelease: ${{ env.RELEASE_TYPE }}
