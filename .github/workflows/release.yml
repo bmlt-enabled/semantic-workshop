@@ -21,6 +21,7 @@ jobs:
           npm run build
           cd dist
           zip -r ../semantic-workshop.zip *
+          tar -czf ../semantic-workshop.tar.gz *
           cd ..
 
       - name: Generate Release Notes 📝
@@ -36,6 +37,6 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         if: github.ref_type == 'tag'
         with:
-          artifacts: semantic-workshop.zip
+          artifacts: semantic-workshop.zip,semantic-workshop.tar.gz
           bodyFile: "changelog.txt"
           prerelease: ${{ env.RELEASE_TYPE }}
