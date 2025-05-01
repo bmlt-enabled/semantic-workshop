@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { A, Button, Heading, Helper, Input, Label, P, Select } from 'flowbite-svelte';
+  import './app.css';
+  import { Button, Heading, Helper, Input, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';

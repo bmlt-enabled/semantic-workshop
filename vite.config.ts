@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   base: './',
-  plugins: [svelte(), svelteTesting()],
+  plugins: [tailwindcss(), svelte(), svelteTesting()],
   test: {
     globals: true,
     environment: 'jsdom',
