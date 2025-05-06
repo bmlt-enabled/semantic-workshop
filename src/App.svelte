@@ -14,7 +14,7 @@
   import GetOther from './components/GetOther.svelte';
 
   // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = (typeof settings !== 'undefined' && settings.apiBaseUrl) ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = typeof settings !== 'undefined' && settings.apiBaseUrl ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
@@ -52,7 +52,7 @@
   let availableFields: { key: string; description: string }[] | undefined = $state();
   let serverLangs: string[] | undefined = $state();
   let nativeLang: string | undefined = $state();
-  let formats: { key_string: string; id: string }[] = $state();
+  let formats: { key_string: string; id: string }[] | undefined = $state();
 
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.

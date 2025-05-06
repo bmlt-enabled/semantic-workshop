@@ -14,9 +14,29 @@
   let formatsComparisonOperator: string = $state('AND');
   let doesNotHaveFormat: boolean[] = $state(new Array(formats.length).fill(false));
   let keyForMeetingKeyValue: string = $state('');
-  let fieldOptions: { name: string; value: string }[] = $state();
-  let meetingKeyValues: { name: string; value: string }[] = $state();
+  let meetingKeyValues: { name: string; value: string }[] = $state([]);
   let meetingFieldValue = $state('');
+  let specificTextValue = $state('');
+  const searchForTextMenuOptions = [
+    { name: $translations.searchOptionGeneral, value: 'general' },
+    { name: $translations.searchOptionLocation, value: 'location' }
+  ];
+  let searchType = $state('general');
+  let searchRadius = $state('');
+  let badRadius = $derived(!/^-?\d*$/.test(searchRadius));
+  let fieldOptions: { name: string; value: string }[] = $derived(availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key })));
+
+  async function computeMeetingKeyValues() {
+    try {
+      const response = await fetch(rootServerURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue));
+      const j = await response.json();
+      meetingKeyValues = j.map((f) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }));
+      meetingFieldValue = '';
+      parameters = '';
+    } catch (error) {
+      // TO FILL IN
+    }
+  }
 
   function computeParameters() {
     if (!getUsedFormats) {
@@ -43,28 +63,40 @@
 
     const specificFieldValuePart = meetingFieldValue ? '&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue) + '&meeting_key_value=' + encodeURIComponent(meetingFieldValue) : '';
 
-    parameters =
-      usedFormatsPart + onWeekdayPart + notOnWeekdayPart + hasVenueTypePart + doesNotHaveVenueTypePart + hasFormatPart + doesNotHaveFormatPart + formatsComparisonOperatorPart + specificFieldValuePart;
-  }
+    const locationModifier = searchType === 'location' ? '&StringSearchIsAnAddress=1' : '';
+    const radiusModifier = searchType === 'location' && searchRadius ? '&SearchStringRadius=' + searchRadius : '';
+    const specificTextValuePart = specificTextValue ? '&SearchString=' + encodeURIComponent(specificTextValue) + locationModifier + radiusModifier : '';
 
-  async function computeMeetingKeyValues() {
-    try {
-      const response = await fetch(rootServerURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue));
-      const j = await response.json();
-      meetingKeyValues = j.map((f) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }));
-      meetingFieldValue = '';
-      parameters = '';
-    } catch (error) {
-      // TO FILL IN
+    if (searchRadius && badRadius) {
+      parameters = null;
+    } else {
+      parameters =
+        usedFormatsPart +
+        onWeekdayPart +
+        notOnWeekdayPart +
+        hasVenueTypePart +
+        doesNotHaveVenueTypePart +
+        hasFormatPart +
+        doesNotHaveFormatPart +
+        formatsComparisonOperatorPart +
+        specificFieldValuePart +
+        specificTextValuePart;
     }
   }
 
-  function initialize() {
-    parameters = '';
-    fieldOptions = availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key }));
+  function computeParametersForSpecificTextValue() {
+    // this resets searchType if specificTextValue was set back to the empty string (by erasing something that was there)
+    // also reset searchRadius if we're back to general search type
+    if (specificTextValue === '') {
+      searchType = 'general';
+    }
+    if (searchType === 'general') {
+      searchRadius = '';
+    }
+    computeParameters();
   }
 
-  onMount(initialize);
+  onMount(() => (parameters = ''));
 </script>
 
 <div>
@@ -197,6 +229,71 @@
         <TableBodyCell>
           <Label for="enter-new-value" class="mb-2">{$translations.enterNewValue}:</Label>
           <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} on:input={computeParameters} />
+        </TableBodyCell>
+      </TableBodyRow>
+    </TableBody>
+  </Table>
+
+  <Table>
+    <caption class="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+      {$translations.specificServiceBodies}
+      <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">{$translations.specificServiceBodiesExplanation}</p>
+    </caption>
+    <TableBody>
+      <TableBodyRow>
+        <TableBodyCell>
+          <p>not finished yet</p>
+        </TableBodyCell>
+      </TableBodyRow>
+    </TableBody>
+  </Table>
+
+  <Table>
+    <caption class="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+      {$translations.notSpecificServiceBodies}
+      <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">{$translations.notSpecificServiceBodiesExplanation}</p>
+    </caption>
+    <TableBody>
+      <TableBodyRow>
+        <TableBodyCell>
+          <p>not finished yet</p>
+        </TableBodyCell>
+      </TableBodyRow>
+    </TableBody>
+  </Table>
+
+  <Table>
+    <caption class="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+      {$translations.searchString}
+      <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">{$translations.searchStringExplanation}</p>
+    </caption>
+    <TableBody>
+      <TableBodyRow>
+        <TableBodyCell>
+          <Label for="search-for-text" class="mb-2">{$translations.searchForThisText}:</Label>
+          <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} on:input={computeParametersForSpecificTextValue} />
+        </TableBodyCell>
+        <TableBodyCell>
+          <Label for="search-type" class="mb-2">{$translations.searchType}:</Label>
+          <Select
+            id="search-type"
+            class="mt-2"
+            items={searchForTextMenuOptions}
+            placeholder={$translations.chooseOption}
+            disabled={specificTextValue === ''}
+            bind:value={searchType}
+            onchange={computeParametersForSpecificTextValue}
+          />
+        </TableBodyCell>
+      </TableBodyRow>
+      <TableBodyRow hidden={searchType !== 'location'}>
+        <TableBodyCell>
+          <Label for="search-radius" class="mb-2">{$translations.searchRadius}:</Label>
+          <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} on:input={computeParametersForSpecificTextValue} />
+          <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">{$translations.searchRadiusExplanation}</p>
+          {#if badRadius}
+            <div class="text-red-500">{$translations.invalidRadius}</div>
+          {/if}
         </TableBodyCell>
       </TableBodyRow>
     </TableBody>
