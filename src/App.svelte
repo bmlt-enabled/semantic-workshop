@@ -136,15 +136,9 @@
       <DarkMode size="lg" class="inline-block transition-colors duration-200 hover:text-gray-900 dark:hover:text-white" />
     </div>
 
-    <div class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
-      <P class="text-gray-600 dark:text-gray-300">{$translations.intro}</P>
-
-      <div class="space-y-4">
-        <Label class="block">
-          <span class="font-medium text-gray-700 dark:text-gray-300">{$translations.language}:</span>
-          <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage())} />
-        </Label>
-
+    <div class="rounded-lg bg-white shadow-sm dark:bg-gray-800">
+      <!-- Fixed Response URL Section -->
+      <div class="border-b border-gray-200 p-6 dark:border-gray-700">
         <div class="space-y-2">
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
@@ -158,48 +152,71 @@
           </output>
         </div>
 
-        <div class="space-y-2">
-          <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
-          <div class="flex gap-2">
-            <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} class="flex-1" />
-            <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} class="whitespace-nowrap">
-              {$translations.updateURL}
-            </Button>
+        {#if operation === 'GetSearchResults' && parameters}
+          <div class="mt-4 space-y-2">
+            <Label for="clientQuery" class="font-medium text-gray-700 dark:text-gray-300">Client Query:</Label>
+            <output id="clientQuery" class="block">
+              <div class="break-all text-blue-600 dark:text-blue-400">
+                {parameters}
+              </div>
+            </output>
           </div>
-          {#if serverError}
-            <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
-          {/if}
-        </div>
-
-        <div class="space-y-2">
-          <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
-            {$translations.operation}:
-          </Label>
-          <Select id="operation" class="w-full" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
-        </div>
+        {/if}
       </div>
 
-      {#if operation}
-        <div class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
-          <div class="w-full">
-            {#if operation === 'GetSearchResults'}
-              <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
-            {:else if operation === 'GetFormats'}
-              <GetFormats {serverLangs} {allLanguages} bind:parameters />
-            {:else if operation === 'GetChanges'}
-              <GetChanges {serviceBodies} bind:parameters />
-            {:else if operation === 'GetFieldValues'}
-              <GetFieldValues {availableFields} bind:parameters />
-            {:else if operation === 'GetNAWSDump'}
-              <GetNAWSDump {serviceBodies} bind:parameters />
-            {:else if operation === 'GetCoverageArea'}
-              <GetCoverageArea bind:parameters />
-            {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
-              <GetOther bind:parameters />
+      <!-- Scrollable Options Section -->
+      <div class="max-h-[calc(100vh-50px)] overflow-y-auto p-6">
+        <P class="text-gray-600 dark:text-gray-300">{$translations.intro}</P>
+
+        <div class="space-y-4">
+          <Label class="block">
+            <span class="font-medium text-gray-700 dark:text-gray-300">{$translations.language}:</span>
+            <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
+          </Label>
+
+          <div class="space-y-2">
+            <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
+            <div class="flex gap-2">
+              <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} class="flex-1" />
+              <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} class="whitespace-nowrap">
+                {$translations.updateURL}
+              </Button>
+            </div>
+            {#if serverError}
+              <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
             {/if}
           </div>
+
+          <div class="space-y-2">
+            <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
+              {$translations.operation}:
+            </Label>
+            <Select id="operation" class="w-full" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
+          </div>
         </div>
-      {/if}
+
+        {#if operation}
+          <div class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+            <div class="w-full">
+              {#if operation === 'GetSearchResults'}
+                <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
+              {:else if operation === 'GetFormats'}
+                <GetFormats {serverLangs} {allLanguages} bind:parameters />
+              {:else if operation === 'GetChanges'}
+                <GetChanges {serviceBodies} bind:parameters />
+              {:else if operation === 'GetFieldValues'}
+                <GetFieldValues {availableFields} bind:parameters />
+              {:else if operation === 'GetNAWSDump'}
+                <GetNAWSDump {serviceBodies} bind:parameters />
+              {:else if operation === 'GetCoverageArea'}
+                <GetCoverageArea bind:parameters />
+              {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
+                <GetOther bind:parameters />
+              {/if}
+            </div>
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
 </main>

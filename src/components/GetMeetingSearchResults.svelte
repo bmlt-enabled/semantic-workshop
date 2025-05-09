@@ -101,8 +101,8 @@
 
 <div class="flex justify-center">
   <Card class="p-4" size="lg">
-    <div class="divide-y divide-gray-200 dark:divide-gray-700">
-      <fieldset class="rounded-lg bg-white p-4 dark:bg-gray-800">
+    <div class="space-y-6">
+      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.formatOptions}</legend>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
@@ -116,7 +116,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSchedule}</legend>
         <div class="space-y-4">
           <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.meetingsOnSpecificDays}</Label>
@@ -143,7 +143,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg bg-white p-4 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.venueOptions}</legend>
         <div class="space-y-4">
           <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.hasVenueType}</Label>
@@ -170,7 +170,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.formatFilters}</legend>
         <div class="space-y-4">
           <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.hasFormat}</Label>
@@ -208,7 +208,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg bg-white p-4 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingKeyValue}</legend>
         <div class="space-y-4">
           <div>
@@ -236,7 +236,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.searchString}</legend>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
