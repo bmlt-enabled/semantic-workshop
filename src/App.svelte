@@ -14,7 +14,7 @@
   import GetOther from './components/GetOther.svelte';
 
   // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = (typeof settings !== 'undefined' && settings.apiBaseUrl) ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
