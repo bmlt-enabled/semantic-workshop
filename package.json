@@ -6,8 +6,6 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "dev:laravel": "vite --config vite.laravel.config.js",
-    "build:laravel": "vite build --config vite.laravel.config.js",
     "preview": "vite preview",
     "lint": "prettier --check vite.config.ts src && eslint vite.config.ts src && svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write vite.config.ts src",
