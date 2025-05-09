@@ -40,7 +40,15 @@
     { name: $translations.getCoverageArea, value: 'GetCoverageArea' }
   ];
 
-  let workshopLanguage = $state('en');
+  function detectBrowserLanguage() {
+    const browserLang = navigator.languages ? navigator.languages[0] : navigator.language;
+    const shortLang = browserLang.slice(0, 2);
+    const supported = allLanguages.map((l) => l.value);
+    return supported.includes(shortLang) ? shortLang : 'en';
+  }
+
+  const initialLang = localStorage.getItem('workshopLanguage') || detectBrowserLanguage();
+  let workshopLanguage = $state(initialLang);
   // rootServerUrl is what gets typed in the URL textbox
   let rootServerURL = $state(defaultRootServerURL);
   // the savedRootServerURL will always end in a / (added if necessary to the rootServerURL)
@@ -114,6 +122,11 @@
   }
 
   onMount(initialize);
+
+  $effect(() => {
+    localStorage.setItem('workshopLanguage', workshopLanguage);
+    translations.setLanguage(workshopLanguage);
+  });
 </script>
 
 <main class="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-gray-900">
@@ -129,7 +142,7 @@
       <div class="space-y-4">
         <Label class="block">
           <span class="font-medium text-gray-700 dark:text-gray-300">{$translations.language}:</span>
-          <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
+          <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage())} />
         </Label>
 
         <div class="space-y-2">
