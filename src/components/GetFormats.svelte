@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox, Label, Select } from 'flowbite-svelte';
+  import { Checkbox, Label, Select, Card } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
@@ -16,12 +16,26 @@
   onMount(() => (parameters = ''));
 </script>
 
-<div>
-  <Label>
-    {$translations.formatLanguage}:
-    <Select class="mt-2" items={formatLanguageOptions} placeholder={$translations.chooseOption} bind:value={formatLanguage} onchange={computeParameters} />
-  </Label>
-  <Checkbox bind:checked={showAllFormats} on:change={computeParameters}>
-    {$translations.showAllFormats}
-  </Checkbox>
+<div class="flex justify-center">
+  <Card class="p-4" size="md">
+    <div class="space-y-6">
+      <div class="space-y-2">
+        <Label class="font-medium text-gray-700 dark:text-gray-300">
+          {$translations.formatLanguage}:
+        </Label>
+        <Select class="w-full" items={formatLanguageOptions} placeholder={$translations.chooseOption} bind:value={formatLanguage} onchange={computeParameters} />
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <Checkbox
+          bind:checked={showAllFormats}
+          on:change={computeParameters}
+          class="text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 h-4 w-4 rounded border-gray-300 bg-gray-100 focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
+        />
+        <Label class="cursor-pointer font-medium text-gray-700 dark:text-gray-300">
+          {$translations.showAllFormats}
+        </Label>
+      </div>
+    </div>
+  </Card>
 </div>
