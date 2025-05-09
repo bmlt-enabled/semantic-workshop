@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox, Label, Select } from 'flowbite-svelte';
+  import { Card, Checkbox, Helper, Label, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
@@ -16,7 +16,18 @@
   onMount(() => (parameters = null));
 </script>
 
-<Label>
-  {$translations.serviceBody}:
-  <Select class="mt-2" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={nawsDumpServiceBodyId} onchange={computeParameters} />
-</Label>
+<div class="flex justify-center">
+  <Card class="p-4" size="md">
+    <div class="space-y-6">
+      <div class="space-y-2">
+        <Label class="font-medium text-gray-700 dark:text-gray-300">
+          {$translations.serviceBody}:
+        </Label>
+        <Select class="w-full" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={nawsDumpServiceBodyId} onchange={computeParameters} />
+        <Helper class="text-gray-500 dark:text-gray-400">
+          {$translations.selectServiceBodyForNAWS}
+        </Helper>
+      </div>
+    </div>
+  </Card>
+</div>

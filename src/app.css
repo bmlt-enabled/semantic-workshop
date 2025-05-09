@@ -31,14 +31,55 @@
 @source "../node_modules/flowbite-svelte/dist";
 @source "../node_modules/flowbite-svelte-icons/dist";
 
-html body {
-  background-color: #ffffff;
-}
-
-html.dark body {
-  background-color: #1b1e21;
+/* Base styles */
+html {
+  @apply antialiased;
 }
 
 body {
-  margin: 1em;
+  @apply m-0 min-h-screen bg-gray-50 text-gray-900 transition-colors duration-200;
+}
+
+/* Dark mode styles */
+html.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  @apply transition-all duration-200;
+}
+
+/* Focus styles */
+:focus-visible {
+  @apply ring-primary-500 ring-2 ring-offset-2 outline-none dark:ring-offset-gray-900;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500;
+}
+
+/* Card hover effects */
+.card {
+  @apply transition-all duration-200 hover:shadow-md;
+}
+
+/* Form element focus states */
+input:focus,
+select:focus,
+textarea:focus {
+  @apply ring-primary-500 ring-2 ring-offset-2 dark:ring-offset-gray-900;
 }

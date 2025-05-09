@@ -116,54 +116,77 @@
   onMount(initialize);
 </script>
 
-<main>
-  <Heading>{$translations.title}</Heading>
+<main class="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-gray-900">
+  <div class="mx-auto max-w-4xl space-y-8">
+    <div class="flex items-center justify-between">
+      <Heading class="text-3xl font-bold text-gray-900 dark:text-white">{$translations.title}</Heading>
+      <DarkMode size="lg" class="inline-block transition-colors duration-200 hover:text-gray-900 dark:hover:text-white" />
+    </div>
 
-  <P>{$translations.intro}</P>
+    <div class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+      <P class="text-gray-600 dark:text-gray-300">{$translations.intro}</P>
 
-  <DarkMode size="lg" class="inline-block hover:text-gray-900 dark:hover:text-white" />
+      <div class="space-y-4">
+        <Label class="block">
+          <span class="font-medium text-gray-700 dark:text-gray-300">{$translations.language}:</span>
+          <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
+        </Label>
 
-  <Label>
-    {$translations.language}:
-    <Select class="mt-2" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
-  </Label>
+        <div class="space-y-2">
+          <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
+          <output id="responseURL" class="block">
+            {#if responseURL}
+              <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                {responseURL}
+              </a>
+            {:else}
+              <div class="text-gray-500 dark:text-gray-400">{$translations.none}</div>
+            {/if}
+          </output>
+        </div>
 
-  <Label for="responseURL">{$translations.responseURL}:</Label>
-  <output id="responseURL">
-    {#if responseURL}
-      <a href={responseURL} target="_blank" class="font-medium text-blue-600 underline hover:no-underline dark:text-blue-500">{responseURL}</a>
-    {:else}
-      <div class="dark:text-white">{$translations.none}</div>
-    {/if}
-  </output>
+        <div class="space-y-2">
+          <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
+          <div class="flex gap-2">
+            <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} class="flex-1" />
+            <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} class="whitespace-nowrap">
+              {$translations.updateURL}
+            </Button>
+          </div>
+          {#if serverError}
+            <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
+          {/if}
+        </div>
 
-  <Label for="rootServerURL">{$translations.rootServerURL}:</Label>
-  <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} />
-  <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL}>{$translations.updateURL}</Button>
-  <Helper>
-    {#if serverError}
-      <div class="text-red-500">{serverError}</div>
-    {/if}
-  </Helper>
+        <div class="space-y-2">
+          <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
+            {$translations.operation}:
+          </Label>
+          <Select id="operation" class="w-full" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
+        </div>
+      </div>
 
-  <Label for="operation" class="mb-2"
-    >{$translations.operation}:
-    <Select id="operation" class="mt-2" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
-  </Label>
-
-  {#if operation === 'GetSearchResults'}
-    <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
-  {:else if operation === 'GetFormats'}
-    <GetFormats {serverLangs} {allLanguages} bind:parameters />
-  {:else if operation === 'GetChanges'}
-    <GetChanges {serviceBodies} bind:parameters />
-  {:else if operation === 'GetFieldValues'}
-    <GetFieldValues {availableFields} bind:parameters />
-  {:else if operation === 'GetNAWSDump'}
-    <GetNAWSDump {serviceBodies} bind:parameters />
-  {:else if operation === 'GetCoverageArea'}
-    <GetCoverageArea bind:parameters />
-  {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
-    <GetOther bind:parameters />
-  {/if}
+      {#if operation}
+        <div class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+          <div class="w-full">
+            {#if operation === 'GetSearchResults'}
+              <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
+            {:else if operation === 'GetFormats'}
+              <GetFormats {serverLangs} {allLanguages} bind:parameters />
+            {:else if operation === 'GetChanges'}
+              <GetChanges {serviceBodies} bind:parameters />
+            {:else if operation === 'GetFieldValues'}
+              <GetFieldValues {availableFields} bind:parameters />
+            {:else if operation === 'GetNAWSDump'}
+              <GetNAWSDump {serviceBodies} bind:parameters />
+            {:else if operation === 'GetCoverageArea'}
+              <GetCoverageArea bind:parameters />
+            {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
+              <GetOther bind:parameters />
+            {/if}
+          </div>
+        </div>
+      {/if}
+    </div>
+  </div>
 </main>
