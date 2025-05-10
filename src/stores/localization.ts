@@ -25,9 +25,6 @@ const strings = new (LocalizedStrings as any)({
     getNAWSDump: 'Get a NAWS Format Export',
     getServerInfo: 'Get Server Information',
     getCoverageArea: 'Get Geographic Coverage Area',
-    intro: `This is a re-implementation of the semantic workshop for the BMLT root server, intended to work
-      with the new Svelte UI. It is currently a standalone app in SvelteKit. It could remain as a separate
-      app, or later also be linked with the BMLT root server.`,
     language: 'Sprache',
     none: '- Keine -',
     noParameters: '- no parameters for this operation -',
@@ -80,9 +77,8 @@ const strings = new (LocalizedStrings as any)({
     hasVenueTypeExplanation: `If none of these is selected, they will have no bearing at all on the search.
       If any are selected, then the search will require that the selected terms match.
       This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.`,
-    intro: `This is a re-implementation of the semantic workshop for the BMLT root server, intended to work
-      with the new Svelte UI. It is currently a standalone app in SvelteKit. It could remain as a separate
-      app, or later also be linked with the BMLT root server.`,
+    intro: `This interactive application will help you build a semantic URL to retrieve data from a BMLT root server.
+      It is available both as part of every BMLT root server and as a separate standalone app at https://semantic.bmlt.app.`,
     invalidMeetingId: 'Invalid meeting ID',
     invalidRadius: 'Invalid radius',
     language: 'Language',

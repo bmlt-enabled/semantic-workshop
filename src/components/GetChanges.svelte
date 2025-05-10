@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Datepicker, Helper, Input, Label, Select, Card } from 'flowbite-svelte';
+  import { Card, Datepicker, Helper, Input, Label, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
@@ -43,16 +43,20 @@
     <div class="space-y-6">
       <div class="space-y-2">
         <Label class="font-medium text-gray-700 dark:text-gray-300">
-          {$translations.getChangesBetween}:
+          <div class="mb-2">
+            {$translations.getChangesBetween}:
+          </div>
+          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} on:select={computeParameters} />
         </Label>
-        <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} on:select={computeParameters} class="w-full" />
       </div>
 
       <div class="space-y-2">
         <Label class="font-medium text-gray-700 dark:text-gray-300">
-          {$translations.getChangesForMeeting}:
+          <div class="mb-2">
+            {$translations.getChangesForMeeting}:
+          </div>
+          <Input type="text" bind:value={changesMeetingId} on:input={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
         </Label>
-        <Input type="text" bind:value={changesMeetingId} on:input={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
         {#if badChangesMeetingId}
           <Helper class="text-red-500 dark:text-red-400">
             {$translations.invalidMeetingId}
@@ -62,9 +66,11 @@
 
       <div class="space-y-2">
         <Label class="font-medium text-gray-700 dark:text-gray-300">
-          {$translations.serviceBody}:
+          <div class="mb-2">
+            {$translations.serviceBody}:
+          </div>
+          <Select class="w-full" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={changesServiceBodyId} onchange={computeParameters} />
         </Label>
-        <Select class="w-full" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={changesServiceBodyId} onchange={computeParameters} />
       </div>
     </div>
   </Card>

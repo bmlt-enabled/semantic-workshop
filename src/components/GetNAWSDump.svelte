@@ -21,9 +21,11 @@
     <div class="space-y-6">
       <div class="space-y-2">
         <Label class="font-medium text-gray-700 dark:text-gray-300">
-          {$translations.serviceBody}:
+          <div class="mb-2">
+            {$translations.serviceBody}:
+          </div>
+          <Select class="w-full" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={nawsDumpServiceBodyId} onchange={computeParameters} />
         </Label>
-        <Select class="w-full" items={serviceBodyOptions} placeholder={$translations.chooseOption} bind:value={nawsDumpServiceBodyId} onchange={computeParameters} />
         <Helper class="text-gray-500 dark:text-gray-400">
           {$translations.selectServiceBodyForNAWS}
         </Helper>

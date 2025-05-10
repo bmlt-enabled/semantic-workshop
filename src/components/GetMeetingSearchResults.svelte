@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow, Card } from 'flowbite-svelte';
+  import { Card, Checkbox, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
@@ -106,12 +106,16 @@
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.formatOptions}</legend>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
-            <Checkbox bind:checked={getUsedFormats} on:change={computeParameters} />
-            <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.getUsedFormats}</Label>
+            <Label class="mt-4 flex items-center font-medium dark:text-white">
+              <Checkbox bind:checked={getUsedFormats} on:change={computeParameters} class="me-1" />
+              {$translations.getUsedFormats}
+            </Label>
           </div>
           <div class="flex items-center space-x-2">
-            <Checkbox bind:checked={getFormatsOnly} disabled={!getUsedFormats} on:change={computeParameters} />
-            <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.getFormatsOnly}</Label>
+            <Label class="mt-4 flex items-center font-medium dark:text-white">
+              <Checkbox bind:checked={getFormatsOnly} disabled={!getUsedFormats} on:change={computeParameters} class="me-1" />
+              {$translations.getFormatsOnly}
+            </Label>
           </div>
         </div>
       </fieldset>
@@ -123,20 +127,23 @@
           <div class="grid grid-cols-7 gap-2">
             {#each $translations.weekdays as day, i}
               <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={onWeekdays[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{day}</Label>
+                <Label class="mt-4 flex text-sm dark:text-white">
+                  <Checkbox bind:checked={onWeekdays[i]} on:change={computeParameters} class="me-1" />
+                  {day}
+                </Label>
               </div>
             {/each}
           </div>
         </div>
-
         <div class="mt-6 space-y-4">
           <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.meetingsNotOnSpecificDays}</Label>
           <div class="grid grid-cols-7 gap-2">
             {#each $translations.weekdays as day, i}
               <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={notOnWeekdays[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{day}</Label>
+                <Label class="mt-4 flex text-sm dark:text-white">
+                  <Checkbox bind:checked={notOnWeekdays[i]} on:change={computeParameters} class="me-1" />
+                  {day}
+                </Label>
               </div>
             {/each}
           </div>
@@ -150,20 +157,23 @@
           <div class="grid grid-cols-3 gap-2">
             {#each $translations.venueTypes as vt, i}
               <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={hasVenueType[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{vt}</Label>
+                <Label class="mt-4 flex text-sm dark:text-white">
+                  <Checkbox bind:checked={hasVenueType[i]} on:change={computeParameters} class="me-1" />
+                  {vt}
+                </Label>
               </div>
             {/each}
           </div>
         </div>
-
         <div class="mt-6 space-y-4">
           <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.doesNotHaveVenueType}</Label>
           <div class="grid grid-cols-3 gap-2">
             {#each $translations.venueTypes as vt, i}
               <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={doesNotHaveVenueType[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{vt}</Label>
+                <Label class="mt-4 flex text-sm dark:text-white">
+                  <Checkbox bind:checked={doesNotHaveVenueType[i]} on:change={computeParameters} class="me-1" />
+                  {vt}
+                </Label>
               </div>
             {/each}
           </div>
@@ -177,33 +187,37 @@
           <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {#each formats as f, i}
               <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={hasFormat[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{f.key_string}</Label>
+                <Label class="mt-4 flex text-sm dark:text-white">
+                  <Checkbox bind:checked={hasFormat[i]} on:change={computeParameters} class="me-1" />
+                  {f.key_string}
+                </Label>
               </div>
             {/each}
           </div>
           <div class="flex items-center space-x-4">
             <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.formatsComparisonOperator}:</Label>
             <div class="flex items-center space-x-2">
-              <Radio bind:group={formatsComparisonOperator} value="AND" on:change={computeParameters} />
-              <Label class="text-sm text-gray-700 dark:text-gray-300">{$translations.and}</Label>
+              <Radio id="and-comparison" bind:group={formatsComparisonOperator} value="AND" on:change={computeParameters} />
+              <Label for="and-comparison" class="text-sm dark:text-white">{$translations.and}</Label>
             </div>
             <div class="flex items-center space-x-2">
-              <Radio bind:group={formatsComparisonOperator} value="OR" on:change={computeParameters} />
-              <Label class="text-sm text-gray-700 dark:text-gray-300">{$translations.or}</Label>
+              <Radio id="or-comparison" bind:group={formatsComparisonOperator} value="OR" on:change={computeParameters} />
+              <Label for="or-comparison" class="text-sm dark:text-white">{$translations.or}</Label>
             </div>
           </div>
-        </div>
 
-        <div class="mt-6 space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.doesNotHaveFormat}</Label>
-          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {#each formats as f, i}
-              <div class="flex items-center space-x-2">
-                <Checkbox bind:checked={doesNotHaveFormat[i]} on:change={computeParameters} />
-                <Label class="text-sm text-gray-700 dark:text-gray-300">{f.key_string}</Label>
-              </div>
-            {/each}
+          <div class="mt-6 space-y-4">
+            <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.doesNotHaveFormat}</Label>
+            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {#each formats as f, i}
+                <div class="flex items-center space-x-2">
+                  <Label class="mt-4 flex text-sm dark:text-white">
+                    <Checkbox bind:checked={doesNotHaveFormat[i]} on:change={computeParameters} class="me-1" />
+                    {f.key_string}
+                  </Label>
+                </div>
+              {/each}
+            </div>
           </div>
         </div>
       </fieldset>
@@ -212,25 +226,36 @@
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingKeyValue}</legend>
         <div class="space-y-4">
           <div>
-            <Label for="select-key" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.field}:</Label>
-            <Select id="select-key" class="w-full" items={fieldOptions} placeholder={$translations.chooseOption} bind:value={keyForMeetingKeyValue} onchange={computeMeetingKeyValues} />
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.field}:
+              </div>
+              <Select class="w-full" items={fieldOptions} placeholder={$translations.chooseOption} bind:value={keyForMeetingKeyValue} onchange={computeMeetingKeyValues} />
+            </Label>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <Label for="select-value" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.selectExistingValue}:</Label>
-              <Select
-                id="select-value"
-                class="w-full"
-                items={meetingKeyValues}
-                placeholder={$translations.chooseOption}
-                disabled={keyForMeetingKeyValue === ''}
-                bind:value={meetingFieldValue}
-                onchange={computeParameters}
-              />
+              <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.selectExistingValue}:
+                </div>
+                <Select
+                  class="w-full"
+                  items={meetingKeyValues}
+                  placeholder={$translations.chooseOption}
+                  disabled={keyForMeetingKeyValue === ''}
+                  bind:value={meetingFieldValue}
+                  onchange={computeParameters}
+                />
+              </Label>
             </div>
             <div>
-              <Label for="enter-new-value" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.enterNewValue}:</Label>
-              <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} on:input={computeParameters} />
+              <Label for="enter-new-value" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.enterNewValue}:
+                </div>
+                <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} on:input={computeParameters} />
+              </Label>
             </div>
           </div>
         </div>
@@ -241,26 +266,38 @@
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <Label for="search-for-text" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.searchForThisText}:</Label>
-              <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} on:input={computeParametersForSpecificTextValue} />
+              <Label for="search-for-text" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.searchForThisText}:
+                </div>
+                <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} on:input={computeParametersForSpecificTextValue} />
+              </Label>
             </div>
             <div>
-              <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.searchType}:</Label>
-              <Select
-                id="search-type"
-                class="w-full"
-                items={searchForTextMenuOptions}
-                placeholder={$translations.chooseOption}
-                disabled={specificTextValue === ''}
-                bind:value={searchType}
-                onchange={computeParametersForSpecificTextValue}
-              />
+              <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.searchType}:
+                </div>
+                <Select
+                  id="search-type"
+                  class="w-full"
+                  items={searchForTextMenuOptions}
+                  placeholder={$translations.chooseOption}
+                  disabled={specificTextValue === ''}
+                  bind:value={searchType}
+                  onchange={computeParametersForSpecificTextValue}
+                />
+              </Label>
             </div>
           </div>
           {#if searchType === 'location'}
             <div>
-              <Label for="search-radius" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">{$translations.searchRadius}:</Label>
-              <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} on:input={computeParametersForSpecificTextValue} />
+              <Label for="search-radius" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.searchRadius}:
+                </div>
+                <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} on:input={computeParametersForSpecificTextValue} />
+              </Label>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.searchRadiusExplanation}</p>
               {#if badRadius}
                 <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>

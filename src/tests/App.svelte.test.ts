@@ -24,6 +24,7 @@ async function selectOperation(operation: string) {
 
 beforeAll(setUpMockFetch);
 afterAll(vi.resetAllMocks);
+beforeEach(() => localStorage.setItem('workshopLanguage', 'en'));
 
 describe('semantic workshop tests (except get meetings)', () => {
   test('initial screen', async () => {

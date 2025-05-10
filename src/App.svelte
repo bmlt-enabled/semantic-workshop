@@ -166,7 +166,7 @@
 
       <!-- Scrollable Options Section -->
       <div class="max-h-[calc(100vh-50px)] overflow-y-auto p-6">
-        <P class="text-gray-600 dark:text-gray-300">{$translations.intro}</P>
+        <P class="dark:text-white">{$translations.intro}</P>
 
         <div class="space-y-4">
           <Label class="block">
