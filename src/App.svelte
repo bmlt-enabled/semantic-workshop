@@ -92,7 +92,7 @@
     savedRootServerURL = s + (s === '' || s.endsWith('/') ? '' : '/');
     // reset state that won't be updated by getData();
     // this will be 'operation' itself, and also state for a particular operation
-    operation = '';
+    operation = savedRootServerURL ? 'GetServerInfo' : '';
     await getAllData();
   }
 
@@ -140,6 +140,7 @@
     if (typeof settings !== 'undefined' && settings.apiBaseUrl) {
       rootServerURL = settings.apiBaseUrl;
       savedRootServerURL = settings.apiBaseUrl;
+      operation = 'GetServerInfo';
       await getAllData();
       return;
     }
@@ -157,6 +158,7 @@
       if (selectedServer) {
         rootServerURL = selectedServer.rootURL;
         savedRootServerURL = selectedServer.rootURL;
+        operation = 'GetServerInfo';
       }
     } catch (error) {
       console.error('Failed to fetch server list:', error);
