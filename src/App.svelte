@@ -23,8 +23,15 @@
   let selectedServer = $state<Server | undefined>(undefined);
   let isLoadingServers = $state(true);
 
+  // Get apiBaseUrl from query params or window.settings
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryApiBaseUrl = urlParams.get('apiBaseUrl');
+  const settings = {
+    apiBaseUrl: queryApiBaseUrl || (typeof window.settings !== 'undefined' ? window.settings.apiBaseUrl : undefined)
+  };
+
   // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = typeof settings !== 'undefined' && settings.apiBaseUrl ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = settings.apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
