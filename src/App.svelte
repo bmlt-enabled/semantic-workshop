@@ -1,6 +1,6 @@
 <script lang="ts">
   import './app.css';
-  import { Button, Heading, Helper, Input, Label, P, Select } from 'flowbite-svelte';
+  import { Heading, Helper, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';
@@ -12,6 +12,16 @@
   import GetNAWSDump from './components/GetNAWSDump.svelte';
   import GetCoverageArea from './components/GetCoverageArea.svelte';
   import GetOther from './components/GetOther.svelte';
+
+  interface Server {
+    id: string;
+    name: string;
+    rootURL: string;
+  }
+
+  let servers = $state<Server[]>([]);
+  let selectedServer = $state<Server | undefined>(undefined);
+  let isLoadingServers = $state(true);
 
   // defaultRootServerURL can also be '' (that works)
   const defaultRootServerURL = typeof settings !== 'undefined' && settings.apiBaseUrl ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
@@ -65,9 +75,7 @@
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.
   let parameters: string | null = $state('');
-  let responseURL = $derived(
-    operation === '' || savedRootServerURL === '' || serverError || parameters === null ? '' : savedRootServerURL + 'client_interface/json/?switcher=' + operation + parameters
-  );
+  let responseURL = $derived(savedRootServerURL === '' || serverError ? '' : savedRootServerURL + (operation ? 'client_interface/json/?switcher=' + operation + (parameters || '') : ''));
 
   async function updateRootServerURL() {
     const s = rootServerURL.trim();
@@ -118,7 +126,45 @@
 
   async function initialize() {
     translations.setLanguage(workshopLanguage);
-    getAllData();
+
+    if (typeof settings !== 'undefined' && settings.apiBaseUrl) {
+      rootServerURL = settings.apiBaseUrl;
+      savedRootServerURL = settings.apiBaseUrl;
+      await getAllData();
+      return;
+    }
+
+    isLoadingServers = true;
+    try {
+      const response = await fetch('https://raw.githubusercontent.com/bmlt-enabled/tomato/refs/heads/master/rootServerList.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      servers = await response.json();
+      servers.sort((a, b) => a.name.localeCompare(b.name));
+      // Set initial server if defaultRootServerURL matches any server
+      selectedServer = servers.find((s) => s.rootURL === defaultRootServerURL);
+      if (selectedServer) {
+        rootServerURL = selectedServer.rootURL;
+        savedRootServerURL = selectedServer.rootURL;
+      }
+    } catch (error) {
+      console.error('Failed to fetch server list:', error);
+      serverError = 'Failed to load server list. Please try again later.';
+    } finally {
+      isLoadingServers = false;
+    }
+    await getAllData();
+  }
+
+  function handleServerSelect(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const server = servers.find((s) => s.id === select.value);
+    if (server) {
+      rootServerURL = server.rootURL;
+      savedRootServerURL = server.rootURL;
+      updateRootServerURL();
+    }
   }
 
   onMount(initialize);
@@ -156,9 +202,14 @@
           <div class="mt-4 space-y-2">
             <Label for="clientQuery" class="font-medium text-gray-700 dark:text-gray-300">Client Query:</Label>
             <output id="clientQuery" class="block">
-              <div class="break-all text-blue-600 dark:text-blue-400">
+              <button
+                type="button"
+                class="w-full text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                onclick={() => parameters && navigator.clipboard.writeText(parameters)}
+                title="Click to copy to clipboard"
+              >
                 {parameters}
-              </div>
+              </button>
             </output>
           </div>
         {/if}
@@ -174,18 +225,21 @@
             <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
           </Label>
 
-          <div class="space-y-2">
-            <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
-            <div class="flex gap-2">
-              <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} class="flex-1" />
-              <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} class="whitespace-nowrap">
-                {$translations.updateURL}
-              </Button>
+          {#if !(typeof settings !== 'undefined' && settings.apiBaseUrl)}
+            <div class="space-y-2">
+              <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
+              <div class="flex gap-2">
+                {#if isLoadingServers}
+                  <div class="flex-1 p-2 text-gray-500 dark:text-gray-400">Loading servers...</div>
+                {:else}
+                  <Select id="rootServerURL" class="flex-1" items={servers.map((s) => ({ value: s.id, name: s.name }))} value={selectedServer?.id} on:change={handleServerSelect} />
+                {/if}
+              </div>
+              {#if serverError}
+                <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
+              {/if}
             </div>
-            {#if serverError}
-              <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
-            {/if}
-          </div>
+          {/if}
 
           <div class="space-y-2">
             <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
