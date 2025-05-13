@@ -6,7 +6,7 @@ export function setUpMockFetch() {
 
 function mockResponse(url: string) {
   if (url === 'https://raw.githubusercontent.com/bmlt-enabled/tomato/refs/heads/master/rootServerList.json') {
-    return [{name: 'Test Zone', id: '42', rootURL: 'https://myzone.org/main_server/'}];
+    return [{ name: 'Test Zone', id: '42', rootURL: 'https://myzone.org/main_server/' }];
   } else if (/BAD/.test(url)) {
     throw new Error('mocked server error');
   } else if (/smallzone.*GetServerInfo/.test(url)) {
