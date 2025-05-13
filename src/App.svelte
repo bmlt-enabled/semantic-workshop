@@ -1,6 +1,6 @@
 <script lang="ts">
   import './app.css';
-  import { Button, Heading, Helper, Input, Label, P, Select } from 'flowbite-svelte';
+  import { Heading, Helper, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';
@@ -12,9 +12,28 @@
   import GetNAWSDump from './components/GetNAWSDump.svelte';
   import GetCoverageArea from './components/GetCoverageArea.svelte';
   import GetOther from './components/GetOther.svelte';
+  import Settings from './components/Settings.svelte';
+
+  let showSettingsModal = $state(false);
+
+  interface Server {
+    id: string;
+    name: string;
+    rootURL: string;
+  }
+
+  let servers = $state<Server[]>([]);
+  let selectedServer = $state<Server | undefined>(undefined);
+  let isLoadingServers = $state(true);
+  let showCustomServerInput = $state(false);
+
+  // Get apiBaseUrl from query params or window.settings
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryApiBaseUrl = urlParams.get('apiBaseUrl');
+  const apiBaseUrl = queryApiBaseUrl || (typeof settings !== 'undefined' && settings.apiBaseUrl);
 
   // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = typeof settings !== 'undefined' && settings.apiBaseUrl ? settings.apiBaseUrl : 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
@@ -65,16 +84,14 @@
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.
   let parameters: string | null = $state('');
-  let responseURL = $derived(
-    operation === '' || savedRootServerURL === '' || serverError || parameters === null ? '' : savedRootServerURL + 'client_interface/json/?switcher=' + operation + parameters
-  );
+  let responseURL = $derived(savedRootServerURL === '' || serverError ? '' : savedRootServerURL + (operation ? 'client_interface/json/?switcher=' + operation + (parameters || '') : ''));
 
   async function updateRootServerURL() {
     const s = rootServerURL.trim();
     savedRootServerURL = s + (s === '' || s.endsWith('/') ? '' : '/');
     // reset state that won't be updated by getData();
     // this will be 'operation' itself, and also state for a particular operation
-    operation = '';
+    operation = savedRootServerURL ? 'GetServerInfo' : '';
     await getAllData();
   }
 
@@ -118,7 +135,59 @@
 
   async function initialize() {
     translations.setLanguage(workshopLanguage);
-    getAllData();
+
+    if (apiBaseUrl) {
+      rootServerURL = apiBaseUrl;
+      savedRootServerURL = apiBaseUrl;
+      operation = 'GetServerInfo';
+      await getAllData();
+      return;
+    }
+
+    isLoadingServers = true;
+    try {
+      const response = await fetch('https://raw.githubusercontent.com/bmlt-enabled/tomato/refs/heads/master/rootServerList.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      servers = await response.json();
+      servers.sort((a, b) => a.name.localeCompare(b.name));
+      // Set initial server if defaultRootServerURL matches any server
+      selectedServer = servers.find((s) => s.rootURL === defaultRootServerURL);
+      if (selectedServer) {
+        rootServerURL = selectedServer.rootURL;
+        savedRootServerURL = selectedServer.rootURL;
+        operation = 'GetServerInfo';
+      }
+    } catch (error) {
+      console.error('Failed to fetch server list:', error);
+      serverError = 'Failed to load server list. Please try again later.';
+    } finally {
+      isLoadingServers = false;
+    }
+    await getAllData();
+  }
+
+  function handleServerSelect(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    if (select.value === 'other') {
+      showCustomServerInput = true;
+      selectedServer = undefined;
+      return;
+    }
+    showCustomServerInput = false;
+    const server = servers.find((s) => s.id === select.value);
+    if (server) {
+      rootServerURL = server.rootURL;
+      savedRootServerURL = server.rootURL;
+      updateRootServerURL();
+    }
+  }
+
+  function handleCustomServerInput() {
+    if (rootServerURL.trim()) {
+      updateRootServerURL();
+    }
   }
 
   onMount(initialize);
@@ -133,12 +202,29 @@
   <div class="mx-auto max-w-4xl space-y-8">
     <div class="flex items-center justify-between">
       <Heading class="text-3xl font-bold text-gray-900 dark:text-white">{$translations.title}</Heading>
-      <DarkMode size="lg" class="inline-block transition-colors duration-200 hover:text-gray-900 dark:hover:text-white" />
+      <div class="flex items-center gap-4">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+          onclick={() => (showSettingsModal = true)}
+          title="Language Settings"
+          aria-label="Open language settings"
+        >
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.2" />
+            <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.2" fill="none" />
+          </svg>
+        </button>
+        <DarkMode size="lg" class="inline-block transition-colors duration-200 hover:text-gray-900 dark:hover:text-white" />
+      </div>
     </div>
+
+    <Settings bind:showModal={showSettingsModal} bind:workshopLanguage {allLanguages} />
 
     <div class="rounded-lg bg-white shadow-sm dark:bg-gray-800">
       <!-- Fixed Response URL Section -->
-      <div class="border-b border-gray-200 p-6 dark:border-gray-700">
+      <div class="sticky top-0 z-20 border-b border-gray-200 bg-white p-6 shadow dark:border-gray-700 dark:bg-gray-800">
         <div class="space-y-2">
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
@@ -156,36 +242,56 @@
           <div class="mt-4 space-y-2">
             <Label for="clientQuery" class="font-medium text-gray-700 dark:text-gray-300">Client Query:</Label>
             <output id="clientQuery" class="block">
-              <div class="break-all text-blue-600 dark:text-blue-400">
+              <button
+                type="button"
+                class="w-full cursor-pointer text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                onclick={() => parameters && navigator.clipboard.writeText(parameters)}
+                title="Click to copy to clipboard"
+              >
                 {parameters}
-              </div>
+              </button>
             </output>
           </div>
         {/if}
       </div>
 
       <!-- Scrollable Options Section -->
-      <div class="max-h-[calc(100vh-50px)] overflow-y-auto p-6">
-        <P class="dark:text-white">{$translations.intro}</P>
+      <div class="p-6">
+        <P class="mb-4 dark:text-white">{$translations.intro}</P>
 
         <div class="space-y-4">
-          <Label class="block">
-            <span class="font-medium text-gray-700 dark:text-gray-300">{$translations.language}:</span>
-            <Select class="mt-2 w-full" items={allLanguages} placeholder={$translations.chooseOption} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
-          </Label>
-
-          <div class="space-y-2">
-            <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
-            <div class="flex gap-2">
-              <Input type="url" id="rootServerURL" placeholder={$translations.urlPlaceholder} bind:value={rootServerURL} class="flex-1" />
-              <Button disabled={savedRootServerURL === rootServerURL} on:click={updateRootServerURL} class="whitespace-nowrap">
-                {$translations.updateURL}
-              </Button>
+          {#if !apiBaseUrl}
+            <div class="space-y-2">
+              <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
+              <div class="flex gap-2">
+                {#if isLoadingServers}
+                  <div class="flex-1 p-2 text-gray-500 dark:text-gray-400">Loading servers...</div>
+                {:else}
+                  <Select
+                    id="rootServerURL"
+                    class="flex-1"
+                    items={[...servers.map((s) => ({ value: s.id, name: s.name })), { value: 'other', name: 'Other...' }]}
+                    value={selectedServer?.id || (showCustomServerInput ? 'other' : '')}
+                    on:change={handleServerSelect}
+                  />
+                {/if}
+              </div>
+              {#if showCustomServerInput}
+                <div class="mt-2">
+                  <input
+                    type="text"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    placeholder="Enter server URL"
+                    bind:value={rootServerURL}
+                    onblur={handleCustomServerInput}
+                  />
+                </div>
+              {/if}
+              {#if serverError}
+                <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
+              {/if}
             </div>
-            {#if serverError}
-              <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
-            {/if}
-          </div>
+          {/if}
 
           <div class="space-y-2">
             <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
