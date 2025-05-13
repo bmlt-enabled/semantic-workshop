@@ -30,12 +30,10 @@
   // Get apiBaseUrl from query params or window.settings
   const urlParams = new URLSearchParams(window.location.search);
   const queryApiBaseUrl = urlParams.get('apiBaseUrl');
-  const settings = {
-    apiBaseUrl: queryApiBaseUrl || window.settings?.apiBaseUrl
-  };
+  const apiBaseUrl = queryApiBaseUrl || (typeof settings !== 'undefined' && settings.apiBaseUrl);
 
   // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = settings.apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
@@ -138,9 +136,9 @@
   async function initialize() {
     translations.setLanguage(workshopLanguage);
 
-    if (settings.apiBaseUrl) {
-      rootServerURL = settings.apiBaseUrl;
-      savedRootServerURL = settings.apiBaseUrl;
+    if (apiBaseUrl) {
+      rootServerURL = apiBaseUrl;
+      savedRootServerURL = apiBaseUrl;
       operation = 'GetServerInfo';
       await getAllData();
       return;
@@ -262,7 +260,7 @@
         <P class="mb-4 dark:text-white">{$translations.intro}</P>
 
         <div class="space-y-4">
-          {#if !(typeof settings !== 'undefined' && settings.apiBaseUrl)}
+          {#if !apiBaseUrl}
             <div class="space-y-2">
               <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
               <div class="flex gap-2">
