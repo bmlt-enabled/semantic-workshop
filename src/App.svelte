@@ -226,7 +226,7 @@
 
     <div class="rounded-lg bg-white shadow-sm dark:bg-gray-800">
       <!-- Fixed Response URL Section -->
-      <div class="border-b border-gray-200 p-6 dark:border-gray-700">
+      <div class="border-b border-gray-200 p-6 dark:border-gray-700 sticky top-0 z-20 bg-white dark:bg-gray-800 shadow">
         <div class="space-y-2">
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
@@ -246,7 +246,7 @@
             <output id="clientQuery" class="block">
               <button
                 type="button"
-                class="w-full text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                class="w-full text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
                 onclick={() => parameters && navigator.clipboard.writeText(parameters)}
                 title="Click to copy to clipboard"
               >
@@ -258,7 +258,7 @@
       </div>
 
       <!-- Scrollable Options Section -->
-      <div class="max-h-[calc(100vh-50px)] overflow-y-auto p-6">
+      <div class="p-6">
         <P class="dark:text-white mb-4">{$translations.intro}</P>
 
         <div class="space-y-4">
