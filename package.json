@@ -38,7 +38,7 @@
     "@testing-library/svelte": "^5.2.7",
     "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.21",
-    "flowbite-svelte": "^0.48.6",
+    "flowbite-svelte": "^1.1.0",
     "globals": "^15.15.0",
     "jsdom": "^26.1.0",
     "localized-strings": "^2.0.3",
