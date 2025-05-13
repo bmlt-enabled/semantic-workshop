@@ -31,7 +31,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const queryApiBaseUrl = urlParams.get('apiBaseUrl');
   const settings = {
-    apiBaseUrl: queryApiBaseUrl || (typeof window.settings !== 'undefined' ? window.settings.apiBaseUrl : undefined)
+    apiBaseUrl: queryApiBaseUrl || window.settings?.apiBaseUrl
   };
 
   // defaultRootServerURL can also be '' (that works)
@@ -138,7 +138,7 @@
   async function initialize() {
     translations.setLanguage(workshopLanguage);
 
-    if (typeof settings !== 'undefined' && settings.apiBaseUrl) {
+    if (settings.apiBaseUrl) {
       rootServerURL = settings.apiBaseUrl;
       savedRootServerURL = settings.apiBaseUrl;
       operation = 'GetServerInfo';
@@ -226,7 +226,7 @@
 
     <div class="rounded-lg bg-white shadow-sm dark:bg-gray-800">
       <!-- Fixed Response URL Section -->
-      <div class="border-b border-gray-200 p-6 dark:border-gray-700 sticky top-0 z-20 bg-white dark:bg-gray-800 shadow">
+      <div class="sticky top-0 z-20 border-b border-gray-200 bg-white p-6 shadow dark:border-gray-700 dark:bg-gray-800">
         <div class="space-y-2">
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
@@ -246,7 +246,7 @@
             <output id="clientQuery" class="block">
               <button
                 type="button"
-                class="w-full text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
+                class="w-full cursor-pointer text-left break-all text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 onclick={() => parameters && navigator.clipboard.writeText(parameters)}
                 title="Click to copy to clipboard"
               >
@@ -259,7 +259,7 @@
 
       <!-- Scrollable Options Section -->
       <div class="p-6">
-        <P class="dark:text-white mb-4">{$translations.intro}</P>
+        <P class="mb-4 dark:text-white">{$translations.intro}</P>
 
         <div class="space-y-4">
           {#if !(typeof settings !== 'undefined' && settings.apiBaseUrl)}

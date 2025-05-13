@@ -4,8 +4,8 @@ declare const settings: {
 
 declare global {
   interface Window {
-    settings?: {
-      apiBaseUrl?: string;
+    settings: {
+      apiBaseUrl: string;
     };
   }
 }
