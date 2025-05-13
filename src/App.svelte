@@ -1,12 +1,4 @@
 <script lang="ts">
-  declare global {
-    interface Window {
-      settings?: {
-        apiBaseUrl?: string;
-      };
-    }
-  }
-
   import './app.css';
   import { Heading, Helper, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
@@ -217,17 +209,13 @@
           type="button"
           class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
           onclick={() => (showSettingsModal = true)}
-          title="Settings"
-          aria-label="Open settings"
+          title="Language Settings"
+          aria-label="Open language settings"
         >
-          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-            />
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.2" />
+            <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.2" fill="none" />
           </svg>
         </button>
         <DarkMode size="lg" class="inline-block transition-colors duration-200 hover:text-gray-900 dark:hover:text-white" />
