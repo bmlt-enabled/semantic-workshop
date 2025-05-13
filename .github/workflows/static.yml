@@ -2,7 +2,7 @@ name: Deploy to Pages
 
 on:
   push:
-    branches: ['pj/aggregator-dropdown']
+    branches: ['main']
   workflow_dispatch:
 
 permissions:
