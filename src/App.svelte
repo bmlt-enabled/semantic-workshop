@@ -1,4 +1,12 @@
 <script lang="ts">
+  declare global {
+    interface Window {
+      settings?: {
+        apiBaseUrl?: string;
+      };
+    }
+  }
+
   import './app.css';
   import { Heading, Helper, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
@@ -25,6 +33,7 @@
   let servers = $state<Server[]>([]);
   let selectedServer = $state<Server | undefined>(undefined);
   let isLoadingServers = $state(true);
+  let showCustomServerInput = $state(false);
 
   // Get apiBaseUrl from query params or window.settings
   const urlParams = new URLSearchParams(window.location.search);
@@ -171,10 +180,22 @@
 
   function handleServerSelect(event: Event) {
     const select = event.target as HTMLSelectElement;
+    if (select.value === 'other') {
+      showCustomServerInput = true;
+      selectedServer = undefined;
+      return;
+    }
+    showCustomServerInput = false;
     const server = servers.find((s) => s.id === select.value);
     if (server) {
       rootServerURL = server.rootURL;
       savedRootServerURL = server.rootURL;
+      updateRootServerURL();
+    }
+  }
+
+  function handleCustomServerInput() {
+    if (rootServerURL.trim()) {
       updateRootServerURL();
     }
   }
@@ -197,6 +218,7 @@
           class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
           onclick={() => (showSettingsModal = true)}
           title="Settings"
+          aria-label="Open settings"
         >
           <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <path
@@ -259,9 +281,26 @@
                 {#if isLoadingServers}
                   <div class="flex-1 p-2 text-gray-500 dark:text-gray-400">Loading servers...</div>
                 {:else}
-                  <Select id="rootServerURL" class="flex-1" items={servers.map((s) => ({ value: s.id, name: s.name }))} value={selectedServer?.id} on:change={handleServerSelect} />
+                  <Select
+                    id="rootServerURL"
+                    class="flex-1"
+                    items={[...servers.map((s) => ({ value: s.id, name: s.name })), { value: 'other', name: 'Other...' }]}
+                    value={selectedServer?.id || (showCustomServerInput ? 'other' : '')}
+                    on:change={handleServerSelect}
+                  />
                 {/if}
               </div>
+              {#if showCustomServerInput}
+                <div class="mt-2">
+                  <input
+                    type="text"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    placeholder="Enter server URL"
+                    bind:value={rootServerURL}
+                    onblur={handleCustomServerInput}
+                  />
+                </div>
+              {/if}
               {#if serverError}
                 <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
               {/if}
