@@ -55,7 +55,7 @@
           <div class="mb-2">
             {$translations.getChangesForMeeting}:
           </div>
-          <Input type="text" bind:value={changesMeetingId} on:input={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
+          <Input type="text" bind:value={changesMeetingId} oninput={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
         </Label>
         {#if badChangesMeetingId}
           <Helper class="text-red-500 dark:text-red-400">

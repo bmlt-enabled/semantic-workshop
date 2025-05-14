@@ -29,7 +29,7 @@
       </div>
       <div class="flex items-center space-x-2">
         <Label class="flex items-center font-medium dark:text-white">
-          <Checkbox bind:checked={showAllFormats} on:change={computeParameters} class="me-2" />
+          <Checkbox bind:checked={showAllFormats} onchange={computeParameters} class="me-2" />
           {$translations.showAllFormats}
         </Label>
       </div>

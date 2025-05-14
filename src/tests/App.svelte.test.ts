@@ -75,9 +75,8 @@ describe('semantic workshop tests (except get meetings)', () => {
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges&service_body_id=8' })).toBeInTheDocument();
     await user.type(meetingIdTextBox, 'BAD');
     expect(screen.getByText(/Invalid meeting ID/)).toBeInTheDocument();
-    // TODO: uncomment this after it's fixed.  GetChanges shouldn't have a response URL for a bad meeting ID.
-    // expect(screen.queryByRole('link')).toBe(null);
-    // expect(screen.getByText(/- none -/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
   });
 
   test('Get a List of Available Field Keys', async () => {
@@ -87,8 +86,7 @@ describe('semantic workshop tests (except get meetings)', () => {
 
   test('Get a List of Specific Field Values', async () => {
     const user = await selectOperation('GetFieldValues');
-    // TODO: uncomment this after it's fixed.  GetFieldValues shouldn't have a response URL until a field is selected.
-    // expect(screen.getByText(/- none -/)).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
     // note that these get alphabetized
@@ -103,8 +101,7 @@ describe('semantic workshop tests (except get meetings)', () => {
 
   test('Get a NAWS Format Export', async () => {
     const user = await selectOperation('GetNAWSDump');
-    // TODO: uncomment this after it's fixed.  GetNAWSDump shouldn't have a response URL until a service body is selected.
-    // expect(screen.getByText(/- none -/)).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
     expect(field.item(1)?.label).toBe('Big Zone');
@@ -352,10 +349,8 @@ describe('Get Meeting Search Results tests', () => {
     ).toBeInTheDocument();
     await user.type(radiusBox, 'BAD');
     expect(screen.getByText(/Invalid radius/)).toBeInTheDocument();
-    // TODO: uncomment these after the code is updated to set the link to null if there isn't a valid response.  Or maybe the current
-    // behavior is ok, in which it just ignores a bad radius.
-    // expect(screen.queryByRole('link')).toBe(null);
-    // expect(screen.getByText(/- none -/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     // clearing the radius box should leave the search type but get rid of the error and remove the radius type from the URL
     await user.clear(radiusBox);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&SearchString=Octopus%20Lane&StringSearchIsAnAddress=1' })).toBeInTheDocument();

@@ -228,7 +228,7 @@
         <div class="space-y-2">
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
-            {#if responseURL}
+            {#if responseURL && parameters !== null}
               <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                 {responseURL}
               </a>
@@ -272,7 +272,7 @@
                     class="flex-1"
                     items={[...servers.map((s) => ({ value: s.id, name: s.name })), { value: 'other', name: 'Other...' }]}
                     value={selectedServer?.id || (showCustomServerInput ? 'other' : '')}
-                    on:change={handleServerSelect}
+                    onchange={handleServerSelect}
                   />
                 {/if}
               </div>

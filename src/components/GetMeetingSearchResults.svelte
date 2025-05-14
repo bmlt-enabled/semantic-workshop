@@ -107,13 +107,13 @@
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
             <Label class="mt-4 flex items-center font-medium dark:text-white">
-              <Checkbox bind:checked={getUsedFormats} on:change={computeParameters} class="me-1" />
+              <Checkbox bind:checked={getUsedFormats} onchange={computeParameters} class="me-1" />
               {$translations.getUsedFormats}
             </Label>
           </div>
           <div class="flex items-center space-x-2">
             <Label class="mt-4 flex items-center font-medium dark:text-white">
-              <Checkbox bind:checked={getFormatsOnly} disabled={!getUsedFormats} on:change={computeParameters} class="me-1" />
+              <Checkbox bind:checked={getFormatsOnly} disabled={!getUsedFormats} onchange={computeParameters} class="me-1" />
               {$translations.getFormatsOnly}
             </Label>
           </div>
@@ -128,7 +128,7 @@
             {#each $translations.weekdays as day, i}
               <div class="flex items-center space-x-2">
                 <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={onWeekdays[i]} on:change={computeParameters} class="me-1" />
+                  <Checkbox bind:checked={onWeekdays[i]} onchange={computeParameters} class="me-1" />
                   {day}
                 </Label>
               </div>
@@ -141,7 +141,7 @@
             {#each $translations.weekdays as day, i}
               <div class="flex items-center space-x-2">
                 <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={notOnWeekdays[i]} on:change={computeParameters} class="me-1" />
+                  <Checkbox bind:checked={notOnWeekdays[i]} onchange={computeParameters} class="me-1" />
                   {day}
                 </Label>
               </div>
@@ -158,7 +158,7 @@
             {#each $translations.venueTypes as vt, i}
               <div class="flex items-center space-x-2">
                 <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={hasVenueType[i]} on:change={computeParameters} class="me-1" />
+                  <Checkbox bind:checked={hasVenueType[i]} onchange={computeParameters} class="me-1" />
                   {vt}
                 </Label>
               </div>
@@ -171,7 +171,7 @@
             {#each $translations.venueTypes as vt, i}
               <div class="flex items-center space-x-2">
                 <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={doesNotHaveVenueType[i]} on:change={computeParameters} class="me-1" />
+                  <Checkbox bind:checked={doesNotHaveVenueType[i]} onchange={computeParameters} class="me-1" />
                   {vt}
                 </Label>
               </div>
@@ -188,7 +188,7 @@
             {#each formats as f, i}
               <div class="flex items-center space-x-2">
                 <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={hasFormat[i]} on:change={computeParameters} class="me-1" />
+                  <Checkbox bind:checked={hasFormat[i]} onchange={computeParameters} class="me-1" />
                   {f.key_string}
                 </Label>
               </div>
@@ -197,11 +197,11 @@
           <div class="flex items-center space-x-4">
             <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.formatsComparisonOperator}:</Label>
             <div class="flex items-center space-x-2">
-              <Radio id="and-comparison" bind:group={formatsComparisonOperator} value="AND" on:change={computeParameters} />
+              <Radio id="and-comparison" bind:group={formatsComparisonOperator} value="AND" onchange={computeParameters} />
               <Label for="and-comparison" class="text-sm dark:text-white">{$translations.and}</Label>
             </div>
             <div class="flex items-center space-x-2">
-              <Radio id="or-comparison" bind:group={formatsComparisonOperator} value="OR" on:change={computeParameters} />
+              <Radio id="or-comparison" bind:group={formatsComparisonOperator} value="OR" onchange={computeParameters} />
               <Label for="or-comparison" class="text-sm dark:text-white">{$translations.or}</Label>
             </div>
           </div>
@@ -212,7 +212,7 @@
               {#each formats as f, i}
                 <div class="flex items-center space-x-2">
                   <Label class="mt-4 flex text-sm dark:text-white">
-                    <Checkbox bind:checked={doesNotHaveFormat[i]} on:change={computeParameters} class="me-1" />
+                    <Checkbox bind:checked={doesNotHaveFormat[i]} onchange={computeParameters} class="me-1" />
                     {f.key_string}
                   </Label>
                 </div>
@@ -254,7 +254,7 @@
                 <div class="mb-2">
                   {$translations.enterNewValue}:
                 </div>
-                <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} on:input={computeParameters} />
+                <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} oninput={computeParameters} />
               </Label>
             </div>
           </div>
@@ -270,7 +270,7 @@
                 <div class="mb-2">
                   {$translations.searchForThisText}:
                 </div>
-                <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} on:input={computeParametersForSpecificTextValue} />
+                <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
               </Label>
             </div>
             <div>
@@ -296,7 +296,7 @@
                 <div class="mb-2">
                   {$translations.searchRadius}:
                 </div>
-                <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} on:input={computeParametersForSpecificTextValue} />
+                <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} oninput={computeParametersForSpecificTextValue} />
               </Label>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.searchRadiusExplanation}</p>
               {#if badRadius}
