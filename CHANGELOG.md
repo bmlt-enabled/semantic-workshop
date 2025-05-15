@@ -1,3 +1,6 @@
+## 0.0.4 (May 15, 2025)
+* Fixes for new version of flowbite.
+
 ## 0.0.3 (May 13, 2025)
 * Language modal.
 
