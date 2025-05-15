@@ -25,6 +25,10 @@
   let searchRadius = $state('');
   let badRadius = $derived(!/^-?\d*$/.test(searchRadius));
   let fieldOptions: { name: string; value: string }[] = $derived(availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key })));
+  let startsAfter = $state('');
+  let startsBefore = $state('');
+  let endsBefore = $state('');
+  let badStartOrEndTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore));
 
   async function computeMeetingKeyValues() {
     try {
@@ -36,6 +40,32 @@
     } catch (error) {
       // TO FILL IN
     }
+  }
+
+  // Time is in 24 hour time and must be at least 00:01 and at most 23:59 (so you can't enter midnight exactly).  It also takes a rather
+  // liberal view of allowed times, mostly so that intermediate entries when typing something in don't show up as errors.
+  // Thus 9, 09, 09:, 09:0, and 09:00 are all legal and represent 9am.  However, 9x, 12:61, and 25:00 are not legal.
+  function validTime(s: string): boolean {
+    if (s === '') {
+      return true;
+    } else if (/^\d\d?(:\d?\d?)?$/.test(s)) {
+      const hm = s.split(':');
+      const h = parseInt(hm[0]);
+      const m = hm.length === 2 && hm[1].length > 0 ? parseInt(hm[1]) : 0;
+      return h < 24 && m < 60 && (h > 0 || m > 0);
+    } else {
+      return false;
+    }
+  }
+
+  function startEndTimePart(when, time) {
+    if (time === '' || !validTime(time)) {
+      return '';
+    }
+    const hm = time.split(':');
+    const hPart = hm[0] === '' || hm[0] === '0' || hm[0] === '00' ? '' : '&' + when + 'H=' + hm[0];
+    const mPart = hm.length < 2 || hm[1] === '' || hm[1] === '0' || hm[1] === '00' ? '' : '&' + when + 'M=' + hm[1];
+    return hPart + mPart;
   }
 
   function computeParameters() {
@@ -67,7 +97,9 @@
     const radiusModifier = searchType === 'location' && searchRadius ? '&SearchStringRadius=' + searchRadius : '';
     const specificTextValuePart = specificTextValue ? '&SearchString=' + encodeURIComponent(specificTextValue) + locationModifier + radiusModifier : '';
 
-    if (searchRadius && badRadius) {
+    const meetingStartEndTimePart = startEndTimePart('StartsAfter', startsAfter) + startEndTimePart('StartsBefore', startsBefore) + startEndTimePart('EndsBefore', endsBefore);
+
+    if ((searchRadius && badRadius) || badStartOrEndTime) {
       parameters = null;
     } else {
       parameters =
@@ -80,7 +112,8 @@
         doesNotHaveFormatPart +
         formatsComparisonOperatorPart +
         specificFieldValuePart +
-        specificTextValuePart;
+        specificTextValuePart +
+        meetingStartEndTimePart;
     }
   }
 
@@ -262,7 +295,7 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.searchString}</legend>
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSearchString}</legend>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -276,7 +309,7 @@
             <div>
               <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
                 <div class="mb-2">
-                  {$translations.searchType}:
+                  {$translations.meetingSearchType}:
                 </div>
                 <Select
                   id="search-type"
@@ -294,16 +327,56 @@
             <div>
               <Label for="search-radius" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
                 <div class="mb-2">
-                  {$translations.searchRadius}:
+                  {$translations.meetingSearchRadius}:
                 </div>
                 <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} oninput={computeParametersForSpecificTextValue} />
               </Label>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.searchRadiusExplanation}</p>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.meetingSearchRadiusExplanation}</p>
               {#if badRadius}
                 <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>
               {/if}
             </div>
           {/if}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingStartOrEndTime}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingStartOrEndTimeExplanation}</div>
+        <div class="space-y-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingStartsAfter}:
+              </div>
+              <Input type="text" placeholder="" bind:value={startsAfter} oninput={computeParameters} />
+            </Label>
+            {#if !validTime(startsAfter)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
+            {/if}
+          </div>
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingStartsBefore}:
+              </div>
+              <Input type="text" placeholder="" bind:value={startsBefore} oninput={computeParameters} />
+            </Label>
+            {#if !validTime(startsBefore)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
+            {/if}
+          </div>
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingEndsBefore}:
+              </div>
+              <Input type="text" placeholder="" bind:value={endsBefore} oninput={computeParameters} />
+            </Label>
+            {#if !validTime(endsBefore)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
+            {/if}
+          </div>
         </div>
       </fieldset>
     </div>

@@ -364,4 +364,43 @@ describe('Get Meeting Search Results tests', () => {
     // searchType should remain 'general'
     expect(searchType.value).toBe('general');
   });
+
+  test('search for meetings based on start or end time', async () => {
+    const user = await selectOperation('GetSearchResults');
+    const startsAfterBox = screen.getByRole('textbox', { name: 'Meeting starts after:' }) as HTMLInputElement;
+    const startsBeforeBox = screen.getByRole('textbox', { name: 'Meeting starts before:' }) as HTMLInputElement;
+    const endsBeforeBox = screen.getByRole('textbox', { name: 'Meeting ends before:' }) as HTMLInputElement;
+    // first test for the correct response after typing each character
+    await user.type(startsAfterBox, '2');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=2' })).toBeInTheDocument();
+    await user.type(startsAfterBox, '0');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=20' })).toBeInTheDocument();
+    await user.type(startsAfterBox, ':');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=20' })).toBeInTheDocument();
+    await user.type(startsAfterBox, '5');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=20&StartsAfterM=5' })).toBeInTheDocument();
+    await user.type(startsAfterBox, '0');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=20&StartsAfterM=50' })).toBeInTheDocument();
+    await user.type(startsAfterBox, '0');
+    expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    // now just test typing something into all 3 boxes
+    await user.clear(startsAfterBox);
+    await user.type(startsAfterBox, '3:15');
+    await user.type(startsBeforeBox, '12:00');
+    await user.type(endsBeforeBox, '11:30');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=3&StartsAfterM=15&StartsBeforeH=12&EndsBeforeH=11&EndsBeforeM=30' })).toBeInTheDocument();
+    // test that invalid time check works for other boxes also
+    await user.type(startsBeforeBox, 'Q');
+    expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    await user.clear(startsAfterBox);
+    await user.clear(startsBeforeBox);
+    await user.clear(endsBeforeBox);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
+    await user.type(endsBeforeBox, 'Q');
+    expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+  });
+
 });
