@@ -34,6 +34,7 @@ describe('semantic workshop tests (except get meetings)', () => {
   test('Get Service Bodies', async () => {
     const user = await selectOperation('GetServiceBodies');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
+    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get Formats', async () => {
@@ -82,6 +83,7 @@ describe('semantic workshop tests (except get meetings)', () => {
   test('Get a List of Available Field Keys', async () => {
     const user = await selectOperation('GetFieldKeys');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldKeys' })).toBeInTheDocument();
+    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get a List of Specific Field Values', async () => {
@@ -114,6 +116,7 @@ describe('semantic workshop tests (except get meetings)', () => {
   test('Get Server Information', async () => {
     const user = await selectOperation('GetServerInfo');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
+    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get Geographic Coverage Area', async () => {
@@ -220,6 +223,9 @@ describe('Get Meeting Search Results tests', () => {
 
   test('meetings that gather on specific weekdays', async () => {
     const user = await selectOperation('GetSearchResults');
+    // Bit of a hack -- there is more than one legend and one explanation that match these strings, so do a getAllByText
+    expect(screen.getAllByText('Search for meetings that gather on specific weekdays'));
+    expect(screen.getAllByText(/If any are selected, then the search will require that the selected terms match. This is an "OR" search./));
     // bit of a hack -- there are TWO Monday boxes, one for meetings that gather on Mondays
     // and another for meetings that do not gather on Mondays
     const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
@@ -233,6 +239,11 @@ describe('Get Meeting Search Results tests', () => {
 
   test('meetings that DO NOT gather on specific weekdays', async () => {
     const user = await selectOperation('GetSearchResults');
+    // similarly -- not the most precise test unfortunately
+    expect(screen.getAllByText(/Search for meetings that/));
+    expect(screen.getAllByText(/do not/));
+    expect(screen.getAllByText(/gather on specific weekdays/));
+    expect(screen.getByText('Any of these that are selected will prevent meetings that gather on the given weekday from being included in the search.')).toBeInTheDocument();
     const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
     await user.click(mondays[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays=-2' })).toBeInTheDocument();
@@ -243,6 +254,8 @@ describe('Get Meeting Search Results tests', () => {
 
   test('meetings that have specific venue types', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getAllByText('Search for meetings that have specific venue types'));
+    expect(screen.getAllByText(/If any are selected, then the search will require that the selected terms match. This is an "OR" search./));
     const virtual = screen.getAllByRole('checkbox', { name: 'Virtual' });
     expect(virtual.length).toBe(2);
     await user.click(virtual[0] as HTMLInputElement);
@@ -254,6 +267,10 @@ describe('Get Meeting Search Results tests', () => {
 
   test('meetings that DO NOT have specific venue types', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getAllByText(/Search for meetings that/));
+    expect(screen.getAllByText(/do not/));
+    expect(screen.getAllByText(/have specific venue types/));
+    expect(screen.getByText('Any of these that are selected will prevent meetings that have the given venue type from being included in the search.')).toBeInTheDocument();
     const virtual = screen.getAllByRole('checkbox', { name: 'Virtual' });
     await user.click(virtual[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&venue_types=-2' })).toBeInTheDocument();
@@ -267,6 +284,8 @@ describe('Get Meeting Search Results tests', () => {
   // need to do so; the server doesn't care.)
   test('meetings that have specific formats', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getAllByText(/Search for meetings that have specific formats/));
+    expect(screen.getAllByText(/If none of these are selected, they will have no bearing at all on the search. If any are/));
     const virtual = screen.getAllByRole('checkbox', { name: 'VM' });
     expect(virtual.length).toBe(2);
     await user.click(virtual[0] as HTMLInputElement);
@@ -284,6 +303,10 @@ describe('Get Meeting Search Results tests', () => {
 
   test('meetings that do not have specific formats', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getAllByText(/Search for meetings that/));
+    expect(screen.getAllByText(/do not/));
+    expect(screen.getAllByText(/have specific formats/));
+    expect(screen.getAllByText(/If none of these are selected, they will have no bearing at all on the search. If any are/));
     const virtual = screen.getAllByRole('checkbox', { name: 'VM' });
     await user.click(virtual[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&formats=-5' })).toBeInTheDocument();
@@ -294,6 +317,8 @@ describe('Get Meeting Search Results tests', () => {
 
   test('search for meetings with a specific value of a field', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getByText('Search for meetings with a specific value of a field')).toBeInTheDocument();
+    expect(screen.getByText(/You can either select an existing value of the chosen field using the left-hand selection menu/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
     expect(field.item(1)?.label).toBe('Key with & in it');
@@ -325,6 +350,8 @@ describe('Get Meeting Search Results tests', () => {
 
   test('search for meetings with some specific text', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getByText('Search for specific text')).toBeInTheDocument();
+    expect(screen.getByText('If you do not enter any text, it will have no effect on the search.')).toBeInTheDocument();
     const textBox = screen.getByRole('textbox', { name: 'Search for this text:' }) as HTMLInputElement;
     const searchType = screen.getByRole('combobox', { name: 'Search type:' }) as HTMLSelectElement;
     // searchType should be initially disabled, and then enabled after typing some text
@@ -367,6 +394,8 @@ describe('Get Meeting Search Results tests', () => {
 
   test('search for meetings based on start or end time', async () => {
     const user = await selectOperation('GetSearchResults');
+    expect(screen.getByText('Meeting start or end time')).toBeInTheDocument();
+    expect(screen.getByText('Format: HH:MM (24 hour time). 12:00 is Noon, 23:59 is Midnight. Leave blank to ignore.')).toBeInTheDocument();
     const startsAfterBox = screen.getByRole('textbox', { name: 'Meeting starts after:' }) as HTMLInputElement;
     const startsBeforeBox = screen.getByRole('textbox', { name: 'Meeting starts before:' }) as HTMLInputElement;
     const endsBeforeBox = screen.getByRole('textbox', { name: 'Meeting ends before:' }) as HTMLInputElement;
@@ -389,7 +418,9 @@ describe('Get Meeting Search Results tests', () => {
     await user.type(startsAfterBox, '3:15');
     await user.type(startsBeforeBox, '12:00');
     await user.type(endsBeforeBox, '11:30');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=3&StartsAfterM=15&StartsBeforeH=12&EndsBeforeH=11&EndsBeforeM=30' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&StartsAfterH=3&StartsAfterM=15&StartsBeforeH=12&EndsBeforeH=11&EndsBeforeM=30' })
+    ).toBeInTheDocument();
     // test that invalid time check works for other boxes also
     await user.type(startsBeforeBox, 'Q');
     expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
@@ -403,4 +434,24 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.queryByRole('link')).toBe(null);
   });
 
+  test('search for meetings based on duration', async () => {
+    const user = await selectOperation('GetSearchResults');
+    expect(screen.getByText('Meeting duration')).toBeInTheDocument();
+    expect(screen.getByText('Format: HH:MM. Leave blank to ignore.')).toBeInTheDocument();
+    const minDurationBox = screen.getByRole('textbox', { name: 'Meeting lasts at least:' }) as HTMLInputElement;
+    const maxDurationBox = screen.getByRole('textbox', { name: 'Meeting lasts at most:' }) as HTMLInputElement;
+    // testing for the correct response after typing each character was tested already in search for meetings based on start or end time
+    await user.type(minDurationBox, '1:00');
+    await user.type(maxDurationBox, '2:30');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&MinDurationH=1&MaxDurationH=2&MaxDurationM=30' })).toBeInTheDocument();
+    await user.type(minDurationBox, 'Q');
+    expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    await user.clear(minDurationBox);
+    await user.clear(maxDurationBox);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
+    await user.type(maxDurationBox, '24:00');
+    expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+  });
 });

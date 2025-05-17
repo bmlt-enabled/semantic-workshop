@@ -28,7 +28,9 @@
   let startsAfter = $state('');
   let startsBefore = $state('');
   let endsBefore = $state('');
-  let badStartOrEndTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore));
+  let minDuration = $state('');
+  let maxDuration = $state('');
+  let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
 
   async function computeMeetingKeyValues() {
     try {
@@ -58,13 +60,13 @@
     }
   }
 
-  function startEndTimePart(when, time) {
+  function timePart(what, time) {
     if (time === '' || !validTime(time)) {
       return '';
     }
     const hm = time.split(':');
-    const hPart = hm[0] === '' || hm[0] === '0' || hm[0] === '00' ? '' : '&' + when + 'H=' + hm[0];
-    const mPart = hm.length < 2 || hm[1] === '' || hm[1] === '0' || hm[1] === '00' ? '' : '&' + when + 'M=' + hm[1];
+    const hPart = hm[0] === '' || hm[0] === '0' || hm[0] === '00' ? '' : '&' + what + 'H=' + hm[0];
+    const mPart = hm.length < 2 || hm[1] === '' || hm[1] === '0' || hm[1] === '00' ? '' : '&' + what + 'M=' + hm[1];
     return hPart + mPart;
   }
 
@@ -97,9 +99,10 @@
     const radiusModifier = searchType === 'location' && searchRadius ? '&SearchStringRadius=' + searchRadius : '';
     const specificTextValuePart = specificTextValue ? '&SearchString=' + encodeURIComponent(specificTextValue) + locationModifier + radiusModifier : '';
 
-    const meetingStartEndTimePart = startEndTimePart('StartsAfter', startsAfter) + startEndTimePart('StartsBefore', startsBefore) + startEndTimePart('EndsBefore', endsBefore);
+    const meetingStartEndTimePart = timePart('StartsAfter', startsAfter) + timePart('StartsBefore', startsBefore) + timePart('EndsBefore', endsBefore);
+    const meetingDurationPart = timePart('MinDuration', minDuration) + timePart('MaxDuration', maxDuration);
 
-    if ((searchRadius && badRadius) || badStartOrEndTime) {
+    if ((searchRadius && badRadius) || badTime) {
       parameters = null;
     } else {
       parameters =
@@ -113,7 +116,8 @@
         formatsComparisonOperatorPart +
         specificFieldValuePart +
         specificTextValuePart +
-        meetingStartEndTimePart;
+        meetingStartEndTimePart +
+        meetingDurationPart;
     }
   }
 
@@ -133,9 +137,9 @@
 </script>
 
 <div class="flex justify-center">
-  <Card class="p-4" size="lg">
+  <Card class="border-gray-500 p-4 dark:border-gray-400" size="lg">
     <div class="space-y-6">
-      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.formatOptions}</legend>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
@@ -153,110 +157,110 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSchedule}</legend>
-        <div class="space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.meetingsOnSpecificDays}</Label>
-          <div class="grid grid-cols-7 gap-2">
-            {#each $translations.weekdays as day, i}
-              <div class="flex items-center space-x-2">
-                <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={onWeekdays[i]} onchange={computeParameters} class="me-1" />
-                  {day}
-                </Label>
-              </div>
-            {/each}
-          </div>
-        </div>
-        <div class="mt-6 space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.meetingsNotOnSpecificDays}</Label>
-          <div class="grid grid-cols-7 gap-2">
-            {#each $translations.weekdays as day, i}
-              <div class="flex items-center space-x-2">
-                <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={notOnWeekdays[i]} onchange={computeParameters} class="me-1" />
-                  {day}
-                </Label>
-              </div>
-            {/each}
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.venueOptions}</legend>
-        <div class="space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.hasVenueType}</Label>
-          <div class="grid grid-cols-3 gap-2">
-            {#each $translations.venueTypes as vt, i}
-              <div class="flex items-center space-x-2">
-                <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={hasVenueType[i]} onchange={computeParameters} class="me-1" />
-                  {vt}
-                </Label>
-              </div>
-            {/each}
-          </div>
-        </div>
-        <div class="mt-6 space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.doesNotHaveVenueType}</Label>
-          <div class="grid grid-cols-3 gap-2">
-            {#each $translations.venueTypes as vt, i}
-              <div class="flex items-center space-x-2">
-                <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={doesNotHaveVenueType[i]} onchange={computeParameters} class="me-1" />
-                  {vt}
-                </Label>
-              </div>
-            {/each}
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.formatFilters}</legend>
-        <div class="space-y-4">
-          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.hasFormat}</Label>
-          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {#each formats as f, i}
-              <div class="flex items-center space-x-2">
-                <Label class="mt-4 flex text-sm dark:text-white">
-                  <Checkbox bind:checked={hasFormat[i]} onchange={computeParameters} class="me-1" />
-                  {f.key_string}
-                </Label>
-              </div>
-            {/each}
-          </div>
-          <div class="flex items-center space-x-4">
-            <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.formatsComparisonOperator}:</Label>
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingsOnSpecificDays}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingsOnSpecificDaysExplanation}</div>
+        <div class="grid grid-cols-7 gap-2">
+          {#each $translations.weekdays as day, i}
             <div class="flex items-center space-x-2">
-              <Radio id="and-comparison" bind:group={formatsComparisonOperator} value="AND" onchange={computeParameters} />
-              <Label for="and-comparison" class="text-sm dark:text-white">{$translations.and}</Label>
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={onWeekdays[i]} onchange={computeParameters} class="me-1" />
+                {day}
+              </Label>
             </div>
-            <div class="flex items-center space-x-2">
-              <Radio id="or-comparison" bind:group={formatsComparisonOperator} value="OR" onchange={computeParameters} />
-              <Label for="or-comparison" class="text-sm dark:text-white">{$translations.or}</Label>
-            </div>
-          </div>
+          {/each}
+        </div>
+      </fieldset>
 
-          <div class="mt-6 space-y-4">
-            <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.doesNotHaveFormat}</Label>
-            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-              {#each formats as f, i}
-                <div class="flex items-center space-x-2">
-                  <Label class="mt-4 flex text-sm dark:text-white">
-                    <Checkbox bind:checked={doesNotHaveFormat[i]} onchange={computeParameters} class="me-1" />
-                    {f.key_string}
-                  </Label>
-                </div>
-              {/each}
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.meetingsNotOnSpecificDays}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingsNotOnSpecificDaysExplanation}</div>
+        <div class="grid grid-cols-7 gap-2">
+          {#each $translations.weekdays as day, i}
+            <div class="flex items-center space-x-2">
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={notOnWeekdays[i]} onchange={computeParameters} class="me-1" />
+                {day}
+              </Label>
             </div>
+          {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.hasVenueType}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.hasVenueTypeExplanation}</div>
+        <div class="grid grid-cols-3 gap-2">
+          {#each $translations.venueTypes as vt, i}
+            <div class="flex items-center space-x-2">
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={hasVenueType[i]} onchange={computeParameters} class="me-1" />
+                {vt}
+              </Label>
+            </div>
+          {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.doesNotHaveVenueType}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveVenueTypeExplanation}</div>
+        <div class="grid grid-cols-3 gap-2">
+          {#each $translations.venueTypes as vt, i}
+            <div class="flex items-center space-x-2">
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={doesNotHaveVenueType[i]} onchange={computeParameters} class="me-1" />
+                {vt}
+              </Label>
+            </div>
+          {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.hasFormat}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.hasFormatExplanation}</div>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {#each formats as f, i}
+            <div class="flex items-center space-x-2">
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={hasFormat[i]} onchange={computeParameters} class="me-1" />
+                {f.key_string}
+              </Label>
+            </div>
+          {/each}
+        </div>
+        <div class="flex items-center space-x-4">
+          <Label class="font-medium text-gray-700 dark:text-gray-300">{$translations.formatsComparisonOperator}:</Label>
+          <div class="flex items-center space-x-2">
+            <Radio id="and-comparison" bind:group={formatsComparisonOperator} value="AND" onchange={computeParameters} />
+            <Label for="and-comparison" class="text-sm dark:text-white">{$translations.and}</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <Radio id="or-comparison" bind:group={formatsComparisonOperator} value="OR" onchange={computeParameters} />
+            <Label for="or-comparison" class="text-sm dark:text-white">{$translations.or}</Label>
           </div>
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.doesNotHaveFormat}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveFormatExplanation}</div>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {#each formats as f, i}
+            <div class="flex items-center space-x-2">
+              <Label class="mt-4 flex text-sm dark:text-white">
+                <Checkbox bind:checked={doesNotHaveFormat[i]} onchange={computeParameters} class="me-1" />
+                {f.key_string}
+              </Label>
+            </div>
+          {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingKeyValue}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingKeyValueExplanation}</div>
         <div class="space-y-4">
           <div>
             <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
@@ -294,8 +298,9 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSearchString}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingSearchStringExplanation}</div>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -340,7 +345,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingStartOrEndTime}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingStartOrEndTimeExplanation}</div>
         <div class="space-y-4">
@@ -374,6 +379,35 @@
               <Input type="text" placeholder="" bind:value={endsBefore} oninput={computeParameters} />
             </Label>
             {#if !validTime(endsBefore)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
+            {/if}
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingDuration}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingDurationExplanation}</div>
+        <div class="space-y-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingLastsAtLeast}:
+              </div>
+              <Input type="text" placeholder="" bind:value={minDuration} oninput={computeParameters} />
+            </Label>
+            {#if !validTime(minDuration)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
+            {/if}
+          </div>
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingLastsAtMost}:
+              </div>
+              <Input type="text" placeholder="" bind:value={maxDuration} oninput={computeParameters} />
+            </Label>
+            {#if !validTime(maxDuration)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
             {/if}
           </div>

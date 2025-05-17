@@ -39,7 +39,7 @@
 </script>
 
 <div class="flex justify-center">
-  <Card class="p-4" size="md">
+  <Card class="border-gray-500 p-4 dark:border-gray-400" size="md">
     <div class="space-y-6">
       <div class="space-y-2">
         <Label class="font-medium text-gray-700 dark:text-gray-300">
