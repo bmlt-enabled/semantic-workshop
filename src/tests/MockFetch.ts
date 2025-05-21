@@ -4,10 +4,16 @@ export function setUpMockFetch() {
   vi.spyOn(global, 'fetch').mockImplementation(mockFetch);
 }
 
+// possibly overkill - but there are two variants of fetching from a bad URL.
+// One is a URL with "BAD" in it -- this causes the response to be not OK.
+// The other has "THROW_EXECPTION" in it -- this just throws an exception.
 function mockResponse(url: string) {
-  if (url === 'https://raw.githubusercontent.com/bmlt-enabled/tomato/refs/heads/master/rootServerList.json') {
-    return [{ name: 'Test Zone', id: '42', rootURL: 'https://myzone.org/main_server/' }];
-  } else if (/BAD/.test(url)) {
+  if (/rootServerList/.test(url)) {
+    return [
+      { name: 'Big Zone', id: '42', rootURL: 'https://bigzone.org/main_server/' },
+      { name: 'Small Zone', id: '21', rootURL: 'https://smallzone.org/main_server/' }
+    ];
+  } else if (/THROW_EXECPTION/.test(url)) {
     throw new Error('mocked server error');
   } else if (/smallzone.*GetServerInfo/.test(url)) {
     return [{ langs: 'it', nativeLang: 'it' }];
@@ -51,6 +57,7 @@ function mockResponse(url: string) {
 //     function mockFetch(url: string): Promise<Response>
 function mockFetch(url: any): any {
   return Promise.resolve({
+    ok: !/BAD/.test(url),
     json: () => Promise.resolve(mockResponse(url))
   });
 }

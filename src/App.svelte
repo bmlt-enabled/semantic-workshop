@@ -1,6 +1,6 @@
 <script lang="ts">
   import './app.css';
-  import { Heading, Helper, Label, P, Select } from 'flowbite-svelte';
+  import { Button, Heading, Helper, Label, P, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';
@@ -24,7 +24,7 @@
 
   let servers = $state<Server[]>([]);
   let selectedServer = $state<Server | undefined>(undefined);
-  let isLoadingServers = $state(true);
+  let isLoadingServers = $state(false);
   let showCustomServerInput = $state(false);
 
   // Get apiBaseUrl from query params or window.settings
@@ -32,8 +32,7 @@
   const queryApiBaseUrl = urlParams.get('apiBaseUrl');
   const apiBaseUrl = queryApiBaseUrl || (typeof settings !== 'undefined' && settings.apiBaseUrl);
 
-  // defaultRootServerURL can also be '' (that works)
-  const defaultRootServerURL = apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
+  const defaultRootServerURL = apiBaseUrl || '';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },
@@ -68,11 +67,9 @@
 
   const initialLang = localStorage.getItem('workshopLanguage') || detectBrowserLanguage();
   let workshopLanguage = $state(initialLang);
-  // rootServerUrl is what gets typed in the URL textbox
-  let rootServerURL = $state(defaultRootServerURL);
-  // the savedRootServerURL will always end in a / (added if necessary to the rootServerURL)
-  let savedRootServerURL = $state(defaultRootServerURL);
-  let serverError = $state('');
+  let rootServerURL: string = $state(defaultRootServerURL);
+  let serverError: string = $state('');
+  let customURL: string = $state('');
   let operation: string = $state('');
   let serverInfo: { langs: string; nativeLang: string }[] | undefined = $state();
   let serviceBodies: { name: string; id: string }[] | undefined = $state();
@@ -82,28 +79,33 @@
   let formats: { key_string: string; id: string }[] | undefined = $state();
 
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
-  // server error, or whatever.
+  // server error, or whatever.  parameters === '' is ok and just means there aren't any parameters for that operation.
   let parameters: string | null = $state('');
-  let responseURL = $derived(savedRootServerURL === '' || serverError ? '' : savedRootServerURL + (operation ? 'client_interface/json/?switcher=' + operation + (parameters || '') : ''));
+  let responseURL: string = $derived(rootServerURL === '' || serverError ? '' : rootServerURL + (operation ? 'client_interface/json/?switcher=' + operation + (parameters || '') : ''));
 
-  async function updateRootServerURL() {
-    const s = rootServerURL.trim();
-    savedRootServerURL = s + (s === '' || s.endsWith('/') ? '' : '/');
-    // reset state that won't be updated by getData();
-    // this will be 'operation' itself, and also state for a particular operation
-    operation = savedRootServerURL ? 'GetServerInfo' : '';
+  async function updateRootServerURL(url: string) {
+    const s = url.trim();
+    // rootServerURL should always end in a '/', unless it's the empty string
+    rootServerURL = s === '' || s.endsWith('/') ? s : s + '/';
+    // Reset 'operation' when the root server URL changes.  There will also be state for the different operations, but since these are
+    // in separate components that state gets reset when the component is rendered again.
+    operation = rootServerURL ? 'GetServerInfo' : '';
     await getAllData();
   }
 
   async function getData(operation: string) {
-    const response = await fetch(savedRootServerURL + 'client_interface/json/?switcher=' + operation);
+    const response = await fetch(rootServerURL + 'client_interface/json/?switcher=' + operation);
+    if (!response.ok) {
+      throw new Error('server response said not OK');
+    }
     return response.json();
   }
 
   // Get data from the server that will be needed for building some of the queries.  Just get it all for now - later we
   // could only get the data if it's needed for a particular operation.
   async function getAllData() {
-    if (savedRootServerURL === '') {
+    serverError = '';
+    if (rootServerURL === '') {
       serverInfo = undefined;
       serverLangs = undefined;
       nativeLang = undefined;
@@ -120,7 +122,6 @@
         availableFields?.sort((a, b) => a.description.localeCompare(b.description));
         formats = await getData('GetFormats');
         formats?.sort((a, b) => a.key_string.localeCompare(b.key_string));
-        serverError = '';
       } catch (error) {
         serverError = $translations.serverError + ' -- ' + error;
         serverInfo = undefined;
@@ -138,7 +139,6 @@
 
     if (apiBaseUrl) {
       rootServerURL = apiBaseUrl;
-      savedRootServerURL = apiBaseUrl;
       operation = 'GetServerInfo';
       await getAllData();
       return;
@@ -156,7 +156,6 @@
       selectedServer = servers.find((s) => s.rootURL === defaultRootServerURL);
       if (selectedServer) {
         rootServerURL = selectedServer.rootURL;
-        savedRootServerURL = selectedServer.rootURL;
         operation = 'GetServerInfo';
       }
     } catch (error) {
@@ -172,21 +171,14 @@
     const select = event.target as HTMLSelectElement;
     if (select.value === 'other') {
       showCustomServerInput = true;
+      rootServerURL = '';
+      customURL = '';
+      operation = '';
       selectedServer = undefined;
-      return;
-    }
-    showCustomServerInput = false;
-    const server = servers.find((s) => s.id === select.value);
-    if (server) {
-      rootServerURL = server.rootURL;
-      savedRootServerURL = server.rootURL;
-      updateRootServerURL();
-    }
-  }
-
-  function handleCustomServerInput() {
-    if (rootServerURL.trim()) {
-      updateRootServerURL();
+    } else {
+      showCustomServerInput = false;
+      const server = servers.find((s) => s.id === select.value);
+      updateRootServerURL(server ? server.rootURL : '');
     }
   }
 
@@ -270,22 +262,20 @@
                   <Select
                     id="rootServerURL"
                     class="flex-1"
-                    items={[...servers.map((s) => ({ value: s.id, name: s.name })), { value: 'other', name: 'Other...' }]}
+                    items={[...servers.map((s) => ({ value: s.id, name: s.name })), { value: 'other', name: $translations.other }]}
                     value={selectedServer?.id || (showCustomServerInput ? 'other' : '')}
                     onchange={handleServerSelect}
                   />
                 {/if}
               </div>
               {#if showCustomServerInput}
-                <div class="mt-2">
-                  <input
-                    type="text"
-                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    placeholder="Enter server URL"
-                    bind:value={rootServerURL}
-                    onblur={handleCustomServerInput}
-                  />
-                </div>
+                <input
+                  type="text"
+                  class="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder={$translations.urlPlaceholder}
+                  bind:value={customURL}
+                />
+                <Button onclick={() => updateRootServerURL(customURL)}>{$translations.updateURL}</Button>
               {/if}
               {#if serverError}
                 <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
@@ -297,7 +287,7 @@
             <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
               {$translations.operation}:
             </Label>
-            <Select id="operation" class="w-full" items={operationOptions} disabled={serverError !== ''} bind:value={operation} />
+            <Select id="operation" class="w-full" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
           </div>
         </div>
 

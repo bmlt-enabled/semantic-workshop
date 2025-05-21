@@ -115,6 +115,7 @@ const strings = new (LocalizedStrings as any)({
       If one or more service bodies are selected, then the meetings found must NOT belong to any of those service bodies.`,
     operation: 'Operation',
     or: 'OR',
+    other: '- Other -',
     responseURL: 'Response URL',
     rootServerURL: 'Root server URL',
     searchForThisText: 'Search for this text',
@@ -130,7 +131,7 @@ const strings = new (LocalizedStrings as any)({
       If one or more service bodies are selected, then the meetings found must belong to one of those service bodies.`,
     title: 'BMLT Semantic Workshop',
     updateURL: 'Update root server URL',
-    urlPlaceholder: 'enter root server URL',
+    urlPlaceholder: 'Enter root server URL ...',
     value: 'Value',
     venueTypes: ['In-person', 'Virtual', 'Hybrid'],
     weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

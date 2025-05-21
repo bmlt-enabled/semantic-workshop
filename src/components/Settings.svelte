@@ -28,10 +28,10 @@
         </button>
       </div>
       <div class="space-y-4">
-        <div>
-          <Label for="language" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Language</Label>
-          <Select id="language" class="w-full" items={allLanguages} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
-        </div>
+        <Label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+          Language
+          <Select class="w-full" items={allLanguages} bind:value={workshopLanguage} onchange={() => translations.setLanguage(workshopLanguage)} />
+        </Label>
         <div class="flex justify-end">
           <button
             type="button"

@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, afterAll, describe, test, expect, vi } from 'vitest';
+import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -6,39 +6,45 @@ import userEvent from '@testing-library/user-event';
 import App from '../App.svelte';
 import { setUpMockFetch } from './MockFetch';
 
-const dummyURL = 'https://myzone.org/main_server/';
+const dummyURL = 'https://bigzone.org/main_server/';
 
-// utility function to set up the page with the operation selected
-async function selectOperation(operation: string) {
+// utility function to set up the semantic workshop page for a unit test
+async function setupTest(operation: string | null, provideBaseUrl = true) {
+  // @ts-ignore
+  global.settings = provideBaseUrl ? { apiBaseUrl: 'https://bigzone.org/main_server/' } : {};
+  localStorage.setItem('workshopLanguage', 'en');
   const user = userEvent.setup();
   render(App);
-  const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-  await userEvent.selectOptions(menu, [operation]);
+  if (operation) {
+    const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
+    await userEvent.selectOptions(menu, [operation]);
+  }
   return user;
 }
 
 beforeAll(setUpMockFetch);
 afterAll(vi.resetAllMocks);
-beforeEach(() => localStorage.setItem('workshopLanguage', 'en'));
 
 describe('semantic workshop tests (except get meetings)', () => {
   test('initial screen', async () => {
-    render(App);
+    await setupTest(null);
     expect(screen.getByRole('heading', { name: 'BMLT Semantic Workshop', level: 1 })).toBeInTheDocument();
     expect(screen.getByLabelText('Response URL:')).toBeInTheDocument();
-    // TODO: test for language selector, dark mode
+    // since this test is set up to provide a base URL, the Select menu for the server shouldn't be shown -- so we should have only one Select menu
+    expect(screen.getAllByRole('combobox').length).toBe(1);
     const operation = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
     expect(operation.value).toBe('GetServerInfo');
+    // there are separate tests later for the Select menu for the server and the language selector
   });
 
   test('Get Service Bodies', async () => {
-    const user = await selectOperation('GetServiceBodies');
+    const user = await setupTest('GetServiceBodies');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get Formats', async () => {
-    const user = await selectOperation('GetFormats');
+    const user = await setupTest('GetFormats');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
     expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
@@ -57,7 +63,7 @@ describe('semantic workshop tests (except get meetings)', () => {
   });
 
   test('Get Changes', async () => {
-    const user = await selectOperation('GetChanges');
+    const user = await setupTest('GetChanges');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges' })).toBeInTheDocument();
     // TODO - not finished -- need to test picking a date range
     // const openDatePicker = screen.getByRole('button', { name: /Open date picker/ });
@@ -81,13 +87,13 @@ describe('semantic workshop tests (except get meetings)', () => {
   });
 
   test('Get a List of Available Field Keys', async () => {
-    const user = await selectOperation('GetFieldKeys');
+    const user = await setupTest('GetFieldKeys');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldKeys' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get a List of Specific Field Values', async () => {
-    const user = await selectOperation('GetFieldValues');
+    const user = await setupTest('GetFieldValues');
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
@@ -102,7 +108,7 @@ describe('semantic workshop tests (except get meetings)', () => {
   });
 
   test('Get a NAWS Format Export', async () => {
-    const user = await selectOperation('GetNAWSDump');
+    const user = await setupTest('GetNAWSDump');
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
@@ -114,73 +120,89 @@ describe('semantic workshop tests (except get meetings)', () => {
   });
 
   test('Get Server Information', async () => {
-    const user = await selectOperation('GetServerInfo');
+    const user = await setupTest('GetServerInfo');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get Geographic Coverage Area', async () => {
-    const user = await selectOperation('GetCoverageArea');
+    const user = await setupTest('GetCoverageArea');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetCoverageArea' })).toBeInTheDocument();
     // TODO: NOT FINISHED -- need to also check map
   });
 
-  // TODO: unskip this after the test is updated to use the new UI elements for selecting a root server from the list or typing one in
-  // after picking the 'Other' option.
-  test.skip('change root server URL', async () => {
+  test('change root server URL', async () => {
     // Various picky tests of changing the root server URL.  After the URL is changed, the response URL should be updated.
-    // Also, the operation should be reset to GetServiceBodies, and the data needed for other operations should be for the new server.
-    // Setting the URL to the empty string is OK and should have no service bodies and no response URL.
-    const user = await selectOperation('GetServerInfo');
-    const rootServerURL = screen.getByRole('textbox', { name: 'Root server URL:' }) as HTMLInputElement;
-    await user.clear(rootServerURL);
-    await user.type(rootServerURL, 'https://smallzone.org/main_server/');
-    expect(rootServerURL.value).toBe('https://smallzone.org/main_server/');
-    const updateURL = screen.getByRole('button', { name: 'Update root server URL' });
-    expect(updateURL).not.toBeDisabled();
-    await user.click(updateURL);
-    const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    // changing the URL should reset the selected operation
-    expect(menu.value).toBe('');
-    await userEvent.selectOptions(menu, ['GetServiceBodies']);
-    // we should see the URL and parameters for smallzone now
-    expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
-    await userEvent.selectOptions(menu, ['GetFormats']);
+    // Also, the operation should be reset to GetServerInfo, and the data needed for other operations should be for the new server.
+    // Setting the URL to the empty string is OK and should have operation menu disabled and no response URL.
+    const user = await setupTest('GetServerInfo', false);
+    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
+    const operationMenu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
+    expect(rootServerMenu.length).toBe(4);
+    await userEvent.selectOptions(rootServerMenu, ['21']);
+    // shouldn't have a text box to type in a custom root server URL at this point
+    expect(screen.queryByRole('textbox')).toBe(null);
+    expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
+    await userEvent.selectOptions(operationMenu, ['GetFormats']);
     const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
     expect(formatLanguage.length).toBe(3);
     expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
     expect(formatLanguage.item(1)?.label).toBe('Server language');
     expect(formatLanguage.item(2)?.label).toBe('Italiano');
-    // finally set the root server URL to the empty string
-    await user.clear(rootServerURL);
-    await user.click(updateURL);
-    expect(screen.queryByRole('link')).toBe(null);
+    expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
+    // changing the root server URL should reset the operation
+    await userEvent.selectOptions(rootServerMenu, ['42']);
+    expect(screen.getByRole('link', { name: 'https://bigzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
+    await userEvent.selectOptions(operationMenu, ['GetServiceBodies']);
+    await userEvent.selectOptions(rootServerMenu, ['other']);
+    const boxes = screen.getAllByRole('textbox');
+    expect(boxes.length).toBe(1);
+    const customUrl = boxes[0];
+    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
+    await user.type(customUrl, 'https://weirdzone.org/main_server/');
+    await user.click(acceptUrl);
+    expect(screen.getByRole('link', { name: 'https://weirdzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
+    await user.clear(customUrl);
+    await user.click(acceptUrl);
+    expect(operationMenu).toBeDisabled();
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
-    await userEvent.selectOptions(menu, ['GetNAWSDump']);
-    const serviceBodiesMenu = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(serviceBodiesMenu.length).toBe(1);
-    expect(serviceBodiesMenu.item(0)?.label).toBe('Choose option ...');
   });
 
-  // TODO: unskip this after the test is updated to use the new UI elements for selecting a root server from the list or typing one in
-  // after picking the 'Other' option.
-  test.skip('bad root server URL', async () => {
-    const user = userEvent.setup();
-    render(App);
-    const rootServerURL = screen.getByRole('textbox', { name: 'Root server URL:' }) as HTMLInputElement;
-    await user.clear(rootServerURL);
-    await user.type(rootServerURL, 'https://BADzone.org/main_server/');
-    const updateURL = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.click(updateURL);
+  test('bad root server URL', async () => {
+    const user = await setupTest('GetServerInfo', false);
+    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
+    await userEvent.selectOptions(rootServerMenu, ['other']);
+    const boxes = screen.getAllByRole('textbox');
+    const customUrl = boxes[0];
+    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
+    await user.type(customUrl, 'https://BADzone.org/main_server/');
+    await user.click(acceptUrl);
+    expect(screen.getByText(/Server error -- Error: server response said not OK/)).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
+  });
+
+  test('another bad root server URL - throws an exception', async () => {
+    const user = await setupTest('GetServerInfo', false);
+    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
+    await userEvent.selectOptions(rootServerMenu, ['other']);
+    const boxes = screen.getAllByRole('textbox');
+    const customUrl = boxes[0];
+    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
+    await user.type(customUrl, 'https://THROW_EXECPTIONzone.org/main_server/');
+    await user.click(acceptUrl);
     expect(screen.getByText(/Server error -- Error: mocked server error/)).toBeInTheDocument();
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
   });
 
-  // TODO: unskip this after the test is updated to use the new UI elements for selecting a different language.
-  test.skip('change semantic workshop language', async () => {
-    render(App);
-    const languagerMenu = screen.getByRole('combobox', { name: 'Language:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(languagerMenu, ['de']);
-    expect(screen.getByRole('heading', { name: 'BMLT Semantische Werkstatt', level: 1 })).toBeInTheDocument();
+  test('change semantic workshop language', async () => {
+    const user = await setupTest('GetServerInfo');
+    const languageSettings = screen.getByRole('button', { name: 'Open language settings' });
+    await user.click(languageSettings);
+    const languageMenu = screen.getByRole('combobox', { name: 'Language' }) as HTMLSelectElement;
+    await userEvent.selectOptions(languageMenu, ['de']);
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
+    expect(screen.getByRole('heading', { name: 'BMLT Semantische Werkstatt', level: 1 }));
   });
 });
 
@@ -188,7 +210,7 @@ describe('check that response parameters are initially cleared', () => {
   test('no leftover response parameters from GetFormats for GetSearchResults ', async () => {
     // In theory we should have a test like this for all the options.
     // Here we are checking that the 'show_all=1' part of the parameter is dropped after we switch operations.
-    const user = await selectOperation('GetFormats');
+    const user = await setupTest('GetFormats');
     const allFormats = screen.getByRole('checkbox', { name: 'Show all formats' }) as HTMLInputElement;
     await user.click(allFormats);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&show_all=1' })).toBeInTheDocument();
@@ -200,7 +222,7 @@ describe('check that response parameters are initially cleared', () => {
 
 describe('Get Meeting Search Results tests', () => {
   test('Get Formats checkboxes', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
     const getUsedFormats = screen.getByRole('checkbox', { name: 'Get the formats used in the results of this search' }) as HTMLInputElement;
     expect(getUsedFormats.checked).toBe(false);
@@ -222,7 +244,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('meetings that gather on specific weekdays', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     // Bit of a hack -- there is more than one legend and one explanation that match these strings, so do a getAllByText
     expect(screen.getAllByText('Search for meetings that gather on specific weekdays'));
     expect(screen.getAllByText(/If any are selected, then the search will require that the selected terms match. This is an "OR" search./));
@@ -238,7 +260,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('meetings that DO NOT gather on specific weekdays', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     // similarly -- not the most precise test unfortunately
     expect(screen.getAllByText(/Search for meetings that/));
     expect(screen.getAllByText(/do not/));
@@ -253,7 +275,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('meetings that have specific venue types', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getAllByText('Search for meetings that have specific venue types'));
     expect(screen.getAllByText(/If any are selected, then the search will require that the selected terms match. This is an "OR" search./));
     const virtual = screen.getAllByRole('checkbox', { name: 'Virtual' });
@@ -266,7 +288,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('meetings that DO NOT have specific venue types', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getAllByText(/Search for meetings that/));
     expect(screen.getAllByText(/do not/));
     expect(screen.getAllByText(/have specific venue types/));
@@ -283,7 +305,7 @@ describe('Get Meeting Search Results tests', () => {
   // sorted -- they are just in whatever order the formats are declared.  (They could be sorted as well, but there isn't really any
   // need to do so; the server doesn't care.)
   test('meetings that have specific formats', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getAllByText(/Search for meetings that have specific formats/));
     expect(screen.getAllByText(/If none of these are selected, they will have no bearing at all on the search. If any are/));
     const virtual = screen.getAllByRole('checkbox', { name: 'VM' });
@@ -302,7 +324,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('meetings that do not have specific formats', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getAllByText(/Search for meetings that/));
     expect(screen.getAllByText(/do not/));
     expect(screen.getAllByText(/have specific formats/));
@@ -316,7 +338,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('search for meetings with a specific value of a field', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getByText('Search for meetings with a specific value of a field')).toBeInTheDocument();
     expect(screen.getByText(/You can either select an existing value of the chosen field using the left-hand selection menu/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
@@ -349,7 +371,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('search for meetings with some specific text', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getByText('Search for specific text')).toBeInTheDocument();
     expect(screen.getByText('If you do not enter any text, it will have no effect on the search.')).toBeInTheDocument();
     const textBox = screen.getByRole('textbox', { name: 'Search for this text:' }) as HTMLInputElement;
@@ -393,7 +415,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('search for meetings based on start or end time', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getByText('Meeting start or end time')).toBeInTheDocument();
     expect(screen.getByText('Format: HH:MM (24 hour time). 12:00 is Noon, 23:59 is Midnight. Leave blank to ignore.')).toBeInTheDocument();
     const startsAfterBox = screen.getByRole('textbox', { name: 'Meeting starts after:' }) as HTMLInputElement;
@@ -435,7 +457,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('search for meetings based on duration', async () => {
-    const user = await selectOperation('GetSearchResults');
+    const user = await setupTest('GetSearchResults');
     expect(screen.getByText('Meeting duration')).toBeInTheDocument();
     expect(screen.getByText('Format: HH:MM. Leave blank to ignore.')).toBeInTheDocument();
     const minDurationBox = screen.getByRole('textbox', { name: 'Meeting lasts at least:' }) as HTMLInputElement;
