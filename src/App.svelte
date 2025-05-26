@@ -32,7 +32,7 @@
   const queryApiBaseUrl = urlParams.get('apiBaseUrl');
   const apiBaseUrl = queryApiBaseUrl || (typeof settings !== 'undefined' && settings.apiBaseUrl);
 
-  const defaultRootServerURL = apiBaseUrl || '';
+  const defaultRootServerURL = apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
     { value: 'de', name: 'Deutsch' },
     { value: 'dk', name: 'Dansk' },

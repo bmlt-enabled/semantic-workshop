@@ -50,6 +50,7 @@ const strings = new (LocalizedStrings as any)({
     doesNotHaveVenueType: 'Search for meetings that <i><b>do not</b></i> have specific venue types',
     doesNotHaveVenueTypeExplanation: `Any of these that are selected will prevent meetings that have the given venue type
       from being included in the search.`,
+    dontSort: `Don't sort`,
     enterNewValue: 'Enter a new value',
     field: 'Field',
     formatLanguage: 'Format language',
@@ -92,6 +93,10 @@ const strings = new (LocalizedStrings as any)({
     meetingKeyValueResult: 'The value must equal',
     meetingLastsAtLeast: 'Meeting lasts at least',
     meetingLastsAtMost: 'Meeting lasts at most',
+    meetingResponseSortOrder: 'Response sort order',
+    meetingResponseSortOrderExplanation: `Select fields to be used in sorting the result.  The result will be sorted first by the field
+      marked '1', then by the field marked '2', and so on.  "Don't sort" means that the field isn't used in sorting, although it will
+      still be part of the result.`,
     meetingSearchRadius: 'Search radius',
     meetingSearchRadiusExplanation: `Search radius is in either miles or km, depending on the root server settings.
       A negative value must be an integer, and is for auto-radius.`,
@@ -104,6 +109,8 @@ const strings = new (LocalizedStrings as any)({
     meetingsOnSpecificDaysExplanation: `If none of these are selected, they will have no bearing at all on the search.
       If any are selected, then the search will require that the selected terms match. This is an "OR" search. Matching
       any one of these will count. They don't all have to match. However, you need at least one match.`,
+    meetingSpecificFields: 'Return only specific fields',
+    meetingSpecificFieldsExplanation: 'The order of the response will be determined by the server.',
     meetingStartOrEndTime: 'Meeting start or end time',
     meetingStartOrEndTimeExplanation: 'Format: HH:MM (24 hour time). 12:00 is Noon, 23:59 is Midnight. Leave blank to ignore.',
     meetingStartsAfter: 'Meeting starts after',

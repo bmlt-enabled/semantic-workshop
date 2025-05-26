@@ -31,6 +31,11 @@
   let minDuration = $state('');
   let maxDuration = $state('');
   let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
+  let selectedFields = $state(Array(availableFields.length).fill(false));
+  // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
+  // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
+  // seems to want the values to be strings only, so the code is constantly converting between strings and ints for this array.
+  let sortOrder: string[] = $state(new Array(availableFields.length).fill('0'));
 
   async function computeMeetingKeyValues() {
     try {
@@ -70,6 +75,51 @@
     return hPart + mPart;
   }
 
+  function computeSpecificFieldsPart() {
+    const encodedNames = [];
+    for (let i = 0; i < availableFields.length; i++) {
+      if (selectedFields[i]) {
+        encodedNames.push(encodeURIComponent(availableFields[i].key));
+      }
+    }
+    return encodedNames.length === 0 ? '' : '&data_field_key=' + encodedNames.join(',');
+  }
+
+  function computeSortOrderPart() {
+    const keys = new Array(sortOrder.length).fill('');
+    for (let i = 0; i < sortOrder.length; i++) {
+      if (sortOrder[i] !== '0') {
+        keys[parseInt(sortOrder[i])-1] = availableFields[i].key;
+      }
+    }
+    const usedKeys = keys.filter((k) => k !== '');
+    return usedKeys.length === 0 ? '' : '&sort_keys=' + usedKeys.map(encodeURIComponent).join(',');
+  }
+
+  // This function is used to decide whether to enable or disable a menu option for the sort order menu for a given field.  Argument i
+  // is the option position, and currentValue is the current position of that field (0 means not part of sort order, 1 means first, etc).
+  // The Don't sort option is always enabled and is handled separately.
+  function allowedSortChoice(i: number, currentValue: number) {
+    // it's ok to select the current position again (although this wouldn't change anything)
+    if (i === currentValue) {
+      return true;
+    }
+    // otherwise, if i is already used as a position, we can't pick it as a position for a different field
+    if (sortOrder.includes(i.toString())) {
+      return false;
+    }
+    // if the current position is the last position used, selecting the next available position wouldn't make sense, since after things
+    // are fixed up we'd just be back to the same state
+    if (currentValue > 0 && !sortOrder.includes((currentValue+1).toString())) {
+      return false;
+    }
+    // if i-1 is used as a position, that means i is the next available position, so enable it
+    if (sortOrder.includes((i-1).toString())) {
+      return true;
+    }
+    return false;
+  }
+
   function computeParameters() {
     if (!getUsedFormats) {
       getFormatsOnly = false;
@@ -102,6 +152,9 @@
     const meetingStartEndTimePart = timePart('StartsAfter', startsAfter) + timePart('StartsBefore', startsBefore) + timePart('EndsBefore', endsBefore);
     const meetingDurationPart = timePart('MinDuration', minDuration) + timePart('MaxDuration', maxDuration);
 
+    const specificFieldsPart = computeSpecificFieldsPart();
+    const sortOrderPart = computeSortOrderPart();
+
     if ((searchRadius && badRadius) || badTime) {
       parameters = null;
     } else {
@@ -117,7 +170,9 @@
         specificFieldValuePart +
         specificTextValuePart +
         meetingStartEndTimePart +
-        meetingDurationPart;
+        meetingDurationPart +
+        specificFieldsPart +
+        sortOrderPart;
     }
   }
 
@@ -131,6 +186,24 @@
       searchRadius = '';
     }
     computeParameters();
+  }
+
+  function computeParametersforSortOrder() {
+    // update sort positions if necessary
+    const sortCopy = [...sortOrder];
+    for (let i = 0; i < sortCopy.length; i++) {
+      if (!sortCopy.includes((i+1).toString())) {
+        // change subsequent positions to 1 less and stop looping
+        for (let j = 0; j < sortCopy.length; j++) {
+          if (parseInt(sortCopy[j]) > i+1) {
+            sortCopy[j] = (parseInt(sortCopy[j]) - 1).toString();
+          }
+        }
+        break;
+      }
+    }
+    computeParameters();
+    sortOrder = sortCopy;
   }
 
   onMount(() => (parameters = ''));
@@ -411,6 +484,41 @@
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
             {/if}
           </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSpecificFields}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingSpecificFieldsExplanation}</div>
+        <div class="grid grid-cols-1 gap-2 mt-2">
+          {#each fieldOptions as f, i}
+            <div class="flex items-center space-x-2">
+              <Label class="flex text-sm dark:text-white">
+                <Checkbox class="me-2" bind:checked={selectedFields[i]} onchange={computeParameters} />
+                {f.name}
+              </Label>
+            </div>
+          {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingResponseSortOrder}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingResponseSortOrderExplanation}</div>
+        <div class="grid grid-cols-1 gap-2 mt-2">
+          {#each fieldOptions as f, n}
+            <div class="flex items-center space-x-2">
+              <Label class="flex text-sm dark:text-white">
+                <Select class="me-2" bind:value={sortOrder[n]} onchange={computeParametersforSortOrder}>
+                  <option selected value='0'>{$translations.dontSort}</option>
+                  {#each fieldOptions as _, i}
+                    <option value={(i+1).toString()} disabled={!allowedSortChoice(i+1,parseInt(sortOrder[n]))}>{i+1}</option>
+                  {/each}
+                </Select>
+                {f.name}
+              </Label>
+            </div>
+          {/each}
         </div>
       </fieldset>
     </div>

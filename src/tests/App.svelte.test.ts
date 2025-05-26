@@ -476,4 +476,78 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.getByText(/Invalid time/)).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBe(null);
   });
+
+  test('return only specific fields', async () => {
+    const user = await setupTest('GetSearchResults');
+    expect(screen.getByText('Return only specific fields')).toBeInTheDocument();
+    expect(screen.getByText('The order of the response will be determined by the server.')).toBeInTheDocument();
+    const s = screen.getByRole('checkbox', { name: 'State' });
+    await user.click(s);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&data_field_key=location_province' })).toBeInTheDocument();
+    const k = screen.getByRole('checkbox', { name: 'Key with & in it' });
+    await user.click(k);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&data_field_key=weird%26key,location_province' })).toBeInTheDocument();
+  });
+
+  test('response sort order', async () => {
+    const user = await setupTest('GetSearchResults');
+    expect(screen.getByText('Response sort order')).toBeInTheDocument();
+    expect(screen.getByText(/Select fields to be used in sorting the result. The result will be sorted first by the field/)).toBeInTheDocument();
+    const serviceBodySelect = screen.getByRole('combobox', { name: 'Service Body ID' }) as HTMLSelectElement;
+    // no sort options selected yet -- the enabled options should only be "Don't sort" and "1"
+    expect(serviceBodySelect.length).toBe(5);
+    expect(serviceBodySelect.item(0)?.label).toBe('Choose option ...');
+    expect(serviceBodySelect.item(1)?.label).toBe('Don\'t sort');
+    expect(serviceBodySelect.item(2)?.label).toBe('1');
+    expect(serviceBodySelect.item(3)?.label).toBe('2');
+    expect(serviceBodySelect.item(4)?.label).toBe('3');
+    expect(serviceBodySelect.item(1)).not.toBeDisabled();
+    expect(serviceBodySelect.item(2)).not.toBeDisabled();
+    expect(serviceBodySelect.item(3)).toBeDisabled();
+    expect(serviceBodySelect.item(4)).toBeDisabled();
+    expect(serviceBodySelect.value).toBe('0');
+    expect(serviceBodySelect.item(1)).not.toBeDisabled();
+    // make 'Service Body ID' be the first field in the sort order, and check the URL
+    await userEvent.selectOptions(serviceBodySelect, ['1']);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&sort_keys=service_body_bigint' })).toBeInTheDocument();
+    const stateSelect = screen.getByRole('combobox', { name: 'State' }) as HTMLSelectElement;
+    // make 'Key with & in it' be the second field in the sort order
+    const weirdKeySelect = screen.getByRole('combobox', { name: 'Key with & in it' }) as HTMLSelectElement;
+    await userEvent.selectOptions(weirdKeySelect, ['2']);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&sort_keys=service_body_bigint,weird%26key' })).toBeInTheDocument();
+    // check that the appropriate options are enabled or disabled for the three fields
+    expect(serviceBodySelect.item(1)).not.toBeDisabled();
+    expect(serviceBodySelect.item(2)).not.toBeDisabled();
+    expect(serviceBodySelect.item(3)).toBeDisabled();
+    expect(serviceBodySelect.item(4)).not.toBeDisabled();
+    expect(stateSelect.item(1)).not.toBeDisabled();
+    expect(stateSelect.item(2)).toBeDisabled();
+    expect(stateSelect.item(3)).toBeDisabled();
+    expect(stateSelect.item(4)).not.toBeDisabled();
+    expect(weirdKeySelect.item(1)).not.toBeDisabled();
+    expect(weirdKeySelect.item(2)).toBeDisabled();
+    expect(weirdKeySelect.item(3)).not.toBeDisabled();
+    expect(weirdKeySelect.item(4)).toBeDisabled();
+    // now make 'State' be the third field in the sort, and check the new state of all options
+    await userEvent.selectOptions(stateSelect, ['3']);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&sort_keys=service_body_bigint,weird%26key,location_province' })).toBeInTheDocument();
+    expect(serviceBodySelect.item(1)).not.toBeDisabled();
+    expect(serviceBodySelect.item(2)).not.toBeDisabled();
+    expect(serviceBodySelect.item(3)).toBeDisabled();
+    expect(serviceBodySelect.item(4)).toBeDisabled();
+    expect(stateSelect.item(1)).not.toBeDisabled();
+    expect(stateSelect.item(2)).toBeDisabled();
+    expect(stateSelect.item(3)).toBeDisabled();
+    expect(stateSelect.item(4)).not.toBeDisabled();
+    expect(weirdKeySelect.item(1)).not.toBeDisabled();
+    expect(weirdKeySelect.item(2)).toBeDisabled();
+    expect(weirdKeySelect.item(3)).not.toBeDisabled();
+    expect(weirdKeySelect.item(4)).toBeDisabled();
+    // Drop 'Key with & in it' from the sort order.  'Service Body ID' should still be first, but now 'State' should move to second.
+    await userEvent.selectOptions(weirdKeySelect, ['0']);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&sort_keys=service_body_bigint,location_province' })).toBeInTheDocument();
+    expect(serviceBodySelect.value).toBe('1');
+    expect(stateSelect.value).toBe('2');
+    expect(weirdKeySelect.value).toBe('0');
+  });
 });
