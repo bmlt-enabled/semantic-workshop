@@ -80,10 +80,16 @@ const strings = new (LocalizedStrings as any)({
       This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.`,
     intro: `This interactive application will help you build a semantic URL to retrieve data from a BMLT root server.
       It is available both as part of every BMLT root server and as a separate standalone app at https://semantic.bmlt.app.`,
+    invalidLatitude: 'Invalid latitude',
+    invalidLongitude: 'Invalid longitude',
     invalidMeetingId: 'Invalid meeting ID',
     invalidRadius: 'Invalid radius',
     invalidTime: 'Invalid time',
+    kilometers: 'Kilometers',
     language: 'Language',
+    latitude: 'Latitude',
+    latLonSearchRadius: 'Latitude/longitude search radius',
+    longitude: 'Longitude',
     meetingDuration: 'Meeting duration',
     meetingDurationExplanation: 'Format: HH:MM. Leave blank to ignore.',
     meetingEndsBefore: 'Meeting ends before',
@@ -93,6 +99,10 @@ const strings = new (LocalizedStrings as any)({
     meetingKeyValueResult: 'The value must equal',
     meetingLastsAtLeast: 'Meeting lasts at least',
     meetingLastsAtMost: 'Meeting lasts at most',
+    meetingLatitudeLongitudeSearch: 'Search using latitude, longitude, and a search radius',
+    meetingLatitudeLongitudeSearchExplanation: `All three values (latitude, longitude, and search radius) are needed for this option.
+      If you specify a negative radius, then it should be an integer, and will specify how many meetings to (roughly) find in an
+      auto-radius search. The units (miles or kilometers) don't matter in this case.`,
     meetingResponseSortOrder: 'Response sort order',
     meetingResponseSortOrderExplanation: `Select fields to be used in sorting the result.  The result will be sorted first by the field
       marked '1', then by the field marked '2', and so on.  "Don't sort" means that the field isn't used in sorting, although it will
@@ -115,6 +125,7 @@ const strings = new (LocalizedStrings as any)({
     meetingStartOrEndTimeExplanation: 'Format: HH:MM (24 hour time). 12:00 is Noon, 23:59 is Midnight. Leave blank to ignore.',
     meetingStartsAfter: 'Meeting starts after',
     meetingStartsBefore: 'Meeting starts before',
+    miles: 'Miles',
     none: '- none -',
     noParameters: '- no parameters for this operation -',
     notSpecificServiceBodies: 'Search for meetings that <i><b>do not</b></i> belong to certain service bodies',
@@ -137,6 +148,7 @@ const strings = new (LocalizedStrings as any)({
     specificServiceBodiesExplanation: `If none of these is selected, this option will have no bearing on the search.
       If one or more service bodies are selected, then the meetings found must belong to one of those service bodies.`,
     title: 'BMLT Semantic Workshop',
+    units: 'Units',
     updateURL: 'Update root server URL',
     urlPlaceholder: 'Enter root server URL ...',
     value: 'Value',

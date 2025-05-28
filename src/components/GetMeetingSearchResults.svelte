@@ -22,8 +22,7 @@
     { name: $translations.searchOptionLocation, value: 'location' }
   ];
   let searchType = $state('general');
-  let searchRadius = $state('');
-  let badRadius = $derived(!/^-?\d*$/.test(searchRadius));
+  let textSearchRadius = $state('');
   let fieldOptions: { name: string; value: string }[] = $derived(availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key })));
   let startsAfter = $state('');
   let startsBefore = $state('');
@@ -31,11 +30,36 @@
   let minDuration = $state('');
   let maxDuration = $state('');
   let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
+  let latitude = $state('');
+  let longitude = $state('');
+  let latLonSearchRadius = $state('');
+  const unitsMenuOptions = [
+    { name: $translations.miles, value: 'miles' },
+    { name: $translations.kilometers, value: 'kilometers' }
+  ];
+  let latLonSearchUnits = $state('miles');
   let selectedFields = $state(Array(availableFields.length).fill(false));
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
   // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
   // seems to want the values to be strings only, so the code is constantly converting between strings and ints for this array.
   let sortOrder: string[] = $state(new Array(availableFields.length).fill('0'));
+
+  // return true if s represents a valid number (either integer or float is ok).  An empty string is also OK -- this indicates an entry
+  // hasn't been made yet, but we don't want to fire off an error message in this case.
+  function validNumber(s: string) {
+    return !isNaN(Number(s));
+  }
+
+  // Return true if s represents a valid radius as far as the meeting search parameters are concerned.  A positive radius can be either an
+  // integer or a float; a negative radius must be an integer (and actually will represent a meeting count or the like). Zero isn't allowed.
+  // An empty string is OK though -- this indicates an entry hasn't been made yet.
+  function validRadius(s: string) {
+    if (s === '') {
+      return true;
+    }
+    const n = Number(s);
+    return !isNaN(n) && (n > 0 || (n < 0 && Number.isInteger(n)));
+  }
 
   async function computeMeetingKeyValues() {
     try {
@@ -89,7 +113,7 @@
     const keys = new Array(sortOrder.length).fill('');
     for (let i = 0; i < sortOrder.length; i++) {
       if (sortOrder[i] !== '0') {
-        keys[parseInt(sortOrder[i])-1] = availableFields[i].key;
+        keys[parseInt(sortOrder[i]) - 1] = availableFields[i].key;
       }
     }
     const usedKeys = keys.filter((k) => k !== '');
@@ -110,11 +134,11 @@
     }
     // if the current position is the last position used, selecting the next available position wouldn't make sense, since after things
     // are fixed up we'd just be back to the same state
-    if (currentValue > 0 && !sortOrder.includes((currentValue+1).toString())) {
+    if (currentValue > 0 && !sortOrder.includes((currentValue + 1).toString())) {
       return false;
     }
     // if i-1 is used as a position, that means i is the next available position, so enable it
-    if (sortOrder.includes((i-1).toString())) {
+    if (sortOrder.includes((i - 1).toString())) {
       return true;
     }
     return false;
@@ -146,16 +170,19 @@
     const specificFieldValuePart = meetingFieldValue ? '&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue) + '&meeting_key_value=' + encodeURIComponent(meetingFieldValue) : '';
 
     const locationModifier = searchType === 'location' ? '&StringSearchIsAnAddress=1' : '';
-    const radiusModifier = searchType === 'location' && searchRadius ? '&SearchStringRadius=' + searchRadius : '';
+    const radiusModifier = searchType === 'location' && textSearchRadius ? '&SearchStringRadius=' + textSearchRadius : '';
     const specificTextValuePart = specificTextValue ? '&SearchString=' + encodeURIComponent(specificTextValue) + locationModifier + radiusModifier : '';
 
     const meetingStartEndTimePart = timePart('StartsAfter', startsAfter) + timePart('StartsBefore', startsBefore) + timePart('EndsBefore', endsBefore);
     const meetingDurationPart = timePart('MinDuration', minDuration) + timePart('MaxDuration', maxDuration);
 
+    const widthPart = '&geo_width' + (latLonSearchUnits === 'kilometers' ? '_km=' : '=') + latLonSearchRadius;
+    const latLonSearchPart = latitude && longitude && latLonSearchRadius ? widthPart + '&long_val=' + longitude + '&lat_val=' + latitude : '';
+
     const specificFieldsPart = computeSpecificFieldsPart();
     const sortOrderPart = computeSortOrderPart();
 
-    if ((searchRadius && badRadius) || badTime) {
+    if ((textSearchRadius && !validRadius(textSearchRadius)) || badTime || !validNumber(latitude) || !validNumber(longitude) || !validRadius(latLonSearchRadius)) {
       parameters = null;
     } else {
       parameters =
@@ -171,6 +198,7 @@
         specificTextValuePart +
         meetingStartEndTimePart +
         meetingDurationPart +
+        latLonSearchPart +
         specificFieldsPart +
         sortOrderPart;
     }
@@ -178,12 +206,12 @@
 
   function computeParametersForSpecificTextValue() {
     // this resets searchType if specificTextValue was set back to the empty string (by erasing something that was there)
-    // also reset searchRadius if we're back to general search type
+    // also reset textSearchRadius if we're back to general search type
     if (specificTextValue === '') {
       searchType = 'general';
     }
     if (searchType === 'general') {
-      searchRadius = '';
+      textSearchRadius = '';
     }
     computeParameters();
   }
@@ -192,10 +220,10 @@
     // update sort positions if necessary
     const sortCopy = [...sortOrder];
     for (let i = 0; i < sortCopy.length; i++) {
-      if (!sortCopy.includes((i+1).toString())) {
+      if (!sortCopy.includes((i + 1).toString())) {
         // change subsequent positions to 1 less and stop looping
         for (let j = 0; j < sortCopy.length; j++) {
-          if (parseInt(sortCopy[j]) > i+1) {
+          if (parseInt(sortCopy[j]) > i + 1) {
             sortCopy[j] = (parseInt(sortCopy[j]) - 1).toString();
           }
         }
@@ -376,30 +404,26 @@
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingSearchStringExplanation}</div>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
-            <div>
-              <Label for="search-for-text" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
-                <div class="mb-2">
-                  {$translations.searchForThisText}:
-                </div>
-                <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
-              </Label>
-            </div>
-            <div>
-              <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
-                <div class="mb-2">
-                  {$translations.meetingSearchType}:
-                </div>
-                <Select
-                  id="search-type"
-                  class="w-full"
-                  items={searchForTextMenuOptions}
-                  placeholder={$translations.chooseOption}
-                  disabled={specificTextValue === ''}
-                  bind:value={searchType}
-                  onchange={computeParametersForSpecificTextValue}
-                />
-              </Label>
-            </div>
+            <Label for="search-for-text" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.searchForThisText}:
+              </div>
+              <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
+            </Label>
+            <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.meetingSearchType}:
+              </div>
+              <Select
+                id="search-type"
+                class="w-full"
+                items={searchForTextMenuOptions}
+                placeholder={$translations.chooseOption}
+                disabled={specificTextValue === ''}
+                bind:value={searchType}
+                onchange={computeParametersForSpecificTextValue}
+              />
+            </Label>
           </div>
           {#if searchType === 'location'}
             <div>
@@ -407,10 +431,10 @@
                 <div class="mb-2">
                   {$translations.meetingSearchRadius}:
                 </div>
-                <Input type="text" id="search-radius" placeholder="" bind:value={searchRadius} oninput={computeParametersForSpecificTextValue} />
+                <Input type="text" id="search-radius" placeholder="" bind:value={textSearchRadius} oninput={computeParametersForSpecificTextValue} />
               </Label>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.meetingSearchRadiusExplanation}</p>
-              {#if badRadius}
+              {#if !validRadius(textSearchRadius)}
                 <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>
               {/if}
             </div>
@@ -488,9 +512,62 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingLatitudeLongitudeSearch}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingLatitudeLongitudeSearchExplanation}</div>
+        <div class="space-y-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.latitude}:
+              </div>
+              <Input type="text" placeholder="" bind:value={latitude} oninput={computeParameters} />
+            </Label>
+            {#if !validNumber(latitude)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidLatitude}</div>
+            {/if}
+          </div>
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.longitude}:
+              </div>
+              <Input type="text" placeholder="" bind:value={longitude} oninput={computeParameters} />
+            </Label>
+            {#if !validNumber(longitude)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidLongitude}</div>
+            {/if}
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+                <div class="mb-2">
+                  {$translations.latLonSearchRadius}:
+                </div>
+                <Input type="text" placeholder="" bind:value={latLonSearchRadius} oninput={computeParameters} />
+              </Label>
+              {#if !validRadius(latLonSearchRadius)}
+                <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>
+              {/if}
+            </div>
+            <Label for="radius-units" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.units}:
+              </div>
+              <Select id="radius-units" class="w-full" placeholder={$translations.chooseOption} bind:value={latLonSearchUnits} onchange={computeParameters}>
+                {#if !latLonSearchRadius.startsWith('-')}
+                  <option selected value="miles">{$translations.miles}</option>
+                  <option value="kilometers">{$translations.kilometers}</option>
+                {/if}
+              </Select>
+            </Label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingSpecificFields}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingSpecificFieldsExplanation}</div>
-        <div class="grid grid-cols-1 gap-2 mt-2">
+        <div class="mt-2 grid grid-cols-1 gap-2">
           {#each fieldOptions as f, i}
             <div class="flex items-center space-x-2">
               <Label class="flex text-sm dark:text-white">
@@ -505,14 +582,14 @@
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingResponseSortOrder}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingResponseSortOrderExplanation}</div>
-        <div class="grid grid-cols-1 gap-2 mt-2">
+        <div class="mt-2 grid grid-cols-1 gap-2">
           {#each fieldOptions as f, n}
             <div class="flex items-center space-x-2">
               <Label class="flex text-sm dark:text-white">
                 <Select class="me-2" bind:value={sortOrder[n]} onchange={computeParametersforSortOrder}>
-                  <option selected value='0'>{$translations.dontSort}</option>
+                  <option selected value="0">{$translations.dontSort}</option>
                   {#each fieldOptions as _, i}
-                    <option value={(i+1).toString()} disabled={!allowedSortChoice(i+1,parseInt(sortOrder[n]))}>{i+1}</option>
+                    <option value={(i + 1).toString()} disabled={!allowedSortChoice(i + 1, parseInt(sortOrder[n]))}>{i + 1}</option>
                   {/each}
                 </Select>
                 {f.name}

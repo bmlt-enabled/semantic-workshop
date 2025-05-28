@@ -4,221 +4,10 @@ import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
 import App from '../App.svelte';
-import { setUpMockFetch } from './MockFetch';
-
-const dummyURL = 'https://bigzone.org/main_server/';
-
-// utility function to set up the semantic workshop page for a unit test
-async function setupTest(operation: string | null, provideBaseUrl = true) {
-  // @ts-ignore
-  global.settings = provideBaseUrl ? { apiBaseUrl: 'https://bigzone.org/main_server/' } : {};
-  localStorage.setItem('workshopLanguage', 'en');
-  const user = userEvent.setup();
-  render(App);
-  if (operation) {
-    const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(menu, [operation]);
-  }
-  return user;
-}
+import { dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
 afterAll(vi.resetAllMocks);
-
-describe('semantic workshop tests (except get meetings)', () => {
-  test('initial screen', async () => {
-    await setupTest(null);
-    expect(screen.getByRole('heading', { name: 'BMLT Semantic Workshop', level: 1 })).toBeInTheDocument();
-    expect(screen.getByLabelText('Response URL:')).toBeInTheDocument();
-    // since this test is set up to provide a base URL, the Select menu for the server shouldn't be shown -- so we should have only one Select menu
-    expect(screen.getAllByRole('combobox').length).toBe(1);
-    const operation = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    expect(operation.value).toBe('GetServerInfo');
-    // there are separate tests later for the Select menu for the server and the language selector
-  });
-
-  test('Get Service Bodies', async () => {
-    const user = await setupTest('GetServiceBodies');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
-    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
-  });
-
-  test('Get Formats', async () => {
-    const user = await setupTest('GetFormats');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
-    const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
-    expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
-    expect(formatLanguage.item(1)?.label).toBe('Server language');
-    expect(formatLanguage.item(2)?.label).toBe('Deutsch');
-    expect(formatLanguage.item(3)?.label).toBe('English');
-    expect(formatLanguage.item(4)?.label).toBe('Español');
-    await userEvent.selectOptions(formatLanguage, ['de']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de' })).toBeInTheDocument();
-    const allFormats = screen.getByRole('checkbox', { name: 'Show all formats' }) as HTMLInputElement;
-    expect(allFormats.checked).toBe(false);
-    await user.click(allFormats);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&lang_enum=de&show_all=1' })).toBeInTheDocument();
-    await userEvent.selectOptions(formatLanguage, ['servLang']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&show_all=1' })).toBeInTheDocument();
-  });
-
-  test('Get Changes', async () => {
-    const user = await setupTest('GetChanges');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges' })).toBeInTheDocument();
-    // TODO - not finished -- need to test picking a date range
-    // const openDatePicker = screen.getByRole('button', { name: /Open date picker/ });
-    // user.click(openDatePicker);
-    const meetingIdTextBox = screen.getByRole('textbox', { name: 'Get changes for a meeting with this ID:' }) as HTMLInputElement;
-    await user.type(meetingIdTextBox, '439');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges&meeting_id=439' })).toBeInTheDocument();
-    await user.clear(meetingIdTextBox);
-    const serviceBody = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(serviceBody.item(0)?.label).toBe('Choose option ...');
-    expect(serviceBody.item(1)?.label).toBe('All service bodies');
-    expect(serviceBody.item(2)?.label).toBe('Big Zone');
-    expect(serviceBody.item(3)?.label).toBe('Northern Region');
-    expect(serviceBody.item(4)?.label).toBe('Southern Region');
-    await userEvent.selectOptions(serviceBody, ['8']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges&service_body_id=8' })).toBeInTheDocument();
-    await user.type(meetingIdTextBox, 'BAD');
-    expect(screen.getByText(/Invalid meeting ID/)).toBeInTheDocument();
-    expect(screen.queryByRole('link')).toBe(null);
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
-  test('Get a List of Available Field Keys', async () => {
-    const user = await setupTest('GetFieldKeys');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldKeys' })).toBeInTheDocument();
-    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
-  });
-
-  test('Get a List of Specific Field Values', async () => {
-    const user = await setupTest('GetFieldValues');
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-    const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
-    expect(field.item(0)?.label).toBe('Choose option ...');
-    // note that these get alphabetized
-    expect(field.item(1)?.label).toBe('Key with & in it');
-    expect(field.item(2)?.label).toBe('Service Body ID');
-    expect(field.item(3)?.label).toBe('State');
-    await userEvent.selectOptions(field, ['location_province']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=location_province' })).toBeInTheDocument();
-    await userEvent.selectOptions(field, ['weird&key']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=weird%26key' })).toBeInTheDocument();
-  });
-
-  test('Get a NAWS Format Export', async () => {
-    const user = await setupTest('GetNAWSDump');
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-    const field = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
-    expect(field.item(0)?.label).toBe('Choose option ...');
-    expect(field.item(1)?.label).toBe('Big Zone');
-    expect(field.item(2)?.label).toBe('Northern Region');
-    expect(field.item(3)?.label).toBe('Southern Region');
-    await userEvent.selectOptions(field, ['9']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetNAWSDump&sb_id=9' })).toBeInTheDocument();
-  });
-
-  test('Get Server Information', async () => {
-    const user = await setupTest('GetServerInfo');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
-    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
-  });
-
-  test('Get Geographic Coverage Area', async () => {
-    const user = await setupTest('GetCoverageArea');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetCoverageArea' })).toBeInTheDocument();
-    // TODO: NOT FINISHED -- need to also check map
-  });
-
-  test('change root server URL', async () => {
-    // Various picky tests of changing the root server URL.  After the URL is changed, the response URL should be updated.
-    // Also, the operation should be reset to GetServerInfo, and the data needed for other operations should be for the new server.
-    // Setting the URL to the empty string is OK and should have operation menu disabled and no response URL.
-    const user = await setupTest('GetServerInfo', false);
-    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
-    const operationMenu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    expect(rootServerMenu.length).toBe(4);
-    await userEvent.selectOptions(rootServerMenu, ['21']);
-    // shouldn't have a text box to type in a custom root server URL at this point
-    expect(screen.queryByRole('textbox')).toBe(null);
-    expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
-    await userEvent.selectOptions(operationMenu, ['GetFormats']);
-    const formatLanguage = screen.getByRole('combobox', { name: 'Format language:' }) as HTMLSelectElement;
-    expect(formatLanguage.length).toBe(3);
-    expect(formatLanguage.item(0)?.label).toBe('Choose option ...');
-    expect(formatLanguage.item(1)?.label).toBe('Server language');
-    expect(formatLanguage.item(2)?.label).toBe('Italiano');
-    expect(screen.getByRole('link', { name: 'https://smallzone.org/main_server/client_interface/json/?switcher=GetFormats' })).toBeInTheDocument();
-    // changing the root server URL should reset the operation
-    await userEvent.selectOptions(rootServerMenu, ['42']);
-    expect(screen.getByRole('link', { name: 'https://bigzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
-    await userEvent.selectOptions(operationMenu, ['GetServiceBodies']);
-    await userEvent.selectOptions(rootServerMenu, ['other']);
-    const boxes = screen.getAllByRole('textbox');
-    expect(boxes.length).toBe(1);
-    const customUrl = boxes[0];
-    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.type(customUrl, 'https://weirdzone.org/main_server/');
-    await user.click(acceptUrl);
-    expect(screen.getByRole('link', { name: 'https://weirdzone.org/main_server/client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
-    await user.clear(customUrl);
-    await user.click(acceptUrl);
-    expect(operationMenu).toBeDisabled();
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
-  test('bad root server URL', async () => {
-    const user = await setupTest('GetServerInfo', false);
-    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(rootServerMenu, ['other']);
-    const boxes = screen.getAllByRole('textbox');
-    const customUrl = boxes[0];
-    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.type(customUrl, 'https://BADzone.org/main_server/');
-    await user.click(acceptUrl);
-    expect(screen.getByText(/Server error -- Error: server response said not OK/)).toBeInTheDocument();
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
-  test('another bad root server URL - throws an exception', async () => {
-    const user = await setupTest('GetServerInfo', false);
-    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(rootServerMenu, ['other']);
-    const boxes = screen.getAllByRole('textbox');
-    const customUrl = boxes[0];
-    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.type(customUrl, 'https://THROW_EXECPTIONzone.org/main_server/');
-    await user.click(acceptUrl);
-    expect(screen.getByText(/Server error -- Error: mocked server error/)).toBeInTheDocument();
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
-  test('change semantic workshop language', async () => {
-    const user = await setupTest('GetServerInfo');
-    const languageSettings = screen.getByRole('button', { name: 'Open language settings' });
-    await user.click(languageSettings);
-    const languageMenu = screen.getByRole('combobox', { name: 'Language' }) as HTMLSelectElement;
-    await userEvent.selectOptions(languageMenu, ['de']);
-    const saveButton = screen.getByRole('button', { name: 'Save' });
-    await user.click(saveButton);
-    expect(screen.getByRole('heading', { name: 'BMLT Semantische Werkstatt', level: 1 }));
-  });
-});
-
-describe('check that response parameters are initially cleared', () => {
-  test('no leftover response parameters from GetFormats for GetSearchResults ', async () => {
-    // In theory we should have a test like this for all the options.
-    // Here we are checking that the 'show_all=1' part of the parameter is dropped after we switch operations.
-    const user = await setupTest('GetFormats');
-    const allFormats = screen.getByRole('checkbox', { name: 'Show all formats' }) as HTMLInputElement;
-    await user.click(allFormats);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFormats&show_all=1' })).toBeInTheDocument();
-    const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(menu, ['GetSearchResults']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
-  });
-});
 
 describe('Get Meeting Search Results tests', () => {
   test('Get Formats checkboxes', async () => {
@@ -396,7 +185,8 @@ describe('Get Meeting Search Results tests', () => {
     expect(
       screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&SearchString=Octopus%20Lane&StringSearchIsAnAddress=1&SearchStringRadius=-25' })
     ).toBeInTheDocument();
-    await user.type(radiusBox, 'BAD');
+    // radius can't be 0; if it's negative, it must be an integer
+    await user.type(radiusBox, '.3');
     expect(screen.getByText(/Invalid radius/)).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBe(null);
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
@@ -404,7 +194,15 @@ describe('Get Meeting Search Results tests', () => {
     await user.clear(radiusBox);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&SearchString=Octopus%20Lane&StringSearchIsAnAddress=1' })).toBeInTheDocument();
     // make an error again
+    await user.type(radiusBox, '0');
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
+    // now make it a valid (positive) number
+    await user.type(radiusBox, '.5');
+    expect(
+      screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&SearchString=Octopus%20Lane&StringSearchIsAnAddress=1&SearchStringRadius=0.5' })
+    ).toBeInTheDocument();
     await user.type(radiusBox, 'BAD');
+    expect(screen.getByText(/- none -/)).toBeInTheDocument();
     // clearing the textBox should reset the search type and the error
     await user.clear(textBox);
     expect(searchType.value).toBe('general');
@@ -477,6 +275,39 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.queryByRole('link')).toBe(null);
   });
 
+  test('search for meetings using latitude, longitude, and a search radius', async () => {
+    const user = await setupTest('GetSearchResults');
+    expect(screen.getByText('Search using latitude, longitude, and a search radius')).toBeInTheDocument();
+    expect(screen.getByText(/All three values \(latitude, longitude, and search radius\) are needed for this option./)).toBeInTheDocument();
+    const latitudeBox = screen.getByRole('textbox', { name: 'Latitude:' }) as HTMLInputElement;
+    const longitudeBox = screen.getByRole('textbox', { name: 'Longitude:' }) as HTMLInputElement;
+    const radiusBox = screen.getByRole('textbox', { name: 'Latitude/longitude search radius:' }) as HTMLInputElement;
+    const unitsBox = screen.getByRole('combobox', { name: 'Units:' }) as HTMLSelectElement;
+    expect(unitsBox.item(0)?.label).toBe('Choose option ...');
+    expect(unitsBox.item(1)?.label).toBe('Miles');
+    expect(unitsBox.item(2)?.label).toBe('Kilometers');
+    expect(unitsBox.value).toBe('miles');
+    await user.type(latitudeBox, '47.5');
+    await user.type(longitudeBox, '-122.3');
+    // need all three values before this shows up in the URL
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
+    await user.type(radiusBox, '16');
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&geo_width=16&long_val=-122.3&lat_val=47.5' })).toBeInTheDocument();
+    await userEvent.selectOptions(unitsBox, ['kilometers']);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&geo_width_km=16&long_val=-122.3&lat_val=47.5' })).toBeInTheDocument();
+    // test each input box for error handling
+    await user.clear(radiusBox);
+    await user.type(radiusBox, '-16.3');
+    expect(screen.getByText(/Invalid radius/)).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBe(null);
+    expect(screen.queryByText(/Invalid latitude/)).toBe(null);
+    await user.type(latitudeBox, 'BAD');
+    expect(screen.getByText(/Invalid latitude/)).toBeInTheDocument();
+    expect(screen.queryByText(/Invalid longitude/)).toBe(null);
+    await user.type(longitudeBox, '-');
+    expect(screen.getByText(/Invalid longitude/)).toBeInTheDocument();
+  });
+
   test('return only specific fields', async () => {
     const user = await setupTest('GetSearchResults');
     expect(screen.getByText('Return only specific fields')).toBeInTheDocument();
@@ -497,7 +328,7 @@ describe('Get Meeting Search Results tests', () => {
     // no sort options selected yet -- the enabled options should only be "Don't sort" and "1"
     expect(serviceBodySelect.length).toBe(5);
     expect(serviceBodySelect.item(0)?.label).toBe('Choose option ...');
-    expect(serviceBodySelect.item(1)?.label).toBe('Don\'t sort');
+    expect(serviceBodySelect.item(1)?.label).toBe("Don't sort");
     expect(serviceBodySelect.item(2)?.label).toBe('1');
     expect(serviceBodySelect.item(3)?.label).toBe('2');
     expect(serviceBodySelect.item(4)?.label).toBe('3');

@@ -1,7 +1,27 @@
 import { vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
+import { render, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import App from '../App.svelte';
+
+export const dummyURL = 'https://bigzone.org/main_server/';
 
 export function setUpMockFetch() {
   vi.spyOn(global, 'fetch').mockImplementation(mockFetch);
+}
+
+// utility function to set up the semantic workshop page for a unit test
+export async function setupTest(operation: string | null, provideBaseUrl = true) {
+  // @ts-ignore
+  global.settings = provideBaseUrl ? { apiBaseUrl: dummyURL } : {};
+  localStorage.setItem('workshopLanguage', 'en');
+  const user = userEvent.setup();
+  render(App);
+  if (operation) {
+    const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
+    await userEvent.selectOptions(menu, [operation]);
+  }
+  return user;
 }
 
 // possibly overkill - but there are two variants of fetching from a bad URL.
