@@ -3,7 +3,13 @@
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
-  let { serverLangs, allLanguages, parameters = $bindable() } = $props();
+  interface Props {
+    serverLangs: string[] | undefined;
+    allLanguages: { value: string; name: string }[];
+    parameters: string | null;
+  }
+
+  let { serverLangs, allLanguages, parameters = $bindable() }: Props = $props();
   let formatLanguage: string = $state('servLang');
   let showAllFormats: boolean = $state(false);
 

@@ -3,7 +3,11 @@
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
-  let { parameters = $bindable() } = $props();
+  interface Props {
+    parameters: string | null;
+  }
+
+  let { parameters = $bindable() }: Props = $props();
   onMount(() => (parameters = ''));
 </script>
 

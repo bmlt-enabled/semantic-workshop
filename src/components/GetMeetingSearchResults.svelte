@@ -1,9 +1,18 @@
 <script lang="ts">
   import { Card, Checkbox, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
   import { onMount } from 'svelte';
+  import ServiceBodiesTree from './ServiceBodiesTree.svelte';
   import { translations } from '../stores/localization';
 
-  let { availableFields, formats, rootServerURL, parameters = $bindable() } = $props();
+  interface Props {
+    availableFields: { key: string; description: string }[] | undefined;
+    formats: { key_string: string; id: string }[] | undefined;
+    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    rootServerURL: string;
+    parameters: string | null;
+  }
+
+  let { availableFields, formats, serviceBodies, rootServerURL, parameters = $bindable() }: Props = $props();
   let getUsedFormats: boolean = $state(false);
   let getFormatsOnly: boolean = $state(false);
   let onWeekdays: boolean[] = $state(new Array(7).fill(false));
@@ -16,6 +25,8 @@
   let keyForMeetingKeyValue: string = $state('');
   let meetingKeyValues: { name: string; value: string }[] = $state([]);
   let meetingFieldValue = $state('');
+  let selectedServiceBodies: string[] = $state([]);
+  let rejectedServiceBodies: string[] = $state([]);
   let specificTextValue = $state('');
   const searchForTextMenuOptions = [
     { name: $translations.searchOptionGeneral, value: 'general' },
@@ -89,7 +100,7 @@
     }
   }
 
-  function timePart(what, time) {
+  function timePart(what: string, time: string): string {
     if (time === '' || !validTime(time)) {
       return '';
     }
@@ -99,7 +110,7 @@
     return hPart + mPart;
   }
 
-  function computeSpecificFieldsPart() {
+  function computeSpecificFieldsPart(): string {
     const encodedNames = [];
     for (let i = 0; i < availableFields.length; i++) {
       if (selectedFields[i]) {
@@ -109,7 +120,7 @@
     return encodedNames.length === 0 ? '' : '&data_field_key=' + encodedNames.join(',');
   }
 
-  function computeSortOrderPart() {
+  function computeSortOrderPart(): string {
     const keys = new Array(sortOrder.length).fill('');
     for (let i = 0; i < sortOrder.length; i++) {
       if (sortOrder[i] !== '0') {
@@ -123,7 +134,7 @@
   // This function is used to decide whether to enable or disable a menu option for the sort order menu for a given field.  Argument i
   // is the option position, and currentValue is the current position of that field (0 means not part of sort order, 1 means first, etc).
   // The Don't sort option is always enabled and is handled separately.
-  function allowedSortChoice(i: number, currentValue: number) {
+  function allowedSortChoice(i: number, currentValue: number): boolean {
     // it's ok to select the current position again (although this wouldn't change anything)
     if (i === currentValue) {
       return true;
@@ -169,6 +180,11 @@
 
     const specificFieldValuePart = meetingFieldValue ? '&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue) + '&meeting_key_value=' + encodeURIComponent(meetingFieldValue) : '';
 
+    const selectedServiceBodiesKey = selectedServiceBodies.length > 1 ? '&services[]=' : '&services=';
+    const selectedServiceBodiesPart = selectedServiceBodies.map((s) => selectedServiceBodiesKey + s).join('');
+    const rejectedServiceBodiesKey = rejectedServiceBodies.length > 1 ? '&services[]=-' : '&services=-';
+    const rejectedServiceBodiesPart = rejectedServiceBodies.map((s) => rejectedServiceBodiesKey + s).join('');
+
     const locationModifier = searchType === 'location' ? '&StringSearchIsAnAddress=1' : '';
     const radiusModifier = searchType === 'location' && textSearchRadius ? '&SearchStringRadius=' + textSearchRadius : '';
     const specificTextValuePart = specificTextValue ? '&SearchString=' + encodeURIComponent(specificTextValue) + locationModifier + radiusModifier : '';
@@ -195,6 +211,8 @@
         doesNotHaveFormatPart +
         formatsComparisonOperatorPart +
         specificFieldValuePart +
+        selectedServiceBodiesPart +
+        rejectedServiceBodiesPart +
         specificTextValuePart +
         meetingStartEndTimePart +
         meetingDurationPart +
@@ -397,6 +415,18 @@
             </div>
           </div>
         </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.specificServiceBodies}</legend>
+        <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{$translations.specificServiceBodiesExplanation}</div>
+        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={selectedServiceBodies} />
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodies}</legend>
+        <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodiesExplanation}</div>
+        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={rejectedServiceBodies} />
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">

@@ -71,7 +71,7 @@
   let customURL: string = $state('');
   let operation: string = $state('');
   let serverInfo: { langs: string; nativeLang: string }[] | undefined = $state();
-  let serviceBodies: { name: string; id: string }[] | undefined = $state();
+  let serviceBodies: { name: string; id: string; parent_id: string }[] | undefined = $state();
   let availableFields: { key: string; description: string }[] | undefined = $state();
   let serverLangs: string[] | undefined = $state();
   let nativeLang: string | undefined = $state();
@@ -294,7 +294,7 @@
           <div class="mt-6 border-t border-gray-500 pt-6 dark:border-gray-400">
             <div class="w-full">
               {#if operation === 'GetSearchResults'}
-                <GetMeetingSearchResults {availableFields} {formats} {rootServerURL} bind:parameters />
+                <GetMeetingSearchResults {availableFields} {formats} {serviceBodies} {rootServerURL} bind:parameters />
               {:else if operation === 'GetFormats'}
                 <GetFormats {serverLangs} {allLanguages} bind:parameters />
               {:else if operation === 'GetChanges'}

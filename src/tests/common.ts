@@ -41,9 +41,9 @@ function mockResponse(url: string) {
     return [{ langs: 'en,es,de', nativeLang: 'en' }];
   } else if (/GetServiceBodies/.test(url)) {
     return [
-      { name: 'Big Zone', id: 5 },
-      { name: 'Northern Region', id: 8 },
-      { name: 'Southern Region', id: 9 }
+      { name: 'Big Zone', id: '5', parent_id: '' },
+      { name: 'Northern Region', id: '8', parent_id: '5' },
+      { name: 'Southern Region', id: '9', parent_id: '5' }
     ];
   } else if (/GetFieldKeys/.test(url)) {
     // the examples with weird characters are for testing URL encoding

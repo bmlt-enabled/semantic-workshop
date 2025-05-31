@@ -3,7 +3,12 @@
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
-  let { availableFields, parameters = $bindable() } = $props();
+  interface Props {
+    availableFields: { key: string; description: string }[] | undefined;
+    parameters: string | null;
+  }
+
+  let { availableFields, parameters = $bindable() }: Props = $props();
   let keyForGetFieldValues: string | undefined = $state();
   const fieldOptions: { name: string; value: string }[] = availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key }));
 

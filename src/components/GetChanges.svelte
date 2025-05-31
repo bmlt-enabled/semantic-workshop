@@ -3,7 +3,12 @@
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
-  let { serviceBodies, parameters = $bindable() } = $props();
+  interface Props {
+    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    parameters: string | null;
+  }
+
+  let { serviceBodies, parameters = $bindable() }: Props = $props();
   let changesFrom: Date | undefined = $state();
   let changesTo: Date | undefined = $state();
   let changesMeetingId: string = $state('');
@@ -46,7 +51,7 @@
           <div class="mb-2">
             {$translations.getChangesBetween}:
           </div>
-          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} on:select={computeParameters} />
+          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} onselect={computeParameters} />
         </Label>
       </div>
 

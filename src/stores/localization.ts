@@ -130,7 +130,7 @@ const strings = new (LocalizedStrings as any)({
     noParameters: '- no parameters for this operation -',
     notSpecificServiceBodies: 'Search for meetings that <i><b>do not</b></i> belong to certain service bodies',
     notSpecificServiceBodiesExplanation: `If none of these is selected, this option will have no bearing on the search.
-      If one or more service bodies are selected, then the meetings found must NOT belong to any of those service bodies.`,
+      If one or more service bodies are selected, then the meetings found must <i><b>not</b></i> belong to any of those service bodies.`,
     operation: 'Operation',
     or: 'OR',
     other: '- Other -',

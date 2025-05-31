@@ -32,6 +32,18 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
   });
 
+  test('Client Query field', async () => {
+    // just do one test to make sure the Client Query field isn't shown when there are no additional parameters, and is when there are
+    const user = await setupTest('GetSearchResults');
+    expect(screen.queryByText(/Client Query/)).toBe(null);
+    const getUsedFormats = screen.getByRole('checkbox', { name: 'Get the formats used in the results of this search' }) as HTMLInputElement;
+    await user.click(getUsedFormats);
+    expect(screen.getByText('Client Query:')).toBeInTheDocument();
+    // since we are querying using a string rather than a regular expression, the following will succeed only if there is a separate piece
+    // of text with the Client Query -- it won't find the corresponding substring in the URL
+    expect(screen.getByText('&get_used_formats=1')).toBeInTheDocument();
+  });
+
   test('meetings that gather on specific weekdays', async () => {
     const user = await setupTest('GetSearchResults');
     // Bit of a hack -- there is more than one legend and one explanation that match these strings, so do a getAllByText
@@ -157,6 +169,23 @@ describe('Get Meeting Search Results tests', () => {
     expect(existingValue.item(2)?.label).toBe('b[4]');
     await userEvent.selectOptions(existingValue, ['b[4]']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=weird%26key&meeting_key_value=b%5B4%5D' })).toBeInTheDocument();
+  });
+
+  test('search for meetings that belong to certain service bodies', async () => {
+    const user = await setupTest('GetSearchResults');
+    // There are two legends that match the getByText since the testing library seems to ignore the "do not" that is in italics.
+    // Just hack around it by getting them both.
+    expect(screen.getAllByText('Search for meetings that belong to certain service bodies').length).toBe(2);
+    expect(screen.getByText(/If one or more service bodies are selected, then the meetings found must belong to one of those service bodies./)).toBeInTheDocument();
+    // TODO: test clicking on some service bodies and checking the response URL.  Unfortunately (a) I couldn't figure out a way to pick
+    // out the checkboxes for the service body tree, and (b) simulating clicking on one of the service body tree checkboxes didn't change
+    // its state.
+  });
+
+  test('search for meetings that do not belong to certain service bodies', async () => {
+    // Very abbreviated test!  See above comment.
+    const user = await setupTest('GetSearchResults');
+    expect(screen.getByText(/belong to any of those service bodies./)).toBeInTheDocument();
   });
 
   test('search for meetings with some specific text', async () => {

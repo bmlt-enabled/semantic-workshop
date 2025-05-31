@@ -3,7 +3,12 @@
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 
-  let { serviceBodies, parameters = $bindable() } = $props();
+  interface Props {
+    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    parameters: string | null;
+  }
+
+  let { serviceBodies, parameters = $bindable() }: Props = $props();
   let nawsDumpServiceBodyId: string | undefined = $state();
   const serviceBodyOptions: { name: string; value: string }[] = serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id }));
 

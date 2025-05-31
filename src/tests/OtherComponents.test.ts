@@ -38,8 +38,9 @@ describe('component tests (except get meetings)', () => {
   test('Get Changes', async () => {
     const user = await setupTest('GetChanges');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges' })).toBeInTheDocument();
-    // TODO - not finished -- need to test picking a date range
-    // const openDatePicker = screen.getByRole('button', { name: /Open date picker/ });
+    // TODO -- should test picking a date range.  Unfortunately trying to test this gives an error (the testing library doesn't like
+    // the animation).  The commented out line to click on the date picker will trigger the error.
+    const openDatePicker = screen.getByRole('button', { name: /Open date picker/ });
     // user.click(openDatePicker);
     const meetingIdTextBox = screen.getByRole('textbox', { name: 'Get changes for a meeting with this ID:' }) as HTMLInputElement;
     await user.type(meetingIdTextBox, '439');
