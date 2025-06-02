@@ -36,9 +36,9 @@ function mockResponse(url: string) {
   } else if (/THROW_EXECPTION/.test(url)) {
     throw new Error('mocked server error');
   } else if (/smallzone.*GetServerInfo/.test(url)) {
-    return [{ langs: 'it', nativeLang: 'it' }];
+    return [{ langs: 'it' }];
   } else if (/GetServerInfo/.test(url)) {
-    return [{ langs: 'en,es,de', nativeLang: 'en' }];
+    return [{ langs: 'en,es,de' }];
   } else if (/GetServiceBodies/.test(url)) {
     return [
       { name: 'Big Zone', id: '5', parent_id: '' },

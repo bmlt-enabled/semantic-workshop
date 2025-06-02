@@ -4,7 +4,7 @@
   import { translations } from '../stores/localization';
 
   interface Props {
-    serverLangs: string[] | undefined;
+    serverLangs: string[];
     allLanguages: { value: string; name: string }[];
     parameters: string | null;
   }

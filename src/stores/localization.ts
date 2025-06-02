@@ -43,6 +43,7 @@ const strings = new (LocalizedStrings as any)({
     allServiceBodies: 'All service bodies',
     and: 'AND',
     chooseOption: 'Choose option ...',
+    clientQuery: 'Client Query (click to copy to clipboard)',
     doesNotHaveFormat: 'Search for meetings that <i><b>do not</b></i> have specific formats',
     doesNotHaveFormatExplanation: `If none of these are selected, they will have no bearing at all on the search.
       If any are selected, then the search will require that the selected terms match.

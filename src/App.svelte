@@ -70,12 +70,11 @@
   let serverError: string = $state('');
   let customURL: string = $state('');
   let operation: string = $state('');
-  let serverInfo: { langs: string; nativeLang: string }[] | undefined = $state();
-  let serviceBodies: { name: string; id: string; parent_id: string }[] | undefined = $state();
-  let availableFields: { key: string; description: string }[] | undefined = $state();
-  let serverLangs: string[] | undefined = $state();
-  let nativeLang: string | undefined = $state();
-  let formats: { key_string: string; id: string }[] | undefined = $state();
+  let serverInfo: { langs: string }[] | undefined = $state();
+  let serviceBodies: { name: string; id: string; parent_id: string }[] = $state([]);
+  let availableFields: { key: string; description: string }[] = $state([]);
+  let serverLangs: string[] = $state([]);
+  let formats: { key_string: string; id: string }[] = $state([]);
 
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.  parameters === '' is ok and just means there aren't any parameters for that operation.
@@ -106,29 +105,26 @@
     serverError = '';
     if (rootServerURL === '') {
       serverInfo = undefined;
-      serverLangs = undefined;
-      nativeLang = undefined;
+      serverLangs = [];
       serviceBodies = [];
       availableFields = [];
     } else {
       try {
         serverInfo = await getData('GetServerInfo');
-        serverLangs = serverInfo?.[0].langs.split(',');
-        nativeLang = serverInfo?.[0].nativeLang;
+        serverLangs = serverInfo ? serverInfo[0].langs.split(',') : [];
         serviceBodies = await getData('GetServiceBodies');
-        serviceBodies?.sort((a, b) => a.name.localeCompare(b.name));
+        serviceBodies.sort((a, b) => a.name.localeCompare(b.name));
         availableFields = await getData('GetFieldKeys');
-        availableFields?.sort((a, b) => a.description.localeCompare(b.description));
+        availableFields.sort((a, b) => a.description.localeCompare(b.description));
         formats = await getData('GetFormats');
-        formats?.sort((a, b) => a.key_string.localeCompare(b.key_string));
+        formats.sort((a, b) => a.key_string.localeCompare(b.key_string));
       } catch (error) {
         serverError = $translations.serverError + ' -- ' + error;
         serverInfo = undefined;
-        serverLangs = undefined;
-        nativeLang = undefined;
-        serviceBodies = undefined;
-        availableFields = undefined;
-        formats = undefined;
+        serverLangs = [];
+        serviceBodies = [];
+        availableFields = [];
+        formats = [];
       }
     }
   }
@@ -231,7 +227,7 @@
 
         {#if operation === 'GetSearchResults' && parameters}
           <div class="mt-4 space-y-2">
-            <Label for="clientQuery" class="font-medium text-gray-700 dark:text-gray-300">Client Query:</Label>
+            <Label for="clientQuery" class="font-medium text-gray-700 dark:text-gray-300">{$translations.clientQuery}:</Label>
             <output id="clientQuery" class="block">
               <button
                 type="button"

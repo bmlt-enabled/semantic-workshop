@@ -5,9 +5,9 @@
   import { translations } from '../stores/localization';
 
   interface Props {
-    availableFields: { key: string; description: string }[] | undefined;
-    formats: { key_string: string; id: string }[] | undefined;
-    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    availableFields: { key: string; description: string }[];
+    formats: { key_string: string; id: string }[];
+    serviceBodies: { name: string; id: string; parent_id: string }[];
     rootServerURL: string;
     parameters: string | null;
   }
@@ -80,7 +80,7 @@
       meetingFieldValue = '';
       parameters = '';
     } catch (error) {
-      // TO FILL IN
+      // TODO - FILL IN
     }
   }
 
@@ -406,11 +406,11 @@
               </Label>
             </div>
             <div>
-              <Label for="enter-new-value" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
                 <div class="mb-2">
                   {$translations.enterNewValue}:
                 </div>
-                <Input type="text" id="enter-new-value" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} oninput={computeParameters} />
+                <Input type="text" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} oninput={computeParameters} />
               </Label>
             </div>
           </div>
@@ -434,18 +434,17 @@
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingSearchStringExplanation}</div>
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
-            <Label for="search-for-text" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
               <div class="mb-2">
                 {$translations.searchForThisText}:
               </div>
-              <Input type="text" id="search-for-text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
+              <Input type="text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
             </Label>
-            <Label for="search-type" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
               <div class="mb-2">
                 {$translations.meetingSearchType}:
               </div>
               <Select
-                id="search-type"
                 class="w-full"
                 items={searchForTextMenuOptions}
                 placeholder={$translations.chooseOption}
@@ -457,11 +456,11 @@
           </div>
           {#if searchType === 'location'}
             <div>
-              <Label for="search-radius" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
                 <div class="mb-2">
                   {$translations.meetingSearchRadius}:
                 </div>
-                <Input type="text" id="search-radius" placeholder="" bind:value={textSearchRadius} oninput={computeParametersForSpecificTextValue} />
+                <Input type="text" placeholder="" bind:value={textSearchRadius} oninput={computeParametersForSpecificTextValue} />
               </Label>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.meetingSearchRadiusExplanation}</p>
               {#if !validRadius(textSearchRadius)}
@@ -579,11 +578,11 @@
                 <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>
               {/if}
             </div>
-            <Label for="radius-units" class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
               <div class="mb-2">
                 {$translations.units}:
               </div>
-              <Select id="radius-units" class="w-full" placeholder={$translations.chooseOption} bind:value={latLonSearchUnits} onchange={computeParameters}>
+              <Select class="w-full" placeholder={$translations.chooseOption} bind:value={latLonSearchUnits} onchange={computeParameters}>
                 {#if !latLonSearchRadius.startsWith('-')}
                   <option selected value="miles">{$translations.miles}</option>
                   <option value="kilometers">{$translations.kilometers}</option>

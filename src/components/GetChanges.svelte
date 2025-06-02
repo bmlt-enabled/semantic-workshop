@@ -4,7 +4,7 @@
   import { translations } from '../stores/localization';
 
   interface Props {
-    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    serviceBodies: { name: string; id: string; parent_id: string }[];
     parameters: string | null;
   }
 
@@ -51,7 +51,7 @@
           <div class="mb-2">
             {$translations.getChangesBetween}:
           </div>
-          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} onselect={computeParameters} />
+          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} on:select={computeParameters} />
         </Label>
       </div>
 

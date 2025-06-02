@@ -33,15 +33,18 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('Client Query field', async () => {
-    // just do one test to make sure the Client Query field isn't shown when there are no additional parameters, and is when there are
+    // Just do one test to make sure the Client Query field isn't shown when there are no additional parameters, and is when there are.
+    // Also check that clicking it copies the text to the clipboard.
     const user = await setupTest('GetSearchResults');
     expect(screen.queryByText(/Client Query/)).toBe(null);
     const getUsedFormats = screen.getByRole('checkbox', { name: 'Get the formats used in the results of this search' }) as HTMLInputElement;
     await user.click(getUsedFormats);
-    expect(screen.getByText('Client Query:')).toBeInTheDocument();
+    expect(screen.getByText('Client Query (click to copy to clipboard):')).toBeInTheDocument();
     // since we are querying using a string rather than a regular expression, the following will succeed only if there is a separate piece
     // of text with the Client Query -- it won't find the corresponding substring in the URL
-    expect(screen.getByText('&get_used_formats=1')).toBeInTheDocument();
+    const query = screen.getByText('&get_used_formats=1');
+    await user.click(query);
+    expect(await navigator.clipboard.readText()).toBe('&get_used_formats=1');
   });
 
   test('meetings that gather on specific weekdays', async () => {
@@ -409,5 +412,16 @@ describe('Get Meeting Search Results tests', () => {
     expect(serviceBodySelect.value).toBe('1');
     expect(stateSelect.value).toBe('2');
     expect(weirdKeySelect.value).toBe('0');
+  });
+
+  test('multiple search options', async () => {
+    // there are many combinations possible of course -- just test one combination (of specific weekday and meeting format)
+    const user = await setupTest('GetSearchResults');
+    // there are TWO Monday boxes, one for meetings that gather on Mondays and another for meetings that do not gather on Mondays
+    const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
+    await user.click(mondays[0] as HTMLInputElement);
+    const virtual = screen.getAllByRole('checkbox', { name: 'VM' });
+    await user.click(virtual[0] as HTMLInputElement);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays=2&formats=5' })).toBeInTheDocument();
   });
 });

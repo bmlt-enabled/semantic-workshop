@@ -4,7 +4,7 @@
   import { translations } from '../stores/localization';
 
   interface Props {
-    serviceBodies: { name: string; id: string; parent_id: string }[] | undefined;
+    serviceBodies: { name: string; id: string; parent_id: string }[];
     parameters: string | null;
   }
 
