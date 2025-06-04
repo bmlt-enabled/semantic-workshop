@@ -358,7 +358,7 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.getByText(/Select fields to be used in sorting the result. The result will be sorted first by the field/)).toBeInTheDocument();
     const serviceBodySelect = screen.getByRole('combobox', { name: 'Service Body ID' }) as HTMLSelectElement;
     // no sort options selected yet -- the enabled options should only be "Don't sort" and "1"
-    expect(serviceBodySelect.length).toBe(5);
+    expect(serviceBodySelect.length).toBe(7);
     expect(serviceBodySelect.item(0)?.label).toBe('Choose option ...');
     expect(serviceBodySelect.item(1)?.label).toBe("Don't sort");
     expect(serviceBodySelect.item(2)?.label).toBe('1');

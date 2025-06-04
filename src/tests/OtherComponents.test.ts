@@ -75,6 +75,8 @@ describe('component tests (except get meetings)', () => {
     expect(field.item(1)?.label).toBe('Key with & in it');
     expect(field.item(2)?.label).toBe('Service Body ID');
     expect(field.item(3)?.label).toBe('State');
+    expect(field.item(4)?.label).toBe('Throw Exception Field');
+    expect(field.item(5)?.label).toBe('Very Bad Field');
     await userEvent.selectOptions(field, ['location_province']);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=location_province' })).toBeInTheDocument();
     await userEvent.selectOptions(field, ['weird&key']);

@@ -5,16 +5,23 @@ import userEvent from '@testing-library/user-event';
 import App from '../App.svelte';
 
 export const dummyURL = 'https://bigzone.org/main_server/';
+export let consoleError = '';
 
 export function setUpMockFetch() {
+  // @ts-ignore
   vi.spyOn(global, 'fetch').mockImplementation(mockFetch);
+  vi.spyOn(console, 'error').mockImplementation(mockConsoleError);
 }
 
+let saveAggregatorError = false;
+
 // utility function to set up the semantic workshop page for a unit test
-export async function setupTest(operation: string | null, provideBaseUrl = true) {
+export async function setupTest(operation: string | null, provideBaseUrl = true, aggregatorError = false) {
   // @ts-ignore
   global.settings = provideBaseUrl ? { apiBaseUrl: dummyURL } : {};
   localStorage.setItem('workshopLanguage', 'en');
+  saveAggregatorError = aggregatorError;
+  consoleError = '';
   const user = userEvent.setup();
   render(App);
   if (operation) {
@@ -24,15 +31,21 @@ export async function setupTest(operation: string | null, provideBaseUrl = true)
   return user;
 }
 
-// possibly overkill - but there are two variants of fetching from a bad URL.
+// Possibly overkill - but there are two variants of fetching from a bad URL.
 // One is a URL with "BAD" in it -- this causes the response to be not OK.
 // The other has "THROW_EXECPTION" in it -- this just throws an exception.
+// The same functionality is used for testing retrievals of bad field values.
+// There is just one flavor of aggregator error though (which throws an exception).
 function mockResponse(url: string) {
   if (/rootServerList/.test(url)) {
-    return [
-      { name: 'Big Zone', id: '42', rootURL: 'https://bigzone.org/main_server/' },
-      { name: 'Small Zone', id: '21', rootURL: 'https://smallzone.org/main_server/' }
-    ];
+    if (saveAggregatorError) {
+      throw new Error('mocked aggregator error');
+    } else {
+      return [
+        { name: 'Big Zone', id: '42', rootURL: 'https://bigzone.org/main_server/' },
+        { name: 'Small Zone', id: '21', rootURL: 'https://smallzone.org/main_server/' }
+      ];
+    }
   } else if (/THROW_EXECPTION/.test(url)) {
     throw new Error('mocked server error');
   } else if (/smallzone.*GetServerInfo/.test(url)) {
@@ -46,11 +59,13 @@ function mockResponse(url: string) {
       { name: 'Southern Region', id: '9', parent_id: '5' }
     ];
   } else if (/GetFieldKeys/.test(url)) {
-    // the examples with weird characters are for testing URL encoding
+    // The field with weird characters is for testing URL encoding; the last two are for testing server error handling.
     return [
       { key: 'service_body_bigint', description: 'Service Body ID' },
       { key: 'location_province', description: 'State' },
-      { key: 'weird&key', description: 'Key with & in it' }
+      { key: 'weird&key', description: 'Key with & in it' },
+      { key: 'very_BAD_field', description: 'Very Bad Field' },
+      { key: 'THROW_EXECPTION_field', description: 'Throw Exception Field' }
     ];
   } else if (/GetFieldValues&meeting_key=location_province/.test(url)) {
     return [
@@ -80,4 +95,8 @@ function mockFetch(url: any): any {
     ok: !/BAD/.test(url),
     json: () => Promise.resolve(mockResponse(url))
   });
+}
+
+function mockConsoleError(e: string): void {
+  consoleError = e;
 }

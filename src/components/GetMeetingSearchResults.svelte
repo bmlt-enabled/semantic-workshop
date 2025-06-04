@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Card, Checkbox, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
+  import { Card, Checkbox, Helper, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import ServiceBodiesTree from './ServiceBodiesTree.svelte';
   import { translations } from '../stores/localization';
@@ -25,6 +25,7 @@
   let keyForMeetingKeyValue: string = $state('');
   let meetingKeyValues: { name: string; value: string }[] = $state([]);
   let meetingFieldValue = $state('');
+  let serverError: string = $state('');
   let selectedServiceBodies: string[] = $state([]);
   let rejectedServiceBodies: string[] = $state([]);
   let specificTextValue = $state('');
@@ -72,16 +73,25 @@
     return !isNaN(n) && (n > 0 || (n < 0 && Number.isInteger(n)));
   }
 
+  // This function is called when the user has selected a field for the "Search for meetings with a specific value of a field" option.
+  // Get the existing values of that field in the database to populate the menu of existing values.  The Response URL should just be
+  // GetSearchResults after this function is called, with no additional parameters -- that will get filled in after the user selects
+  // an existing value of a field or types in a new one.
   async function computeMeetingKeyValues() {
     try {
       const response = await fetch(rootServerURL + 'client_interface/json/?switcher=GetFieldValues&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue));
-      const j = await response.json();
-      meetingKeyValues = j.map((f: Record<string, string>) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }));
-      meetingFieldValue = '';
-      parameters = '';
+      if (!response.ok) {
+        throw new Error('server response said not OK');
+      } else {
+        const j = await response.json();
+        meetingKeyValues = j.map((f: Record<string, string>) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }));
+      }
     } catch (error) {
-      // TODO - FILL IN
+      meetingKeyValues = [];
+      serverError = $translations.serverError + ' -- ' + error;
     }
+    meetingFieldValue = '';
+    parameters = '';
   }
 
   // Time is in 24 hour time and must be at least 00:01 and at most 23:59 (so you can't enter midnight exactly).  It also takes a rather
@@ -388,6 +398,9 @@
               </div>
               <Select class="w-full" items={fieldOptions} placeholder={$translations.chooseOption} bind:value={keyForMeetingKeyValue} onchange={computeMeetingKeyValues} />
             </Label>
+            {#if serverError}
+              <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
+            {/if}
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -399,7 +412,7 @@
                   class="w-full"
                   items={meetingKeyValues}
                   placeholder={$translations.chooseOption}
-                  disabled={keyForMeetingKeyValue === ''}
+                  disabled={keyForMeetingKeyValue === '' || serverError !== ''}
                   bind:value={meetingFieldValue}
                   onchange={computeParameters}
                 />
@@ -410,7 +423,7 @@
                 <div class="mb-2">
                   {$translations.enterNewValue}:
                 </div>
-                <Input type="text" disabled={keyForMeetingKeyValue === ''} placeholder="" bind:value={meetingFieldValue} oninput={computeParameters} />
+                <Input type="text" disabled={keyForMeetingKeyValue === '' || serverError !== ''} placeholder="" bind:value={meetingFieldValue} onInput={computeParameters} />
               </Label>
             </div>
           </div>
@@ -438,7 +451,7 @@
               <div class="mb-2">
                 {$translations.searchForThisText}:
               </div>
-              <Input type="text" placeholder="" bind:value={specificTextValue} oninput={computeParametersForSpecificTextValue} />
+              <Input type="text" placeholder="" bind:value={specificTextValue} onInput={computeParametersForSpecificTextValue} />
             </Label>
             <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
               <div class="mb-2">
@@ -460,7 +473,7 @@
                 <div class="mb-2">
                   {$translations.meetingSearchRadius}:
                 </div>
-                <Input type="text" placeholder="" bind:value={textSearchRadius} oninput={computeParametersForSpecificTextValue} />
+                <Input type="text" placeholder="" bind:value={textSearchRadius} onInput={computeParametersForSpecificTextValue} />
               </Label>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{$translations.meetingSearchRadiusExplanation}</p>
               {#if !validRadius(textSearchRadius)}
@@ -480,7 +493,7 @@
               <div class="mb-2">
                 {$translations.meetingStartsAfter}:
               </div>
-              <Input type="text" placeholder="" bind:value={startsAfter} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={startsAfter} onInput={computeParameters} />
             </Label>
             {#if !validTime(startsAfter)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
@@ -491,7 +504,7 @@
               <div class="mb-2">
                 {$translations.meetingStartsBefore}:
               </div>
-              <Input type="text" placeholder="" bind:value={startsBefore} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={startsBefore} onInput={computeParameters} />
             </Label>
             {#if !validTime(startsBefore)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
@@ -502,7 +515,7 @@
               <div class="mb-2">
                 {$translations.meetingEndsBefore}:
               </div>
-              <Input type="text" placeholder="" bind:value={endsBefore} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={endsBefore} onInput={computeParameters} />
             </Label>
             {#if !validTime(endsBefore)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
@@ -520,7 +533,7 @@
               <div class="mb-2">
                 {$translations.meetingLastsAtLeast}:
               </div>
-              <Input type="text" placeholder="" bind:value={minDuration} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={minDuration} onInput={computeParameters} />
             </Label>
             {#if !validTime(minDuration)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
@@ -531,7 +544,7 @@
               <div class="mb-2">
                 {$translations.meetingLastsAtMost}:
               </div>
-              <Input type="text" placeholder="" bind:value={maxDuration} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={maxDuration} onInput={computeParameters} />
             </Label>
             {#if !validTime(maxDuration)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidTime}</div>
@@ -549,7 +562,7 @@
               <div class="mb-2">
                 {$translations.latitude}:
               </div>
-              <Input type="text" placeholder="" bind:value={latitude} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={latitude} onInput={computeParameters} />
             </Label>
             {#if !validNumber(latitude)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidLatitude}</div>
@@ -560,7 +573,7 @@
               <div class="mb-2">
                 {$translations.longitude}:
               </div>
-              <Input type="text" placeholder="" bind:value={longitude} oninput={computeParameters} />
+              <Input type="text" placeholder="" bind:value={longitude} onInput={computeParameters} />
             </Label>
             {#if !validNumber(longitude)}
               <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidLongitude}</div>
@@ -572,7 +585,7 @@
                 <div class="mb-2">
                   {$translations.latLonSearchRadius}:
                 </div>
-                <Input type="text" placeholder="" bind:value={latLonSearchRadius} oninput={computeParameters} />
+                <Input type="text" placeholder="" bind:value={latLonSearchRadius} onInput={computeParameters} />
               </Label>
               {#if !validRadius(latLonSearchRadius)}
                 <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidRadius}</div>

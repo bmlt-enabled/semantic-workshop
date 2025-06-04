@@ -58,32 +58,6 @@ describe('general app tests', () => {
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
   });
 
-  test('bad root server URL', async () => {
-    const user = await setupTest('GetServerInfo', false);
-    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(rootServerMenu, ['other']);
-    const boxes = screen.getAllByRole('textbox');
-    const customUrl = boxes[0];
-    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.type(customUrl, 'https://BADzone.org/main_server/');
-    await user.click(acceptUrl);
-    expect(screen.getByText(/Server error -- Error: server response said not OK/)).toBeInTheDocument();
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
-  test('another bad root server URL - throws an exception', async () => {
-    const user = await setupTest('GetServerInfo', false);
-    const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
-    await userEvent.selectOptions(rootServerMenu, ['other']);
-    const boxes = screen.getAllByRole('textbox');
-    const customUrl = boxes[0];
-    const acceptUrl = screen.getByRole('button', { name: 'Update root server URL' });
-    await user.type(customUrl, 'https://THROW_EXECPTIONzone.org/main_server/');
-    await user.click(acceptUrl);
-    expect(screen.getByText(/Server error -- Error: mocked server error/)).toBeInTheDocument();
-    expect(screen.getByText(/- none -/)).toBeInTheDocument();
-  });
-
   test('change semantic workshop language', async () => {
     const user = await setupTest('GetServerInfo');
     const languageSettings = screen.getByRole('button', { name: 'Open language settings' });

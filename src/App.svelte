@@ -152,14 +152,14 @@
       if (selectedServer) {
         rootServerURL = selectedServer.rootURL;
         operation = 'GetServerInfo';
+        await getAllData();
       }
     } catch (error) {
-      console.error('Failed to fetch server list:', error);
-      serverError = 'Failed to load server list. Please try again later.';
+      console.error('Failed to fetch server list -- ' + error);
+      serverError = $translations.failedToFetchServerList + ' ' + error;
     } finally {
       isLoadingServers = false;
     }
-    await getAllData();
   }
 
   function handleServerSelect(event: Event) {
@@ -252,7 +252,7 @@
               <Label for="rootServerURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.rootServerURL}:</Label>
               <div class="flex gap-2">
                 {#if isLoadingServers}
-                  <div class="flex-1 p-2 text-gray-500 dark:text-gray-400">Loading servers...</div>
+                  <div class="flex-1 p-2 text-gray-500 dark:text-gray-400">{$translations.loadingServers}</div>
                 {:else}
                   <Select
                     id="rootServerURL"

@@ -51,7 +51,7 @@
           <div class="mb-2">
             {$translations.getChangesBetween}:
           </div>
-          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} on:select={computeParameters} />
+          <Datepicker range bind:rangeFrom={changesFrom} bind:rangeTo={changesTo} onselect={computeParameters} />
         </Label>
       </div>
 
@@ -60,7 +60,7 @@
           <div class="mb-2">
             {$translations.getChangesForMeeting}:
           </div>
-          <Input type="text" bind:value={changesMeetingId} oninput={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
+          <Input type="text" bind:value={changesMeetingId} onInput={computeParameters} class="w-full" placeholder={$translations.enterMeetingId} />
         </Label>
         {#if badChangesMeetingId}
           <Helper class="text-red-500 dark:text-red-400">
