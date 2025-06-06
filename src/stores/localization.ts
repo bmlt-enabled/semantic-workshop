@@ -157,7 +157,7 @@ const strings = new (LocalizedStrings as any)({
     urlPlaceholder: 'Enter root server URL ...',
     value: 'Value',
     venueTypes: ['In-person', 'Virtual', 'Hybrid'],
-    weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   }
 });
 

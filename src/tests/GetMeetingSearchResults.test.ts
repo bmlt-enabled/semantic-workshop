@@ -54,11 +54,11 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.getAllByText(/If any are selected, then the search will require that the selected terms match. This is an "OR" search./));
     // bit of a hack -- there are TWO Monday boxes, one for meetings that gather on Mondays
     // and another for meetings that do not gather on Mondays
-    const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
+    const mondays = screen.getAllByRole('checkbox', { name: 'Mon' });
     expect(mondays.length).toBe(2);
     await user.click(mondays[0] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays=2' })).toBeInTheDocument();
-    const wednesdays = screen.getAllByRole('checkbox', { name: 'Wednesday' });
+    const wednesdays = screen.getAllByRole('checkbox', { name: 'Wed' });
     await user.click(wednesdays[0] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays[]=2&weekdays[]=4' })).toBeInTheDocument();
   });
@@ -70,10 +70,10 @@ describe('Get Meeting Search Results tests', () => {
     expect(screen.getAllByText(/do not/));
     expect(screen.getAllByText(/gather on specific weekdays/));
     expect(screen.getByText('Any of these that are selected will prevent meetings that gather on the given weekday from being included in the search.')).toBeInTheDocument();
-    const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
+    const mondays = screen.getAllByRole('checkbox', { name: 'Mon' });
     await user.click(mondays[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays=-2' })).toBeInTheDocument();
-    const wednesdays = screen.getAllByRole('checkbox', { name: 'Wednesday' });
+    const wednesdays = screen.getAllByRole('checkbox', { name: 'Wed' });
     await user.click(wednesdays[1] as HTMLInputElement);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&weekdays[]=-2&weekdays[]=-4' })).toBeInTheDocument();
   });
@@ -418,7 +418,7 @@ describe('Get Meeting Search Results tests', () => {
     // there are many combinations possible of course -- just test one combination (of specific weekday and meeting format)
     const user = await setupTest('GetSearchResults');
     // there are TWO Monday boxes, one for meetings that gather on Mondays and another for meetings that do not gather on Mondays
-    const mondays = screen.getAllByRole('checkbox', { name: 'Monday' });
+    const mondays = screen.getAllByRole('checkbox', { name: 'Mon' });
     await user.click(mondays[0] as HTMLInputElement);
     const virtual = screen.getAllByRole('checkbox', { name: 'VM' });
     await user.click(virtual[0] as HTMLInputElement);

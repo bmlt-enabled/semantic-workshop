@@ -289,7 +289,7 @@
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingsOnSpecificDays}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingsOnSpecificDaysExplanation}</div>
-        <div class="grid grid-cols-7 gap-2">
+        <div class="grid gap-2 sm:grid-cols-1 lg:grid-cols-7">
           {#each $translations.weekdays as day, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
@@ -304,7 +304,7 @@
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.meetingsNotOnSpecificDays}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingsNotOnSpecificDaysExplanation}</div>
-        <div class="grid grid-cols-7 gap-2">
+        <div class="grid gap-2 sm:grid-cols-1 lg:grid-cols-7">
           {#each $translations.weekdays as day, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
