@@ -12,6 +12,7 @@
   import GetNAWSDump from './components/GetNAWSDump.svelte';
   import GetOther from './components/GetOther.svelte';
   import Settings from './components/Settings.svelte';
+  import DownloadCSV from './components/DownloadCSV.svelte';
 
   let showSettingsModal = $state(false);
 
@@ -218,9 +219,12 @@
           <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
           <output id="responseURL" class="block">
             {#if responseURL && parameters !== null}
-              <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                {responseURL}
-              </a>
+              <div class="flex items-center gap-4">
+                <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                  {responseURL}
+                </a>
+                <DownloadCSV {responseURL} />
+              </div>
             {:else}
               <div class="text-gray-500 dark:text-gray-400">{$translations.none}</div>
             {/if}

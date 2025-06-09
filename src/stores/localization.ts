@@ -12,6 +12,8 @@ const settings = { defaultLanguage: 'en' };
 const strings = new (LocalizedStrings as any)({
   de: {
     allServiceBodies: 'All service bodies',
+    downloading: 'Downloading...',
+    downloadAsCSV: 'Download as CSV',
     field: 'Field',
     formatLanguage: 'Format language',
     getServiceBodies: 'Get Service Bodies',
@@ -52,6 +54,8 @@ const strings = new (LocalizedStrings as any)({
     doesNotHaveVenueTypeExplanation: `Any of these that are selected will prevent meetings that have the given venue type
       from being included in the search.`,
     dontSort: `Don't sort`,
+    downloading: 'Downloading...',
+    downloadAsCSV: 'Download as CSV',
     enterNewValue: 'Enter a new value',
     failedToFetchServerList: `Failed to fetch server list. Please try again later, or else enter the desired server URL, followed by /semantic/,
       directly into a web browser.`,
