@@ -12,6 +12,7 @@
   import GetNAWSDump from './components/GetNAWSDump.svelte';
   import GetOther from './components/GetOther.svelte';
   import Settings from './components/Settings.svelte';
+  import DownloadCSV from './components/DownloadCSV.svelte';
 
   let showSettingsModal = $state(false);
 
@@ -215,12 +216,19 @@
       <!-- Fixed Response URL Section -->
       <div class="sticky top-0 z-20 border-b border-gray-500 bg-white p-6 shadow dark:border-gray-400 dark:bg-gray-800">
         <div class="space-y-2">
-          <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
+          <div class="flex items-center justify-between">
+            <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
+            {#if responseURL && parameters !== null}
+              <DownloadCSV {responseURL} />
+            {/if}
+          </div>
           <output id="responseURL" class="block">
             {#if responseURL && parameters !== null}
-              <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                {responseURL}
-              </a>
+              <div class="flex items-center gap-4">
+                <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                  {responseURL}
+                </a>
+              </div>
             {:else}
               <div class="text-gray-500 dark:text-gray-400">{$translations.none}</div>
             {/if}
@@ -284,7 +292,9 @@
             <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
               {$translations.operation}:
             </Label>
-            <Select id="operation" class="w-full" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
+            <div class="flex gap-2">
+              <Select id="operation" class="flex-1" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
+            </div>
           </div>
         </div>
 
