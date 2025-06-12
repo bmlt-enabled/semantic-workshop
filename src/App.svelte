@@ -223,7 +223,6 @@
                 <a href={responseURL} target="_blank" class="break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                   {responseURL}
                 </a>
-                <DownloadCSV {responseURL} />
               </div>
             {:else}
               <div class="text-gray-500 dark:text-gray-400">{$translations.none}</div>
