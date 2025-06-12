@@ -288,7 +288,12 @@
             <Label for="operation" class="font-medium text-gray-700 dark:text-gray-300">
               {$translations.operation}:
             </Label>
-            <Select id="operation" class="w-full" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
+            <div class="flex gap-2">
+              <Select id="operation" class="flex-1" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
+              {#if responseURL && parameters !== null}
+                <DownloadCSV {responseURL} />
+              {/if}
+            </div>
           </div>
         </div>
 
