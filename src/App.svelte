@@ -216,7 +216,12 @@
       <!-- Fixed Response URL Section -->
       <div class="sticky top-0 z-20 border-b border-gray-500 bg-white p-6 shadow dark:border-gray-400 dark:bg-gray-800">
         <div class="space-y-2">
-          <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
+          <div class="flex items-center justify-between">
+            <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
+            {#if responseURL && parameters !== null}
+              <DownloadCSV {responseURL} />
+            {/if}
+          </div>
           <output id="responseURL" class="block">
             {#if responseURL && parameters !== null}
               <div class="flex items-center gap-4">
@@ -289,9 +294,6 @@
             </Label>
             <div class="flex gap-2">
               <Select id="operation" class="flex-1" items={operationOptions} disabled={rootServerURL === '' || serverError !== ''} bind:value={operation} />
-              {#if responseURL && parameters !== null}
-                <DownloadCSV {responseURL} />
-              {/if}
             </div>
           </div>
         </div>
