@@ -92,7 +92,7 @@ describe('component tests (except get meetings)', () => {
     expect(field.item(2)?.label).toBe('Northern Region');
     expect(field.item(3)?.label).toBe('Southern Region');
     await userEvent.selectOptions(field, ['9']);
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetNAWSDump&sb_id=9' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/csv/?switcher=GetNAWSDump&sb_id=9' })).toBeInTheDocument();
   });
 
   test('Get Server Information', async () => {

@@ -79,7 +79,9 @@
   // state for response URL.  parameters === null implies that there isn't a valid response URL due to a missing parameter,
   // server error, or whatever.  parameters === '' is ok and just means there aren't any parameters for that operation.
   let parameters: string | null = $state('');
-  let responseURL: string = $derived(rootServerURL === '' || serverError ? '' : rootServerURL + (operation ? 'client_interface/json/?switcher=' + operation + (parameters || '') : ''));
+  let responseURL: string = $derived(
+    rootServerURL === '' || serverError ? '' : rootServerURL + (operation ? `client_interface/${operation === 'GetNAWSDump' ? 'csv' : 'json'}/?switcher=` + operation + (parameters || '') : '')
+  );
 
   async function updateRootServerURL(url: string) {
     const s = url.trim();
