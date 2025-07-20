@@ -1,3 +1,15 @@
+## 0.0.8 (July 20, 2025)
+* CSS fix, rounded top corners.
+
+## 0.0.7 (June 12, 2025)
+* Add download as CSV button.
+
+## 0.0.6 (June 12, 2025)
+* Use csv for NAWS export.
+
+## 0.0.5 (June 6, 2025)
+* Fix various css things, bump flowbite version.
+
 ## 0.0.4 (May 15, 2025)
 * Fixes for new version of flowbite.
 
