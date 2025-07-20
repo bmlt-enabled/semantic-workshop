@@ -214,7 +214,7 @@
 
     <div class="rounded-lg bg-white shadow-sm dark:bg-gray-800">
       <!-- Fixed Response URL Section -->
-      <div class="sticky top-0 z-20 border-b border-gray-500 bg-white p-6 shadow dark:border-gray-400 dark:bg-gray-800">
+      <div class="sticky top-0 z-20 rounded-t-lg border-b border-gray-500 bg-white p-6 shadow dark:border-gray-400 dark:bg-gray-800">
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <Label for="responseURL" class="font-medium text-gray-700 dark:text-gray-300">{$translations.responseURL}:</Label>
