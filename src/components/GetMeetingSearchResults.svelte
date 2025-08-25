@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Card, Checkbox, Helper, Input, Label, Radio, Select, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
+  import { Card, Checkbox, Helper, Input, Label, Radio, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import ServiceBodiesTree from './ServiceBodiesTree.svelte';
   import { translations } from '../stores/localization';
@@ -45,10 +45,6 @@
   let latitude = $state('');
   let longitude = $state('');
   let latLonSearchRadius = $state('');
-  const unitsMenuOptions = [
-    { name: $translations.miles, value: 'miles' },
-    { name: $translations.kilometers, value: 'kilometers' }
-  ];
   let latLonSearchUnits = $state('miles');
   let selectedFields = $state(Array(availableFields.length).fill(false));
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
@@ -302,7 +298,7 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.meetingsNotOnSpecificDays}</legend>
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingsNotOnSpecificDays}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingsNotOnSpecificDaysExplanation}</div>
         <div class="grid gap-2 sm:grid-cols-1 lg:grid-cols-7">
           {#each $translations.weekdays as day, i}
@@ -332,7 +328,7 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.doesNotHaveVenueType}</legend>
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveVenueType}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveVenueTypeExplanation}</div>
         <div class="grid grid-cols-3 gap-2">
           {#each $translations.venueTypes as vt, i}
@@ -373,7 +369,7 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.doesNotHaveFormat}</legend>
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveFormat}</legend>
         <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.doesNotHaveFormatExplanation}</div>
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {#each formats as f, i}
@@ -437,8 +433,8 @@
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
-        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodies}</legend>
-        <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodiesExplanation}</div>
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.notSpecificServiceBodies}</legend>
+        <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{$translations.notSpecificServiceBodiesExplanation}</div>
         <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={rejectedServiceBodies} />
       </fieldset>
 

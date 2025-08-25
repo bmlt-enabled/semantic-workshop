@@ -8,7 +8,7 @@ export const dummyURL = 'https://bigzone.org/main_server/';
 export let consoleError = '';
 
 export function setUpMockFetch() {
-  // @ts-ignore
+  // @ts-expect-error this is for global ignore
   vi.spyOn(global, 'fetch').mockImplementation(mockFetch);
   vi.spyOn(console, 'error').mockImplementation(mockConsoleError);
 }
@@ -17,7 +17,7 @@ let saveAggregatorError = false;
 
 // utility function to set up the semantic workshop page for a unit test
 export async function setupTest(operation: string | null, provideBaseUrl = true, aggregatorError = false) {
-  // @ts-ignore
+  // @ts-expect-error this is for global ignore
   global.settings = provideBaseUrl ? { apiBaseUrl: dummyURL } : {};
   localStorage.setItem('workshopLanguage', 'en');
   saveAggregatorError = aggregatorError;

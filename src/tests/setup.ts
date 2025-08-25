@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
-// @ts-ignore
+// @ts-expect-error this is for mock for
 global.window.matchMedia = vi.fn().mockImplementation((query) => ({
   matches: false,
   media: query,

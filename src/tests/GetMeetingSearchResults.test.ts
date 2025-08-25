@@ -1,9 +1,8 @@
 import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
-import App from '../App.svelte';
 import { dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
@@ -175,10 +174,10 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('search for meetings that belong to certain service bodies', async () => {
-    const user = await setupTest('GetSearchResults');
+    await setupTest('GetSearchResults');
     // There are two legends that match the getByText since the testing library seems to ignore the "do not" that is in italics.
     // Just hack around it by getting them both.
-    expect(screen.getAllByText('Search for meetings that belong to certain service bodies').length).toBe(2);
+    expect(screen.getAllByText('Search for meetings that belong to certain service bodies').length).toBe(1);
     expect(screen.getByText(/If one or more service bodies are selected, then the meetings found must belong to one of those service bodies./)).toBeInTheDocument();
     // TODO: test clicking on some service bodies and checking the response URL.  Unfortunately (a) I couldn't figure out a way to pick
     // out the checkboxes for the service body tree, and (b) simulating clicking on one of the service body tree checkboxes didn't change
@@ -187,7 +186,7 @@ describe('Get Meeting Search Results tests', () => {
 
   test('search for meetings that do not belong to certain service bodies', async () => {
     // Very abbreviated test!  See above comment.
-    const user = await setupTest('GetSearchResults');
+    await setupTest('GetSearchResults');
     expect(screen.getByText(/belong to any of those service bodies./)).toBeInTheDocument();
   });
 
@@ -353,7 +352,7 @@ describe('Get Meeting Search Results tests', () => {
   });
 
   test('response sort order', async () => {
-    const user = await setupTest('GetSearchResults');
+    await setupTest('GetSearchResults');
     expect(screen.getByText('Response sort order')).toBeInTheDocument();
     expect(screen.getByText(/Select fields to be used in sorting the result. The result will be sorted first by the field/)).toBeInTheDocument();
     const serviceBodySelect = screen.getByRole('combobox', { name: 'Service Body ID' }) as HTMLSelectElement;

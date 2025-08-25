@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { Button } from 'flowbite-svelte';
   import Node from './ServiceBodiesTreeNode.svelte';
-  import { translations } from '../stores/localization';
 
   interface TreeNode {
     label: string;

@@ -1,9 +1,8 @@
 import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
-import App from '../App.svelte';
 import { dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
@@ -11,7 +10,7 @@ afterAll(vi.resetAllMocks);
 
 describe('component tests (except get meetings)', () => {
   test('Get Service Bodies', async () => {
-    const user = await setupTest('GetServiceBodies');
+    await setupTest('GetServiceBodies');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
@@ -40,7 +39,7 @@ describe('component tests (except get meetings)', () => {
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetChanges' })).toBeInTheDocument();
     // TODO -- should test picking a date range.  Unfortunately trying to test this gives an error (the testing library doesn't like
     // the animation).  The commented out line to click on the date picker will trigger the error.
-    const openDatePicker = screen.getByRole('button', { name: /Open date picker/ });
+    screen.getByRole('button', { name: /Open date picker/ });
     // user.click(openDatePicker);
     const meetingIdTextBox = screen.getByRole('textbox', { name: 'Get changes for a meeting with this ID:' }) as HTMLInputElement;
     await user.type(meetingIdTextBox, '439');
@@ -61,13 +60,13 @@ describe('component tests (except get meetings)', () => {
   });
 
   test('Get a List of Available Field Keys', async () => {
-    const user = await setupTest('GetFieldKeys');
+    await setupTest('GetFieldKeys');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetFieldKeys' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get a List of Specific Field Values', async () => {
-    const user = await setupTest('GetFieldValues');
+    await setupTest('GetFieldValues');
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
@@ -84,7 +83,7 @@ describe('component tests (except get meetings)', () => {
   });
 
   test('Get a NAWS Format Export', async () => {
-    const user = await setupTest('GetNAWSDump');
+    await setupTest('GetNAWSDump');
     expect(screen.getByText(/- none -/)).toBeInTheDocument();
     const field = screen.getByRole('combobox', { name: 'Service body:' }) as HTMLSelectElement;
     expect(field.item(0)?.label).toBe('Choose option ...');
@@ -96,13 +95,13 @@ describe('component tests (except get meetings)', () => {
   });
 
   test('Get Server Information', async () => {
-    const user = await setupTest('GetServerInfo');
+    await setupTest('GetServerInfo');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServerInfo' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
   });
 
   test('Get Geographic Coverage Area', async () => {
-    const user = await setupTest('GetCoverageArea');
+    await setupTest('GetCoverageArea');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetCoverageArea' })).toBeInTheDocument();
     expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
     // The old semantic workshop implementation also displayed a map with the rectangle representing the coverage area.  This is

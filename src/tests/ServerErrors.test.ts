@@ -1,9 +1,8 @@
 import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
-import App from '../App.svelte';
 import { consoleError, dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
@@ -11,7 +10,7 @@ afterAll(vi.resetAllMocks);
 
 describe('server error tests', () => {
   test('aggregator error', async () => {
-    const user = await setupTest('GetServerInfo', false, true);
+    await setupTest('GetServerInfo', false, true);
     expect(screen.getByText(/mocked aggregator error/)).toBeInTheDocument();
     expect(consoleError).toBe('Failed to fetch server list -- Error: mocked aggregator error');
   });
@@ -43,7 +42,7 @@ describe('server error tests', () => {
   });
 
   test('server error for search for meetings with a specific value of a field option', async () => {
-    const user = await setupTest('GetSearchResults');
+    await setupTest('GetSearchResults');
     const field = screen.getByRole('combobox', { name: 'Field:' }) as HTMLSelectElement;
     await userEvent.selectOptions(field, ['very_BAD_field']);
     expect(screen.getByText(/Server error -- Error: server response said not OK/)).toBeInTheDocument();

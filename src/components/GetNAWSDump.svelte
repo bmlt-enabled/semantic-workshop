@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Card, Checkbox, Helper, Label, Select } from 'flowbite-svelte';
+  import { Card, Helper, Label, Select } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { translations } from '../stores/localization';
 

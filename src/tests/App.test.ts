@@ -1,9 +1,8 @@
 import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
-import App from '../App.svelte';
 import { dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
