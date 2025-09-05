@@ -305,7 +305,7 @@
               {#if operation === 'GetSearchResults'}
                 <GetMeetingSearchResults {availableFields} {formats} {serviceBodies} {rootServerURL} bind:parameters />
               {:else if operation === 'GetFormats'}
-                <GetFormats {serverLangs} {allLanguages} bind:parameters />
+                <GetFormats {serverLangs} {allLanguages} {formats} bind:parameters />
               {:else if operation === 'GetChanges'}
                 <GetChanges {serviceBodies} bind:parameters />
               {:else if operation === 'GetFieldValues'}
