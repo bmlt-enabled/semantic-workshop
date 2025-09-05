@@ -49,8 +49,11 @@
   let publishedStatus = $state('published');
   let meetingIds = $state('');
   let excludeMeetingIds = $state('');
+  let pageSize = $state('');
+  let pageNumber = $state('');
   let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
   let badMeetingIds = $derived(!validMeetingIds(meetingIds) || !validMeetingIds(excludeMeetingIds));
+  let badPagination = $derived(!validPositiveInteger(pageSize) || !validPositiveInteger(pageNumber));
   let selectedFields = $state(Array(availableFields.length).fill(false));
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
   // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
@@ -85,6 +88,16 @@
       .map((id) => id.trim())
       .filter((id) => id !== '');
     return ids.every((id) => /^\d+$/.test(id) && parseInt(id) > 0);
+  }
+
+  // Return true if s represents a valid positive integer
+  // An empty string is OK -- this indicates the parameter isn't being used
+  function validPositiveInteger(s: string) {
+    if (s === '') {
+      return true;
+    }
+    const n = parseInt(s);
+    return !isNaN(n) && n > 0 && n.toString() === s;
   }
 
   // This function is called when the user has selected a field for the "Search for meetings with a specific value of a field" option.
@@ -182,6 +195,17 @@
     return part;
   }
 
+  function computePaginationPart(): string {
+    let part = '';
+    if (pageSize && validPositiveInteger(pageSize)) {
+      part += '&page_size=' + pageSize;
+    }
+    if (pageNumber && validPositiveInteger(pageNumber)) {
+      part += '&page_num=' + pageNumber;
+    }
+    return part;
+  }
+
   // This function is used to decide whether to enable or disable a menu option for the sort order menu for a given field.  Argument i
   // is the option position, and currentValue is the current position of that field (0 means not part of sort order, 1 means first, etc).
   // The Don't sort option is always enabled and is handled separately.
@@ -252,8 +276,9 @@
     const specificFieldsPart = computeSpecificFieldsPart();
     const sortOrderPart = computeSortOrderPart();
     const meetingIdsPart = computeMeetingIdsPart();
+    const paginationPart = computePaginationPart();
 
-    if ((textSearchRadius && !validRadius(textSearchRadius)) || badTime || badMeetingIds || !validNumber(latitude) || !validNumber(longitude) || !validRadius(latLonSearchRadius)) {
+    if ((textSearchRadius && !validRadius(textSearchRadius)) || badTime || badMeetingIds || badPagination || !validNumber(latitude) || !validNumber(longitude) || !validRadius(latLonSearchRadius)) {
       parameters = null;
     } else {
       parameters =
@@ -276,7 +301,8 @@
         publishedStatusPart +
         specificFieldsPart +
         sortOrderPart +
-        meetingIdsPart;
+        meetingIdsPart +
+        paginationPart;
     }
   }
 
@@ -733,6 +759,35 @@
               </Label>
             </div>
           {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.pagination}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.paginationExplanation}</div>
+        <div class="mt-4 grid grid-cols-2 gap-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.pageSize}:
+              </div>
+              <Input type="text" placeholder="10" bind:value={pageSize} onInput={computeParameters} />
+            </Label>
+            {#if !validPositiveInteger(pageSize)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">Please enter a positive integer</div>
+            {/if}
+          </div>
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.pageNumber}:
+              </div>
+              <Input type="text" placeholder="1" bind:value={pageNumber} onInput={computeParameters} />
+            </Label>
+            {#if !validPositiveInteger(pageNumber)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">Please enter a positive integer</div>
+            {/if}
+          </div>
         </div>
       </fieldset>
 
