@@ -10,6 +10,7 @@
   import GetChanges from './components/GetChanges.svelte';
   import GetFieldValues from './components/GetFieldValues.svelte';
   import GetNAWSDump from './components/GetNAWSDump.svelte';
+  import GetServiceBodies from './components/GetServiceBodies.svelte';
   import GetOther from './components/GetOther.svelte';
   import Settings from './components/Settings.svelte';
   import DownloadCSV from './components/DownloadCSV.svelte';
@@ -311,7 +312,9 @@
                 <GetFieldValues {availableFields} bind:parameters />
               {:else if operation === 'GetNAWSDump'}
                 <GetNAWSDump {serviceBodies} bind:parameters />
-              {:else if ['GetServiceBodies', 'GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
+              {:else if operation === 'GetServiceBodies'}
+                <GetServiceBodies {serviceBodies} bind:parameters />
+              {:else if ['GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
                 <GetOther bind:parameters />
               {/if}
             </div>

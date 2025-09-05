@@ -12,7 +12,15 @@ describe('component tests (except get meetings)', () => {
   test('Get Service Bodies', async () => {
     await setupTest('GetServiceBodies');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetServiceBodies' })).toBeInTheDocument();
-    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
+    // GetServiceBodies now has proper parameters (service selection, recursive, parents)
+    expect(screen.getByText('Return only specific service bodies')).toBeInTheDocument();
+    expect(screen.getByText('Exclude specific service bodies from results')).toBeInTheDocument();
+    expect(screen.getByText('Service body hierarchy options')).toBeInTheDocument();
+    expect(screen.getByText('Include child service bodies')).toBeInTheDocument();
+    expect(screen.getByText('Include parent service bodies')).toBeInTheDocument();
+    // Both checkboxes should be disabled initially since no service bodies are selected
+    expect(screen.getByRole('checkbox', { name: 'Include child service bodies' })).toBeDisabled();
+    expect(screen.getByRole('checkbox', { name: 'Include parent service bodies' })).toBeDisabled();
   });
 
   test('Get Formats', async () => {

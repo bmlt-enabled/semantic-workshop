@@ -27,7 +27,14 @@ const strings = new (LocalizedStrings as any)({
     getSearchResults: 'Get Meeting Search Results',
     getServerInfo: 'Get Server Information',
     getServiceBodies: 'Get Service Bodies',
+    getServiceBodiesExclude: 'Exclude specific service bodies from results',
+    getServiceBodiesExcludeExplanation:
+      'If none of these is selected, this option will have no bearing on the results. If one or more service bodies are selected, then the service bodies returned must not be any of those service bodies.',
+    getServiceBodiesInclude: 'Return only specific service bodies',
+    getServiceBodiesIncludeExplanation:
+      'If none of these is selected, this option will have no bearing on the results. If one or more service bodies are selected, then the service bodies returned must be one of those service bodies.',
     includeChildServiceBodies: 'Include child service bodies',
+    includeParentServiceBodies: 'Include parent service bodies',
     language: 'Sprache',
     none: '- Keine -',
     noParameters: '- no parameters for this operation -',
@@ -39,6 +46,9 @@ const strings = new (LocalizedStrings as any)({
     serverError: 'Server error',
     serverLanguage: 'Server language',
     serviceBody: 'Service body',
+    serviceBodyOptions: 'Service body hierarchy options',
+    serviceBodyOptionsExplanation:
+      'These options control whether to include related service bodies in the hierarchy. They only have effect when you have selected specific service bodies to include or exclude.',
     showAllFormats: 'Show all formats',
     title: 'BMLT Semantische Werkstatt',
     updateURL: 'Update root server URL',
@@ -77,6 +87,12 @@ const strings = new (LocalizedStrings as any)({
     getSearchResults: 'Get Meeting Search Results',
     getServerInfo: 'Get Server Information',
     getServiceBodies: 'Get Service Bodies',
+    getServiceBodiesExclude: 'Exclude specific service bodies from results',
+    getServiceBodiesExcludeExplanation: `If none of these is selected, this option will have no bearing on the results.
+      If one or more service bodies are selected, then the service bodies returned must <i><b>not</b></i> be any of those service bodies.`,
+    getServiceBodiesInclude: 'Return only specific service bodies',
+    getServiceBodiesIncludeExplanation: `If none of these is selected, this option will have no bearing on the results.
+      If one or more service bodies are selected, then the service bodies returned must be one of those service bodies.`,
     getUsedFormats: 'Get the formats used in the results of this search',
     hasFormat: 'Search for meetings that have specific formats',
     hasFormatExplanation: `If none of these are selected, they will have no bearing at all on the search.
@@ -89,6 +105,7 @@ const strings = new (LocalizedStrings as any)({
       If any are selected, then the search will require that the selected terms match.
       This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.`,
     includeChildServiceBodies: 'Include child service bodies',
+    includeParentServiceBodies: 'Include parent service bodies',
     intro: `This interactive application will help you build a semantic URL to retrieve data from a BMLT root server.
       It is available both as part of every BMLT root server and as a separate standalone app at https://semantic.bmlt.app.`,
     invalidLatitude: 'Invalid latitude',
@@ -158,6 +175,9 @@ const strings = new (LocalizedStrings as any)({
     serverError: 'Server error',
     serverLanguage: 'Server language',
     serviceBody: 'Service body',
+    serviceBodyOptions: 'Service body hierarchy options',
+    serviceBodyOptionsExplanation: `These options control whether to include related service bodies in the hierarchy.
+      They only have effect when you have selected specific service bodies to include or exclude.`,
     showAllFormats: 'Show all formats',
     specificServiceBodies: 'Search for meetings that belong to certain service bodies',
     specificServiceBodiesExplanation: `If none of these is selected, this option will have no bearing on the search.
