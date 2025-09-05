@@ -27,10 +27,13 @@ const strings = new (LocalizedStrings as any)({
     getSearchResults: 'Get Meeting Search Results',
     getServerInfo: 'Get Server Information',
     getServiceBodies: 'Get Service Bodies',
+    includeChildServiceBodies: 'Include child service bodies',
     language: 'Sprache',
     none: '- Keine -',
     noParameters: '- no parameters for this operation -',
     operation: 'Operation',
+    recursiveServiceBodies: 'Child service bodies',
+    recursiveServiceBodiesExplanation: 'When searching by service bodies, also include meetings from child service bodies.',
     responseURL: 'Response URL',
     rootServerURL: 'Root server URL',
     serverError: 'Server error',
@@ -85,6 +88,7 @@ const strings = new (LocalizedStrings as any)({
     hasVenueTypeExplanation: `If none of these is selected, they will have no bearing at all on the search.
       If any are selected, then the search will require that the selected terms match.
       This is an "OR" search. Matching any one of these will count. They don't all have to match. However, you need at least one match.`,
+    includeChildServiceBodies: 'Include child service bodies',
     intro: `This interactive application will help you build a semantic URL to retrieve data from a BMLT root server.
       It is available both as part of every BMLT root server and as a separate standalone app at https://semantic.bmlt.app.`,
     invalidLatitude: 'Invalid latitude',
@@ -142,6 +146,9 @@ const strings = new (LocalizedStrings as any)({
     operation: 'Operation',
     or: 'OR',
     other: '- Other -',
+    recursiveServiceBodies: 'Child service bodies',
+    recursiveServiceBodiesExplanation: `When searching by service bodies, also include meetings from child service bodies.
+      This option only has effect when you have selected specific service bodies to include or exclude.`,
     responseURL: 'Response URL',
     rootServerURL: 'Root server URL',
     searchForThisText: 'Search for this text',

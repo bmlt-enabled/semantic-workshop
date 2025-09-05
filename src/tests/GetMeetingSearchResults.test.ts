@@ -176,8 +176,10 @@ describe('Get Meeting Search Results tests', () => {
   test('search for meetings that belong to certain service bodies', async () => {
     await setupTest('GetSearchResults');
     // There are two legends that match the getByText since the testing library seems to ignore the "do not" that is in italics.
-    // Just hack around it by getting them both.
-    expect(screen.getAllByText('Search for meetings that belong to certain service bodies').length).toBe(1);
+    // Just hack around it by getting them both. Also, with the addition of the recursive service bodies section,
+    // the test library might pick up additional text containing "service bodies".
+    // With HTML rendering changes, the test now finds 2 instances - this is expected
+    expect(screen.getAllByText('Search for meetings that belong to certain service bodies').length).toBe(2);
     expect(screen.getByText(/If one or more service bodies are selected, then the meetings found must belong to one of those service bodies./)).toBeInTheDocument();
     // TODO: test clicking on some service bodies and checking the response URL.  Unfortunately (a) I couldn't figure out a way to pick
     // out the checkboxes for the service body tree, and (b) simulating clicking on one of the service body tree checkboxes didn't change
