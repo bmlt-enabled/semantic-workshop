@@ -39,6 +39,8 @@ const strings = new (LocalizedStrings as any)({
     none: '- Keine -',
     noParameters: '- no parameters for this operation -',
     operation: 'Operation',
+    publishedStatus: 'Veröffentlichungsstatus',
+    publishedStatusExplanation: 'Filtern Sie Meetings nach ihrem Veröffentlichungsstatus. Standardmäßig werden nur veröffentlichte Meetings angezeigt.',
     recursiveServiceBodies: 'Child service bodies',
     recursiveServiceBodiesExplanation: 'When searching by service bodies, also include meetings from child service bodies.',
     responseURL: 'Response URL',
@@ -49,7 +51,10 @@ const strings = new (LocalizedStrings as any)({
     serviceBodyOptions: 'Service body hierarchy options',
     serviceBodyOptionsExplanation:
       'These options control whether to include related service bodies in the hierarchy. They only have effect when you have selected specific service bodies to include or exclude.',
+    showAll: 'Alle Meetings anzeigen',
     showAllFormats: 'Show all formats',
+    showPublished: 'Nur veröffentlichte Meetings anzeigen',
+    showUnpublished: 'Nur unveröffentlichte Meetings anzeigen',
     title: 'BMLT Semantische Werkstatt',
     updateURL: 'Update root server URL',
     urlPlaceholder: 'enter root server URL'
@@ -163,6 +168,8 @@ const strings = new (LocalizedStrings as any)({
     operation: 'Operation',
     or: 'OR',
     other: '- Other -',
+    publishedStatus: 'Published Status',
+    publishedStatusExplanation: 'Filter meetings by their published status. By default, only published meetings are shown.',
     recursiveServiceBodies: 'Child service bodies',
     recursiveServiceBodiesExplanation: `When searching by service bodies, also include meetings from child service bodies.
       This option only has effect when you have selected specific service bodies to include or exclude.`,
@@ -178,7 +185,10 @@ const strings = new (LocalizedStrings as any)({
     serviceBodyOptions: 'Service body hierarchy options',
     serviceBodyOptionsExplanation: `These options control whether to include related service bodies in the hierarchy.
       They only have effect when you have selected specific service bodies to include or exclude.`,
+    showAll: 'Show all meetings',
     showAllFormats: 'Show all formats',
+    showPublished: 'Show only published meetings',
+    showUnpublished: 'Show only unpublished meetings',
     specificServiceBodies: 'Search for meetings that belong to certain service bodies',
     specificServiceBodiesExplanation: `If none of these is selected, this option will have no bearing on the search.
       If one or more service bodies are selected, then the meetings found must belong to one of those service bodies.`,

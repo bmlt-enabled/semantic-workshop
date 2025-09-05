@@ -47,6 +47,7 @@
   let longitude = $state('');
   let latLonSearchRadius = $state('');
   let latLonSearchUnits = $state('miles');
+  let publishedStatus = $state('published');
   let selectedFields = $state(Array(availableFields.length).fill(false));
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
   // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
@@ -203,6 +204,8 @@
     const widthPart = '&geo_width' + (latLonSearchUnits === 'kilometers' ? '_km=' : '=') + latLonSearchRadius;
     const latLonSearchPart = latitude && longitude && latLonSearchRadius ? widthPart + '&long_val=' + longitude + '&lat_val=' + latitude : '';
 
+    const publishedStatusPart = publishedStatus === 'unpublished' ? '&advanced_published=-1' : publishedStatus === 'all' ? '&advanced_published=0' : '';
+
     const specificFieldsPart = computeSpecificFieldsPart();
     const sortOrderPart = computeSortOrderPart();
 
@@ -226,6 +229,7 @@
         meetingStartEndTimePart +
         meetingDurationPart +
         latLonSearchPart +
+        publishedStatusPart +
         specificFieldsPart +
         sortOrderPart;
     }
@@ -344,6 +348,25 @@
               </Label>
             </div>
           {/each}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.publishedStatus}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.publishedStatusExplanation}</div>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center space-x-2">
+            <Radio id="show-all" bind:group={publishedStatus} value="all" onchange={computeParameters} />
+            <Label for="show-all" class="text-sm dark:text-white">{$translations.showAll}</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <Radio id="show-published" bind:group={publishedStatus} value="published" onchange={computeParameters} />
+            <Label for="show-published" class="text-sm dark:text-white">{$translations.showPublished}</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <Radio id="show-unpublished" bind:group={publishedStatus} value="unpublished" onchange={computeParameters} />
+            <Label for="show-unpublished" class="text-sm dark:text-white">{$translations.showUnpublished}</Label>
+          </div>
         </div>
       </fieldset>
 
