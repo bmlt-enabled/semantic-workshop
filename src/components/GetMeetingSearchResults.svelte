@@ -42,12 +42,15 @@
   let endsBefore = $state('');
   let minDuration = $state('');
   let maxDuration = $state('');
-  let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
   let latitude = $state('');
   let longitude = $state('');
   let latLonSearchRadius = $state('');
   let latLonSearchUnits = $state('miles');
   let publishedStatus = $state('published');
+  let meetingIds = $state('');
+  let excludeMeetingIds = $state('');
+  let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
+  let badMeetingIds = $derived(!validMeetingIds(meetingIds) || !validMeetingIds(excludeMeetingIds));
   let selectedFields = $state(Array(availableFields.length).fill(false));
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
   // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
@@ -69,6 +72,19 @@
     }
     const n = Number(s);
     return !isNaN(n) && (n > 0 || (n < 0 && Number.isInteger(n)));
+  }
+
+  // Return true if s represents valid meeting IDs (comma-separated positive integers)
+  // An empty string is OK -- this indicates no specific meeting IDs are being filtered
+  function validMeetingIds(s: string) {
+    if (s === '') {
+      return true;
+    }
+    const ids = s
+      .split(',')
+      .map((id) => id.trim())
+      .filter((id) => id !== '');
+    return ids.every((id) => /^\d+$/.test(id) && parseInt(id) > 0);
   }
 
   // This function is called when the user has selected a field for the "Search for meetings with a specific value of a field" option.
@@ -137,6 +153,33 @@
     }
     const usedKeys = keys.filter((k) => k !== '');
     return usedKeys.length === 0 ? '' : '&sort_keys=' + usedKeys.map(encodeURIComponent).join(',');
+  }
+
+  function computeMeetingIdsPart(): string {
+    let part = '';
+    if (meetingIds) {
+      const ids = meetingIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id !== '');
+      if (ids.length > 1) {
+        part += ids.map((id) => '&meeting_ids[]=' + id).join('');
+      } else if (ids.length === 1) {
+        part += '&meeting_ids=' + ids[0];
+      }
+    }
+    if (excludeMeetingIds) {
+      const excludeIds = excludeMeetingIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id !== '');
+      if (excludeIds.length > 1) {
+        part += excludeIds.map((id) => '&meeting_ids[]=-' + id).join('');
+      } else if (excludeIds.length === 1) {
+        part += '&meeting_ids=-' + excludeIds[0];
+      }
+    }
+    return part;
   }
 
   // This function is used to decide whether to enable or disable a menu option for the sort order menu for a given field.  Argument i
@@ -208,8 +251,9 @@
 
     const specificFieldsPart = computeSpecificFieldsPart();
     const sortOrderPart = computeSortOrderPart();
+    const meetingIdsPart = computeMeetingIdsPart();
 
-    if ((textSearchRadius && !validRadius(textSearchRadius)) || badTime || !validNumber(latitude) || !validNumber(longitude) || !validRadius(latLonSearchRadius)) {
+    if ((textSearchRadius && !validRadius(textSearchRadius)) || badTime || badMeetingIds || !validNumber(latitude) || !validNumber(longitude) || !validRadius(latLonSearchRadius)) {
       parameters = null;
     } else {
       parameters =
@@ -231,7 +275,8 @@
         latLonSearchPart +
         publishedStatusPart +
         specificFieldsPart +
-        sortOrderPart;
+        sortOrderPart +
+        meetingIdsPart;
     }
   }
 
@@ -366,6 +411,38 @@
           <div class="flex items-center space-x-2">
             <Radio id="show-unpublished" bind:group={publishedStatus} value="unpublished" onchange={computeParameters} />
             <Label for="show-unpublished" class="text-sm dark:text-white">{$translations.showUnpublished}</Label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingIds}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingIdsExplanation}</div>
+        <div class="space-y-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">Include Meeting IDs:</div>
+              <Input type="text" placeholder="123, 456, 789" bind:value={meetingIds} onInput={computeParameters} />
+            </Label>
+            {#if !validMeetingIds(meetingIds)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidMeetingId}</div>
+            {/if}
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
+        <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.meetingIdsExclude}</legend>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">{$translations.meetingIdsExcludeExplanation}</div>
+        <div class="space-y-4">
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">Exclude Meeting IDs:</div>
+              <Input type="text" placeholder="101, 202, 303" bind:value={excludeMeetingIds} onInput={computeParameters} />
+            </Label>
+            {#if !validMeetingIds(excludeMeetingIds)}
+              <div class="mt-1 text-sm text-red-500 dark:text-red-400">{$translations.invalidMeetingId}</div>
+            {/if}
           </div>
         </div>
       </fieldset>
