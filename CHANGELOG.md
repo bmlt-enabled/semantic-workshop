@@ -1,3 +1,6 @@
+## 0.1.0 (September 5, 2025)
+* Adds missing parameter options.
+
 ## 0.0.8 (July 20, 2025)
 * CSS fix, rounded top corners.
 
