@@ -20,7 +20,7 @@
   interface Server {
     id: string;
     name: string;
-    rootURL: string;
+    url: string;
   }
 
   let servers = $state<Server[]>([]);
@@ -145,16 +145,16 @@
 
     isLoadingServers = true;
     try {
-      const response = await fetch('https://raw.githubusercontent.com/bmlt-enabled/tomato/refs/heads/master/rootServerList.json');
+      const response = await fetch('https://raw.githubusercontent.com/bmlt-enabled/aggregator/main/serverList.json');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       servers = await response.json();
       servers.sort((a, b) => a.name.localeCompare(b.name));
       // Set initial server if defaultRootServerURL matches any server
-      selectedServer = servers.find((s) => s.rootURL === defaultRootServerURL);
+      selectedServer = servers.find((s) => s.url === defaultRootServerURL);
       if (selectedServer) {
-        rootServerURL = selectedServer.rootURL;
+        rootServerURL = selectedServer.url;
         operation = 'GetServerInfo';
         await getAllData();
       }
@@ -177,7 +177,7 @@
     } else {
       showCustomServerInput = false;
       const server = servers.find((s) => s.id === select.value);
-      updateRootServerURL(server ? server.rootURL : '');
+      updateRootServerURL(server ? server.url : '');
     }
   }
 

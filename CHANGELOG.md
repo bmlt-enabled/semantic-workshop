@@ -1,3 +1,6 @@
+## 0.1.1 (October 26, 2025)
+* Changed aggregator server json url.
+
 ## 0.1.0 (September 5, 2025)
 * Adds missing parameter options.
 
