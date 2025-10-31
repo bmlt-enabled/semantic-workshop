@@ -42,7 +42,7 @@
     "jsdom": "^27.0.0",
     "localized-strings": "^2.0.3",
     "tailwindcss": "^4.0.0",
-    "vitest": "^3.1.2",
+    "vitest": "^4.0.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }
