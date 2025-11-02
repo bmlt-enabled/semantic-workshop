@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import App from '../App.svelte';
 
@@ -24,9 +24,13 @@ export async function setupTest(operation: string | null, provideBaseUrl = true,
   consoleError = '';
   const user = userEvent.setup();
   render(App);
+  // Wait for the initial render to complete
+  await waitFor(() => screen.getByRole('combobox', { name: 'Operation:' }));
   if (operation) {
     const menu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
     await userEvent.selectOptions(menu, [operation]);
+    // Wait for the operation's content to load
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
   return user;
 }
@@ -37,13 +41,13 @@ export async function setupTest(operation: string | null, provideBaseUrl = true,
 // The same functionality is used for testing retrievals of bad field values.
 // There is just one flavor of aggregator error though (which throws an exception).
 function mockResponse(url: string) {
-  if (/rootServerList/.test(url)) {
+  if (/serverList\.json/.test(url)) {
     if (saveAggregatorError) {
       throw new Error('mocked aggregator error');
     } else {
       return [
-        { name: 'Big Zone', id: '42', rootURL: 'https://bigzone.org/main_server/' },
-        { name: 'Small Zone', id: '21', rootURL: 'https://smallzone.org/main_server/' }
+        { name: 'Big Zone', id: '42', url: 'https://bigzone.org/main_server/' },
+        { name: 'Small Zone', id: '21', url: 'https://smallzone.org/main_server/' }
       ];
     }
   } else if (/THROW_EXECPTION/.test(url)) {

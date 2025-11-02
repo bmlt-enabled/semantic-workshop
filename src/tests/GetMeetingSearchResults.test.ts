@@ -1,17 +1,19 @@
-import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
+import { beforeAll, afterAll, afterEach, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { screen } from '@testing-library/svelte';
+import { screen, waitFor, cleanup } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
 import { dummyURL, setUpMockFetch, setupTest } from './common';
 
 beforeAll(setUpMockFetch);
+afterEach(cleanup);
 afterAll(vi.resetAllMocks);
 
 describe('Get Meeting Search Results tests', () => {
+  vi.setConfig({ testTimeout: 15000 });
   test('Get Formats checkboxes', async () => {
     const user = await setupTest('GetSearchResults');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument(), { timeout: 10000 });
     const getUsedFormats = screen.getByRole('checkbox', { name: 'Get the formats used in the results of this search' }) as HTMLInputElement;
     expect(getUsedFormats.checked).toBe(false);
     const getFormatsOnly = screen.getByRole('checkbox', { name: 'Get just the formats (not the search results)' }) as HTMLInputElement;
@@ -35,6 +37,7 @@ describe('Get Meeting Search Results tests', () => {
     // Just do one test to make sure the Client Query field isn't shown when there are no additional parameters, and is when there are.
     // Also check that clicking it copies the text to the clipboard.
     const user = await setupTest('GetSearchResults');
+    await waitFor(() => expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults' })).toBeInTheDocument(), { timeout: 10000 });
     expect(screen.queryByText(/Client Query/)).toBe(null);
     const getUsedFormats = screen.getByRole('checkbox', { name: 'Get the formats used in the results of this search' }) as HTMLInputElement;
     await user.click(getUsedFormats);

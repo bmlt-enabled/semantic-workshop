@@ -27,7 +27,7 @@ describe('general app tests', () => {
     const user = await setupTest('GetServerInfo', false);
     const rootServerMenu = screen.getByRole('combobox', { name: 'Root server URL:' }) as HTMLSelectElement;
     const operationMenu = screen.getByRole('combobox', { name: 'Operation:' }) as HTMLSelectElement;
-    expect(rootServerMenu.length).toBe(4);
+    expect(rootServerMenu.length).toBe(4); // 3 servers + 'other'
     await userEvent.selectOptions(rootServerMenu, ['21']);
     // shouldn't have a text box to type in a custom root server URL at this point
     expect(screen.queryByRole('textbox')).toBe(null);

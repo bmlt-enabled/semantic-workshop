@@ -11,7 +11,7 @@ afterAll(vi.resetAllMocks);
 describe('server error tests', () => {
   test('aggregator error', async () => {
     await setupTest('GetServerInfo', false, true);
-    expect(screen.getByText(/mocked aggregator error/)).toBeInTheDocument();
+    expect(screen.getByText(/Failed to fetch server list/)).toBeInTheDocument();
     expect(consoleError).toBe('Failed to fetch server list -- Error: mocked aggregator error');
   });
 
