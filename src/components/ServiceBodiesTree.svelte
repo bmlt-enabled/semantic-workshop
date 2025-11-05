@@ -14,9 +14,10 @@
     serviceBodies: { name: string; id: string; parent_id: string }[];
     onchange: () => void;
     selectedValues?: string[];
+    idPrefix?: string;
   }
 
-  let { serviceBodies, onchange, selectedValues = $bindable([]) }: Props = $props();
+  let { serviceBodies, onchange, selectedValues = $bindable([]), idPrefix = '' }: Props = $props();
 
   const treeMap: Record<string, TreeNode> = {};
   let trees = $derived.by(() => convertServiceBodiesToTreeNodes(serviceBodies));
@@ -99,7 +100,7 @@
 </script>
 
 <div>
-  {#each trees as tree (tree)}
-    <Node {tree} toggle={rebuildTree} />
+  {#each trees as tree (tree.value)}
+    <Node {tree} toggle={rebuildTree} {idPrefix} />
   {/each}
 </div>

@@ -561,7 +561,7 @@
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{$translations.specificServiceBodies}</legend>
         <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{$translations.specificServiceBodiesExplanation}</div>
-        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={selectedServiceBodies} />
+        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={selectedServiceBodies} idPrefix="include-" />
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-gray-50 p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">
@@ -569,7 +569,7 @@
         <legend class="text-lg font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodies}</legend>
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{@html $translations.notSpecificServiceBodiesExplanation}</div>
-        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={rejectedServiceBodies} />
+        <ServiceBodiesTree {serviceBodies} onchange={computeParameters} bind:selectedValues={rejectedServiceBodies} idPrefix="exclude-" />
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-500 bg-white p-6 shadow-sm dark:border-gray-400 dark:bg-gray-800">

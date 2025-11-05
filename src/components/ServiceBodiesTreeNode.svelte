@@ -14,9 +14,10 @@
   interface Props {
     toggle: (e: CustomEvent<{ node: TreeNode }>, checkAsParent?: boolean) => void;
     tree: TreeNode;
+    idPrefix?: string;
   }
 
-  let { toggle, tree = $bindable() }: Props = $props();
+  let { toggle, tree = $bindable(), idPrefix = '' }: Props = $props();
 
   const toggleExpansion = () => {
     tree.expanded = !tree.expanded;
@@ -35,22 +36,22 @@
         {#if tree.children.length > 0}
           <button type="button" onclick={toggleExpansion} class="arrow" class:arrowDown={tree.expanded} aria-expanded={tree.expanded} aria-label="Toggle node"></button>
         {/if}
-        <Checkbox id={tree.value} data-label={tree.label} checked={tree.checked} indeterminate={tree.indeterminate} onclick={toggleCheck} />
-        <Label for={tree.value} class="ml-2">{tree.label}</Label>
+        <Checkbox id={idPrefix + tree.value} data-label={tree.label} checked={tree.checked} indeterminate={tree.indeterminate} onclick={toggleCheck} />
+        <Label class="ml-2 cursor-pointer" onclick={toggleCheck}>{tree.label}</Label>
       </div>
       {#if tree.expanded}
         <ul>
-          {#each tree.children as child (child)}
+          {#each tree.children as child (child.value)}
             <li>
-              <ServiceBodiesTreeNode tree={child} {toggle} />
+              <ServiceBodiesTreeNode tree={child} {toggle} {idPrefix} />
             </li>
           {/each}
         </ul>
       {/if}
     {:else}
       <div class="flex items-center space-x-2">
-        <Checkbox data-label={tree.label} checked={tree.checked} indeterminate={tree.indeterminate} onclick={toggleCheck} />
-        <Label for={tree.label} class="ml-2">{tree.label}</Label>
+        <Checkbox id={idPrefix + tree.value} data-label={tree.label} checked={tree.checked} indeterminate={tree.indeterminate} onclick={toggleCheck} />
+        <Label class="ml-2 cursor-pointer" onclick={toggleCheck}>{tree.label}</Label>
       </div>
     {/if}
   </li>
