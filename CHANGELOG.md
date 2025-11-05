@@ -1,3 +1,6 @@
+## 0.1.2 (November 5, 2025)
+* Fix page scroll issue when selecting service bodies.
+
 ## 0.1.1 (October 26, 2025)
 * Changed aggregator server json url.
 
