@@ -22,6 +22,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@tsconfig/svelte": "^5.0.4",
     "@types/eslint": "^9.6.1",
+    "@types/leaflet": "^1.9.21",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.5",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "flowbite-svelte": "^1.5.5",
+    "leaflet": "^1.9.4",
     "localized-strings": "^2.0.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }

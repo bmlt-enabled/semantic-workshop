@@ -12,6 +12,7 @@
   import GetNAWSDump from './components/GetNAWSDump.svelte';
   import GetServiceBodies from './components/GetServiceBodies.svelte';
   import GetOther from './components/GetOther.svelte';
+  import GetCoverageArea from './components/GetCoverageArea.svelte';
   import Settings from './components/Settings.svelte';
   import DownloadCSV from './components/DownloadCSV.svelte';
 
@@ -314,7 +315,9 @@
                 <GetNAWSDump {serviceBodies} bind:parameters />
               {:else if operation === 'GetServiceBodies'}
                 <GetServiceBodies {serviceBodies} bind:parameters />
-              {:else if ['GetFieldKeys', 'GetServerInfo', 'GetCoverageArea'].includes(operation)}
+              {:else if operation === 'GetCoverageArea'}
+                <GetCoverageArea {rootServerURL} bind:parameters />
+              {:else if ['GetFieldKeys', 'GetServerInfo'].includes(operation)}
                 <GetOther bind:parameters />
               {/if}
             </div>

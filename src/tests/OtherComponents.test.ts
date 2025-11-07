@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { screen } from '@testing-library/svelte';
+import { screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
 import { dummyURL, setUpMockFetch, setupTest } from './common';
@@ -111,8 +111,16 @@ describe('component tests (except get meetings)', () => {
   test('Get Geographic Coverage Area', async () => {
     await setupTest('GetCoverageArea');
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetCoverageArea' })).toBeInTheDocument();
-    expect(screen.getByText('- no parameters for this operation -')).toBeInTheDocument();
-    // The old semantic workshop implementation also displayed a map with the rectangle representing the coverage area.  This is
-    // ommitted for now for the new implementation -- not clear it was ever really used.
+    // Should show coverage area description
+    expect(screen.getByText(/Coverage area for this BMLT server/i)).toBeInTheDocument();
+    // Wait for the map component to be present (it loads after data fetch)
+    await waitFor(
+      () => {
+        // The map container div should be rendered after data loads
+        const mapContainers = document.querySelectorAll('.h-96.overflow-hidden.rounded-lg');
+        expect(mapContainers.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 }
+    );
   });
 });

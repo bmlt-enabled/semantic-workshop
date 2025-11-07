@@ -1,3 +1,6 @@
+## 0.1.3 (November 7, 2025)
+* Added map to Get Geographic Coverage Area.
+
 ## 0.1.2 (November 5, 2025)
 * Fix page scroll issue when selecting service bodies.
 

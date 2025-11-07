@@ -87,6 +87,15 @@ function mockResponse(url: string) {
       { key_string: 'Ag', id: '8' },
       { key_string: 'LGBT', id: '3' }
     ];
+  } else if (/GetCoverageArea/.test(url)) {
+    return [
+      {
+        nw_corner_latitude: 49.0,
+        nw_corner_longitude: -125.0,
+        se_corner_latitude: 32.0,
+        se_corner_longitude: -114.0
+      }
+    ];
   } else {
     throw new Error('Internal error: no mocked response for this request' + url);
   }
