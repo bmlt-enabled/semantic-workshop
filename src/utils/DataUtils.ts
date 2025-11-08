@@ -20,6 +20,8 @@ export function processExportData(data: any[]): any[] {
       let value: string | number = row[key];
       if (typeof value === 'string' && value.includes('#@-@#')) {
         [, value] = value.split('#@-@#');
+      } else if (typeof value === 'object' && value !== null) {
+        value = JSON.stringify(value);
       }
       acc[key] = value;
       return acc;
