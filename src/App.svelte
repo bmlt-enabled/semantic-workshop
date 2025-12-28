@@ -1,6 +1,7 @@
 <script lang="ts">
   import './app.css';
   import { Button, Heading, Helper, Label, P, Select } from 'flowbite-svelte';
+  import { SvelteMap } from 'svelte/reactivity';
   import { onMount } from 'svelte';
 
   import DarkMode from './components/DarkMode.svelte';
@@ -36,8 +37,8 @@
 
   const defaultRootServerURL = apiBaseUrl || 'https://bmlt.wszf.org/main_server/';
   const allLanguages = [
+    { value: 'da', name: 'Dansk' },
     { value: 'de', name: 'Deutsch' },
-    { value: 'dk', name: 'Dansk' },
     { value: 'en', name: 'English' },
     { value: 'es', name: 'Español' },
     { value: 'fa', name: 'فارسی' },
@@ -119,7 +120,15 @@
         serverLangs = serverInfo ? serverInfo[0].langs.split(',') : [];
         serviceBodies = await getData('GetServiceBodies');
         serviceBodies.sort((a, b) => a.name.localeCompare(b.name));
-        availableFields = await getData('GetFieldKeys');
+        const fields = await getData('GetFieldKeys');
+        // Deduplicate by key in case server returns duplicates
+        const fieldMap = new SvelteMap<string, { key: string; description: string }>();
+        for (const field of fields) {
+          if (!fieldMap.has(field.key)) {
+            fieldMap.set(field.key, field);
+          }
+        }
+        availableFields = Array.from(fieldMap.values());
         availableFields.sort((a, b) => a.description.localeCompare(b.description));
         formats = await getData('GetFormats');
         formats.sort((a, b) => a.key_string.localeCompare(b.key_string));

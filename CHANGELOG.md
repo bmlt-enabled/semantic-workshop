@@ -1,6 +1,9 @@
+## 0.1.5 (December 28, 2025)
+* Use correct Danish language code (da) instead of country code (dk).
+
 ## 0.1.4 (November 8, 2025)
 * Fix for Get Changes CSV output missing data.
-
+ 
 ## 0.1.3 (November 7, 2025)
 * Added map to Get Geographic Coverage Area.
 

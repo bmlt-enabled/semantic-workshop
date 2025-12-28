@@ -17,6 +17,9 @@
   let excludeFormatIds: boolean[] = $state([]);
   let includeKeyStrings: boolean[] = $state([]);
 
+  let filteredLangs = $derived(allLanguages.filter((x: { value: string; name: string }) => serverLangs.includes(x.value)));
+  let formatLanguageOptions = $derived([{ value: 'servLang', name: 'Server language' }].concat(filteredLangs));
+
   // Initialize arrays when formats change
   $effect(() => {
     const formatCount = formats ? formats.length : 0;
@@ -80,9 +83,6 @@
 
     parameters = languagePart + showAllPart + formatIdsPart + keyStringsPart;
   }
-
-  const filteredLangs = allLanguages.filter((x: { value: string; name: string }) => serverLangs.includes(x.value));
-  const formatLanguageOptions = [{ value: 'servLang', name: 'Server language' }].concat(filteredLangs);
   onMount(() => (parameters = ''));
 </script>
 
