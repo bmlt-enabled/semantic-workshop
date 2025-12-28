@@ -14,6 +14,7 @@
   let changesMeetingId: string = $state('');
   let badChangesMeetingId: boolean = $state(false);
   let changesServiceBodyId: string = $state('all');
+  let serviceBodyOptions = $derived([{ value: 'all', name: $translations.allServiceBodies }, ...serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id }))]);
 
   function computeParameters() {
     badChangesMeetingId = /[^\d]/.test(changesMeetingId);
@@ -37,9 +38,6 @@
       return '';
     }
   }
-
-  const bodies: { name: string; value: string }[] = serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id }));
-  const serviceBodyOptions = [{ value: 'all', name: $translations.allServiceBodies }].concat(bodies);
   onMount(() => (parameters = ''));
 </script>
 

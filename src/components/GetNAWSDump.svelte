@@ -10,7 +10,7 @@
 
   let { serviceBodies, parameters = $bindable() }: Props = $props();
   let nawsDumpServiceBodyId: string | undefined = $state();
-  const serviceBodyOptions: { name: string; value: string }[] = serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id }));
+  let serviceBodyOptions = $derived(serviceBodies.map((b: { name: string; id: string }) => ({ name: b.name, value: b.id })));
 
   // If nawsDumpServiceBodyId is null, no service body has been selected and so we should not have a response URL yet.
   // Set parameters to null in computeParameters and onMount to indicate this.

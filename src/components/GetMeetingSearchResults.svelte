@@ -19,9 +19,9 @@
   let notOnWeekdays: boolean[] = $state(new Array(7).fill(false));
   let hasVenueType: boolean[] = $state(new Array(3).fill(false));
   let doesNotHaveVenueType: boolean[] = $state(new Array(3).fill(false));
-  let hasFormat: boolean[] = $state(new Array(formats.length).fill(false));
+  let hasFormat: boolean[] = $state<boolean[]>([]);
   let formatsComparisonOperator: string = $state('AND');
-  let doesNotHaveFormat: boolean[] = $state(new Array(formats.length).fill(false));
+  let doesNotHaveFormat: boolean[] = $state<boolean[]>([]);
   let keyForMeetingKeyValue: string = $state('');
   let meetingKeyValues: { name: string; value: string }[] = $state([]);
   let meetingFieldValue = $state('');
@@ -37,6 +37,24 @@
   let searchType = $state('general');
   let textSearchRadius = $state('');
   let fieldOptions: { name: string; value: string }[] = $derived(availableFields.map((f: { key: string; description: string }) => ({ name: f.description, value: f.key })));
+
+  // Initialize/resize arrays when props change
+  // Using $effect (not $derived) because these arrays need to be mutable for user interaction
+  $effect(() => {
+    if (hasFormat.length !== formats.length) {
+      hasFormat = new Array(formats.length).fill(false);
+    }
+    if (doesNotHaveFormat.length !== formats.length) {
+      doesNotHaveFormat = new Array(formats.length).fill(false);
+    }
+    if (selectedFields.length !== availableFields.length) {
+      selectedFields = new Array(availableFields.length).fill(false);
+    }
+    if (sortOrder.length !== availableFields.length) {
+      sortOrder = new Array(availableFields.length).fill('0');
+    }
+  });
+
   let startsAfter = $state('');
   let startsBefore = $state('');
   let endsBefore = $state('');
@@ -54,11 +72,11 @@
   let badTime = $derived(!validTime(startsAfter) || !validTime(startsBefore) || !validTime(endsBefore) || !validTime(minDuration) || !validTime(maxDuration));
   let badMeetingIds = $derived(!validMeetingIds(meetingIds) || !validMeetingIds(excludeMeetingIds));
   let badPagination = $derived(!validPositiveInteger(pageSize) || !validPositiveInteger(pageNumber));
-  let selectedFields = $state(Array(availableFields.length).fill(false));
+  let selectedFields: boolean[] = $state<boolean[]>([]);
   // sortOrder[i] gives the sort order for availableFields[i], where a value of '1' means it's the first field to be used in the sort,
   // '2' means it's the second, etc.  '0' means that field isn't in the sort order.  Annoyingly, the flowbite-svelte version of Select
   // seems to want the values to be strings only, so the code is constantly converting between strings and ints for this array.
-  let sortOrder: string[] = $state(new Array(availableFields.length).fill('0'));
+  let sortOrder: string[] = $state<string[]>([]);
 
   // return true if s represents a valid number (either integer or float is ok).  An empty string is also OK -- this indicates an entry
   // hasn't been made yet, but we don't want to fire off an error message in this case.
@@ -367,7 +385,15 @@
           {#each $translations.weekdays as day, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={onWeekdays[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={onWeekdays[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    onWeekdays[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {day}
               </Label>
             </div>
@@ -383,7 +409,15 @@
           {#each $translations.weekdays as day, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={notOnWeekdays[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={notOnWeekdays[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    notOnWeekdays[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {day}
               </Label>
             </div>
@@ -398,7 +432,15 @@
           {#each $translations.venueTypes as vt, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={hasVenueType[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={hasVenueType[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    hasVenueType[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {vt}
               </Label>
             </div>
@@ -414,7 +456,15 @@
           {#each $translations.venueTypes as vt, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={doesNotHaveVenueType[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={doesNotHaveVenueType[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    doesNotHaveVenueType[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {vt}
               </Label>
             </div>
@@ -480,7 +530,15 @@
           {#each formats as f, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={hasFormat[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={hasFormat[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    hasFormat[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {f.key_string}
               </Label>
             </div>
@@ -507,7 +565,15 @@
           {#each formats as f, i}
             <div class="flex items-center space-x-2">
               <Label class="mt-4 flex text-sm dark:text-white">
-                <Checkbox bind:checked={doesNotHaveFormat[i]} onchange={computeParameters} class="me-1" />
+                <Checkbox
+                  checked={doesNotHaveFormat[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    doesNotHaveFormat[i] = target.checked;
+                    computeParameters();
+                  }}
+                  class="me-1"
+                />
                 {f.key_string}
               </Label>
             </div>
@@ -754,7 +820,15 @@
           {#each fieldOptions as f, i}
             <div class="flex items-center space-x-2">
               <Label class="flex text-sm dark:text-white">
-                <Checkbox class="me-2" bind:checked={selectedFields[i]} onchange={computeParameters} />
+                <Checkbox
+                  class="me-2"
+                  checked={selectedFields[i] || false}
+                  onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    selectedFields[i] = target.checked;
+                    computeParameters();
+                  }}
+                />
                 {f.name}
               </Label>
             </div>
