@@ -1,3 +1,7 @@
+## 0.1.6 (January 11, 2026)
+* Add support for multiple values when filtering by `meeting_key` using array syntax `meeting_key_value[]`, enabling 
+searches across multiple cities or counties.
+
 ## 0.1.5 (December 28, 2025)
 * Use correct Danish language code (da) instead of country code (dk).
 
