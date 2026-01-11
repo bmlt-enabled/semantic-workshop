@@ -153,26 +153,40 @@ describe('Get Meeting Search Results tests', () => {
     expect(field.item(2)?.label).toBe('Service Body ID');
     expect(field.item(3)?.label).toBe('State');
     await userEvent.selectOptions(field, ['location_province']);
-    const existingValue = screen.getByRole('combobox', { name: 'Select an existing value:' }) as HTMLSelectElement;
     const newValueTextBox = screen.getByRole('textbox', { name: 'Enter a new value:' }) as HTMLInputElement;
-    expect(existingValue.item(0)?.label).toBe('Choose option ...');
-    expect(existingValue.item(1)?.label).toBe('WA');
-    expect(existingValue.item(2)?.label).toBe('OR');
-    await userEvent.selectOptions(existingValue, ['OR']);
-    expect(newValueTextBox.value).toBe('OR');
+
+    // Check that checkboxes for existing values are displayed
+    const waCheckbox = screen.getByRole('checkbox', { name: 'WA' }) as HTMLInputElement;
+    const orCheckbox = screen.getByRole('checkbox', { name: 'OR' }) as HTMLInputElement;
+
+    // Select single value via checkbox
+    await user.click(orCheckbox);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value=OR' })).toBeInTheDocument();
-    await user.clear(newValueTextBox);
-    await user.type(newValueTextBox, 'WA');
-    expect(existingValue.value).toBe('WA');
+
+    // Select multiple values via checkboxes
+    await user.click(waCheckbox);
+    expect(
+      screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value[]=OR&meeting_key_value[]=WA' })
+    ).toBeInTheDocument();
+
+    // Unselect one value
+    await user.click(orCheckbox);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value=WA' })).toBeInTheDocument();
-    await user.type(newValueTextBox, 'ZZU');
-    expect(existingValue.value).toBe('');
-    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value=WAZZU' })).toBeInTheDocument();
+
+    // Type custom value to add to selections
+    await user.type(newValueTextBox, 'CA');
+    expect(
+      screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value[]=WA&meeting_key_value[]=CA' })
+    ).toBeInTheDocument();
+
+    // Clear typed value but keep checkbox selection
+    await user.clear(newValueTextBox);
+    expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=location_province&meeting_key_value=WA' })).toBeInTheDocument();
+
+    // Test with different field having special characters
     await userEvent.selectOptions(field, ['weird&key']);
-    expect(existingValue.item(0)?.label).toBe('Choose option ...');
-    expect(existingValue.item(1)?.label).toBe('a[3]');
-    expect(existingValue.item(2)?.label).toBe('b[4]');
-    await userEvent.selectOptions(existingValue, ['b[4]']);
+    const bCheckbox = screen.getByRole('checkbox', { name: 'b[4]' }) as HTMLInputElement;
+    await user.click(bCheckbox);
     expect(screen.getByRole('link', { name: dummyURL + 'client_interface/json/?switcher=GetSearchResults&meeting_key=weird%26key&meeting_key_value=b%5B4%5D' })).toBeInTheDocument();
   });
 

@@ -25,6 +25,7 @@
   let keyForMeetingKeyValue: string = $state('');
   let meetingKeyValues: { name: string; value: string }[] = $state([]);
   let meetingFieldValue = $state('');
+  let selectedMeetingFieldValues: boolean[] = $state([]);
   let serverError: string = $state('');
   let selectedServiceBodies: string[] = $state([]);
   let rejectedServiceBodies: string[] = $state([]);
@@ -51,7 +52,10 @@
       selectedFields = new Array(availableFields.length).fill(false);
     }
     if (sortOrder.length !== availableFields.length) {
-      sortOrder = new Array(availableFields.length).fill('0');
+      sortOrder = new Array(availableFields.length).fill(false);
+    }
+    if (selectedMeetingFieldValues.length !== meetingKeyValues.length) {
+      selectedMeetingFieldValues = new Array(meetingKeyValues.length).fill(false);
     }
   });
 
@@ -129,10 +133,14 @@
         throw new Error('server response said not OK');
       } else {
         const j = await response.json();
-        meetingKeyValues = j.map((f: Record<string, string>) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }));
+        meetingKeyValues = j
+          .map((f: Record<string, string>) => ({ name: f[keyForMeetingKeyValue], value: f[keyForMeetingKeyValue] }))
+          .sort((a: { name: string; value: string }, b: { name: string; value: string }) => a.name.localeCompare(b.name));
+        selectedMeetingFieldValues = new Array(meetingKeyValues.length).fill(false);
       }
     } catch (error) {
       meetingKeyValues = [];
+      selectedMeetingFieldValues = [];
       serverError = $translations.serverError + ' -- ' + error;
     }
     meetingFieldValue = '';
@@ -270,8 +278,21 @@
     const doesNotHaveFormatOp = doesNotHaveFormat.filter((d) => d).length > 1 ? '[]=-' : '=-';
     const doesNotHaveFormatPart = doesNotHaveFormat.map((x, i) => (x ? '&formats' + doesNotHaveFormatOp + formats[i].id : '')).join('');
     const formatsComparisonOperatorPart = hasFormatCount > 0 && formatsComparisonOperator === 'OR' ? '&formats_comparison_operator=OR' : '';
+    const selectedValues = selectedMeetingFieldValues.map((selected, i) => (selected ? meetingKeyValues[i].value : null)).filter((v) => v !== null);
 
-    const specificFieldValuePart = meetingFieldValue ? '&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue) + '&meeting_key_value=' + encodeURIComponent(meetingFieldValue) : '';
+    if (meetingFieldValue && !selectedValues.includes(meetingFieldValue)) {
+      selectedValues.push(meetingFieldValue);
+    }
+
+    let specificFieldValuePart = '';
+    if (selectedValues.length > 0) {
+      specificFieldValuePart = '&meeting_key=' + encodeURIComponent(keyForMeetingKeyValue);
+      if (selectedValues.length === 1) {
+        specificFieldValuePart += '&meeting_key_value=' + encodeURIComponent(selectedValues[0]);
+      } else {
+        specificFieldValuePart += selectedValues.map((v) => '&meeting_key_value[]=' + encodeURIComponent(v)).join('');
+      }
+    }
 
     const selectedServiceBodiesKey = selectedServiceBodies.length > 1 ? '&services[]=' : '&services=';
     const selectedServiceBodiesPart = selectedServiceBodies.map((s) => selectedServiceBodiesKey + s).join('');
@@ -596,30 +617,42 @@
               <Helper class="text-red-500 dark:text-red-400">{serverError}</Helper>
             {/if}
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          {#if meetingKeyValues.length > 0}
             <div>
               <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
                 <div class="mb-2">
-                  {$translations.selectExistingValue}:
+                  {$translations.selectExistingValue} (select multiple):
                 </div>
-                <Select
-                  class="w-full"
-                  items={meetingKeyValues}
-                  placeholder={$translations.chooseOption}
-                  disabled={keyForMeetingKeyValue === '' || serverError !== ''}
-                  bind:value={meetingFieldValue}
-                  onchange={computeParameters}
-                />
               </Label>
-            </div>
-            <div>
-              <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
-                <div class="mb-2">
-                  {$translations.enterNewValue}:
+              <div class="mt-2 max-h-48 overflow-y-auto rounded border border-gray-300 p-2 dark:border-gray-600">
+                <div class="grid grid-cols-1 gap-1 sm:grid-cols-2">
+                  {#each meetingKeyValues as mkv, i}
+                    <div class="flex items-center space-x-2">
+                      <Label class="flex text-sm dark:text-white">
+                        <Checkbox
+                          class="me-1"
+                          checked={selectedMeetingFieldValues[i] || false}
+                          onchange={(e) => {
+                            const target = e.target as HTMLInputElement;
+                            selectedMeetingFieldValues[i] = target.checked;
+                            computeParameters();
+                          }}
+                        />
+                        {mkv.name}
+                      </Label>
+                    </div>
+                  {/each}
                 </div>
-                <Input type="text" disabled={keyForMeetingKeyValue === '' || serverError !== ''} placeholder="" bind:value={meetingFieldValue} onInput={computeParameters} />
-              </Label>
+              </div>
             </div>
+          {/if}
+          <div>
+            <Label class="mb-2 block text-sm text-gray-700 dark:text-gray-300">
+              <div class="mb-2">
+                {$translations.enterNewValue}:
+              </div>
+              <Input type="text" disabled={keyForMeetingKeyValue === '' || serverError !== ''} placeholder="" bind:value={meetingFieldValue} onInput={computeParameters} />
+            </Label>
           </div>
         </div>
       </fieldset>
