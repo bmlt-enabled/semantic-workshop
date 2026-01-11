@@ -1,4 +1,4 @@
-## 0.1.6 (UNRELEASED)
+## 0.1.6 (January 11, 2026)
 * Add support for multiple values when filtering by `meeting_key` using array syntax `meeting_key_value[]`, enabling 
 searches across multiple cities or counties.
 
